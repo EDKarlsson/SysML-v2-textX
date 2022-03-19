@@ -1,0 +1,77 @@
+
+/* Features */
+
+fragment FeaturePrefix returns SysML::Feature :
+	( direction = FeatureDirection )?
+	( isAbstract ?= 'abstract' )?
+	( isComposite ?= 'composite' | isPortion ?= 'portion' )?
+	( isReadOnly ?= 'readonly' )?
+	( isDerived ?= 'derived' )?
+	( isEnd ?= 'end' )?
+;
+
+enum FeatureDirection returns SysML::FeatureDirectionKind:
+	in = 'in' | out = 'out' | inout = 'inout'
+;
+
+Feature returns SysML::Feature :
+	FeaturePrefix
+	( 'feature'? FeatureDeclaration | 'feature' )
+	ValuePart? TypeBody
+;
+
+fragment FeatureDeclaration returns SysML::Feature :
+	( isSufficient ?= 'all' )?
+	( Identification ( FeatureSpecializationPart | FeatureConjugationPart )?
+	| FeatureSpecializationPart
+	| FeatureConjugationPart
+	)
+	DisjoiningPart?
+	TypeFeaturingPart?
+;
+
+fragment TypeFeaturingPart returns SysML::Feature :
+	'featured' 'by' ownedRelationship += OwnedTypeFeaturing
+	( ',' ownedRelationship += OwnedTypeFeaturing )*
+;
+
+fragment FeatureSpecializationPart returns SysML::Feature :
+	  ( -> FeatureSpecialization )+ MultiplicityPart? FeatureSpecialization*
+	| MultiplicityPart FeatureSpecialization*
+;
+
+fragment MultiplicityPart returns SysML::Feature :
+	  ownedRelationship += OwnedMultiplicity
+	| ( ownedRelationship += OwnedMultiplicity )?
+	  ( isOrdered ?= 'ordered' isNonunique ?= 'nonunique'?
+	  | isNonunique ?= 'nonunique' isOrdered ?= 'ordered'?
+	  )
+;
+
+fragment FeatureSpecialization returns SysML::Feature :
+	Typings | Subsettings | Redefinitions
+;
+
+fragment Typings returns SysML::Feature :
+	TypedBy ( ',' ownedRelationship += OwnedFeatureTyping )*
+;
+
+fragment TypedBy returns SysML::Feature :
+	( ':' | 'typed' 'by' ) ownedRelationship += OwnedFeatureTyping
+;
+
+fragment Subsettings returns SysML::Feature :
+	Subsets ( ',' ownedRelationship += OwnedSubsetting )*
+;
+
+fragment Subsets returns SysML::Feature :
+	( ':>' | 'subsets' ) ownedRelationship += OwnedSubsetting
+;
+
+fragment Redefinitions returns SysML::Feature :
+	Redefines ( ',' ownedRelationship += OwnedRedefinition )*
+;
+
+fragment Redefines returns SysML::Feature :
+	( ':>>' | 'redefines' ) ownedRelationship += OwnedRedefinition
+;

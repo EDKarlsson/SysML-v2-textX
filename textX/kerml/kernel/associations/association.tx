@@ -1,0 +1,12 @@
+
+/* ASSOCIATIONS */
+
+Association returns SysML::Association :
+	( isAbstract ?= 'abstract' )? 'assoc'
+	ClassifierDeclaration TypeBody
+;
+
+AssociationStructure returns SysML::AssociationStructure :
+	( isAbstract ?= 'abstract' )? 'assoc' 'struct'
+	ClassifierDeclaration TypeBody
+;

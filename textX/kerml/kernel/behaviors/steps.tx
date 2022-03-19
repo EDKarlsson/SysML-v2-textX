@@ -1,0 +1,24 @@
+
+/* Steps */
+
+Step returns SysML::Step :
+	FeaturePrefix 'step'
+	StepDeclaration TypeBody
+;
+
+fragment StepDeclaration returns SysML::Step :
+	FeatureDeclaration? ( ValuePart | StepParameterList )?
+;
+
+fragment StepParameterList returns SysML::Step :
+	'(' ( ownedRelationship += StepParameterMember
+	    ( ',' ownedRelationship += StepParameterMember )* )? ')'
+;
+
+StepParameterMember returns SysML::ParameterMembership :
+	ownedRelatedElement += StepParameter // ownedMemberParameter = StepParameter
+;
+
+StepParameter returns SysML::Feature :
+	Parameter ValuePart?
+;

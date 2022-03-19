@@ -1,0 +1,11 @@
+/* Type Featuring */
+
+TypeFeaturing returns SysML::TypeFeaturing :
+	'featuring' ( Identification? 'of')?
+	featureOfType = [SysML::Feature | QualifiedName]
+	'by' featuringType = [SysML::Feature | QualifiedName] ';'
+;
+
+OwnedTypeFeaturing returns SysML::TypeFeaturing :
+	featuringType = [SysML::Type | QualifiedName]
+;

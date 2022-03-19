@@ -1,0 +1,6 @@
+/* STRUCTURES */
+
+Structure returns SysML::Structure :
+	( isAbstract ?= 'abstract' )? 'struct'
+	ClassifierDeclaration TypeBody
+;

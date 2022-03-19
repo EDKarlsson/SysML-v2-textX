@@ -1,0 +1,16 @@
+/* Subsetting */
+
+Subsetting returns SysML::Subsetting :
+	( 'specialization' Identification? )?
+    'subset'
+    ( subsettingFeature = [SysML::Feature | QualifiedName]
+	| ownedRelatedElement += FeatureChain )
+    ( ':>' | 'subsets' )
+    ( subsettedFeature = [SysML::Feature | QualifiedName]
+	| ownedRelatedElement += FeatureChain ) ';'
+;
+
+OwnedSubsetting returns SysML::Subsetting:
+	  subsettedFeature = [SysML::Feature | QualifiedName]
+	| ownedRelatedElement += FeatureChain
+;

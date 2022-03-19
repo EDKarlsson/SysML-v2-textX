@@ -1,0 +1,34 @@
+
+/* Connectors */
+
+Connector returns SysML::Connector :
+	FeaturePrefix 'connector'
+	ConnectorDeclaration TypeBody
+;
+
+fragment ConnectorDeclaration returns SysML::Connector :
+	BinaryConnectorDeclaration | NaryConnectorDeclaration
+;
+
+fragment BinaryConnectorDeclaration returns SysML::Connector :
+	( FeatureDeclaration? 'from' | isSufficient ?= 'all' 'from'? )?
+	ownedRelationship += ConnectorEndMember 'to'
+	ownedRelationship += ConnectorEndMember
+;
+
+fragment NaryConnectorDeclaration returns SysML::Connector :
+	FeatureDeclaration?
+	( '(' ownedRelationship += ConnectorEndMember ','
+	      ownedRelationship += ConnectorEndMember
+	      ( ',' ownedRelationship += ConnectorEndMember )*
+	  ')' )?
+;
+
+ConnectorEndMember returns SysML::EndFeatureMembership :
+	( memberName = Name ':>' )? ownedRelatedElement += ConnectorEnd // ownedMemberFeature = ConnectorEnd
+;
+
+ConnectorEnd returns SysML::Feature :
+	ownedRelationship += OwnedSubsetting
+	( ownedRelationship += OwnedMultiplicity )?
+;

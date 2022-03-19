@@ -1,0 +1,44 @@
+/* Namespace Elements */
+
+NonFeatureElement returns SysML::Element :
+	  Element
+	| Relationship
+	| Comment
+	| TextualRepresentation
+	| AnnotatingFeature
+	| Namespace
+	| Package
+	| Multiplicity
+	| Type
+	| Classifier
+	| Class
+	| Structure
+	| DataType
+	| Association
+	| AssociationStructure
+	| Interaction
+	| Behavior
+	| Function
+	| Predicate
+	| Specialization
+	| Conjugation
+	| FeatureTyping
+	| Subclassification
+	| Disjoining
+	| Subsetting
+	| Redefinition
+	| TypeFeaturing
+;
+
+FeatureElement returns SysML::Feature :
+	  Feature
+	| Step
+	| Expression
+	| BooleanExpression
+	| Invariant
+	| Connector
+	| BindingConnector
+	| Succession
+	| ItemFlow
+	| SuccessionItemFlow
+;

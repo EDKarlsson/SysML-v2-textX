@@ -1,0 +1,37 @@
+/* Types */
+
+Type returns SysML::Type :
+    ( isAbstract ?= 'abstract' )? 'type'
+    TypeDeclaration TypeBody
+;
+
+fragment TypeDeclaration returns SysML::Type :
+    ( isSufficient ?= 'all' )? Identification?
+    ( ownedRelationship += OwnedMultiplicity )?
+    ( SpecializationPart | ConjugationPart )+
+    DisjoiningPart?
+;
+
+fragment SpecializationPart returns SysML::Type :
+      ( ':>' | 'specializes' ) ownedRelationship += OwnedSpecialization
+      ( ',' ownedRelationship += OwnedSpecialization )*
+;
+
+fragment ConjugationPart returns SysML::Type :
+	( '~' | 'conjugates' ) ownedRelationship += OwnedConjugation
+;
+
+fragment DisjoiningPart returns SysML::Type :
+	'disjoint' 'from' ownedRelationship += OwnedDisjoining
+	( ',' ownedRelationship += OwnedDisjoining )*
+;
+
+fragment TypeBody returns SysML::Type :
+	';' |
+	'{' ( ownedRelationship += OwnedDocumentation
+		| ownedRelationship += NonFeatureMember
+		| ownedRelationship += FeatureMember
+		| ownedRelationship += AliasMember
+		| ownedRelationship += Import
+	)* '}'
+;

@@ -1,0 +1,19 @@
+/* Textual Representation */
+
+OwnedTextualRepresentationAnnotation returns SysML::Annotation :
+	ownedRelatedElement += OwnedTextualRepresentation
+;
+
+OwnedTextualRepresentation returns SysML::TextualRepresentation :
+	( 'rep' ( humanId = Name )? )?
+	'language' language = STRING_VALUE body = REGULAR_COMMENT
+	ownedRelationship += EmptyAnnotation
+;
+
+TextualRepresentation returns SysML::TextualRepresentation :
+    ( 'rep' Identification? 'about' ownedRelationship += Annotation
+    | ( 'rep' Identification? )? ownedRelationship += EmptyAnnotation
+    )
+    'language' language = STRING_VALUE
+    body = REGULAR_COMMENT
+;

@@ -1,0 +1,94 @@
+
+/* Base Expressions */
+
+BaseExpression returns SysML::Expression :
+	  NullExpression
+	| LiteralExpression
+	| FeatureReferenceExpression
+	| InvocationExpression
+	| ExpressionBody
+	| '(' SequenceExpression ')'
+;
+// Expression Bodies
+
+// This default production is overridden in the KerML and SysML grammars.
+ExpressionBody returns SysML::Expression :
+	'{' ( ownedRelationship += BodyParameterMember ';' )*
+	    ownedRelationship += ResultExpressionMember '}'
+;
+
+ResultExpressionMember returns SysML::ResultExpressionMembership :
+	ownedRelatedElement += OwnedExpression // ownedResultExpression = OwnedExpression
+;
+
+BodyParameterMember returns SysML::ParameterMembership :
+	'in' memberName = Name ownedRelatedElement += BodyParameter // ownedMemberParameter = BodyParameter
+;
+
+BodyParameter returns SysML::Feature :
+	{SysML::Feature}
+;
+
+// Sequence Expressions
+
+SequenceExpression returns SysML::Expression :
+	OwnedExpression
+	( ','
+	| {SysML::OperatorExpression.operand += current} operator = ','
+	  operand += SequenceExpression
+	)?
+;
+
+// Feature Reference Expressions
+
+FeatureReferenceExpression returns SysML::FeatureReferenceExpression :
+	ownedRelationship += FeatureReferenceMember
+;
+
+FeatureReferenceMember returns SysML::Membership :
+	memberElement = [SysML::Feature | QualifiedName]
+;
+
+// Invocation Expressions
+
+InvocationExpression returns SysML::InvocationExpression :
+	ownedRelationship += OwnedFeatureTyping ArgumentList
+;
+
+OwnedFeatureTyping returns SysML::FeatureTyping :
+	  type = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain
+;
+
+FeatureChain returns SysML::Feature :
+	ownedRelationship += OwnedFeatureChaining
+	( '.' ownedRelationship += OwnedFeatureChaining )+
+;
+
+OwnedFeatureChaining returns SysML::FeatureChaining :
+	chainingFeature = [SysML::Feature | QualifiedName]
+;
+
+fragment ArgumentList returns SysML::Expression :
+	'(' ( PositionalArgumentList | NamedArgumentList )? ')'
+;
+
+fragment PositionalArgumentList returns SysML::Expression :
+	ownedRelationship += OwnedExpressionMember
+	( ',' ownedRelationship += OwnedExpressionMember )*
+;
+
+fragment NamedArgumentList returns SysML::Expression :
+	ownedRelationship += NamedExpressionMember
+	( ',' ownedRelationship += NamedExpressionMember )*
+;
+
+NamedExpressionMember returns SysML::FeatureMembership :
+	memberName = Name '=' ownedRelatedElement += OwnedExpression // ownedMemberFeature = OwnedExpression
+;
+
+// Null Expressions
+
+NullExpression returns SysML::NullExpression :
+	{SysML::NullExpression} ( 'null' | '(' ')' )
+;

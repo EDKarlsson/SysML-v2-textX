@@ -1,0 +1,38 @@
+
+/* Literal Expressions */
+
+LiteralExpression returns SysML::LiteralExpression :
+	  LiteralBoolean
+	| LiteralString
+	| LiteralInteger
+	| LiteralReal
+	| LiteralInfinity
+;
+
+LiteralBoolean returns SysML::LiteralBoolean :
+	value = BooleanValue
+;
+
+BooleanValue returns Ecore::EBoolean :
+	'true' | 'false'
+;
+
+LiteralString returns SysML::LiteralString :
+	value = STRING_VALUE
+;
+
+LiteralInteger returns SysML::LiteralInteger:
+	value = DECIMAL_VALUE
+;
+
+LiteralReal returns SysML::LiteralRational:
+	value = RealValue
+;
+
+RealValue returns Ecore::EDouble:
+	DECIMAL_VALUE? '.' ( DECIMAL_VALUE | EXP_VALUE ) | EXP_VALUE
+;
+
+LiteralInfinity returns SysML::LiteralInfinity :
+	{SysML::LiteralInfinity} '*'
+;

@@ -1,0 +1,14 @@
+/* Feature Conjugation */
+
+fragment FeatureConjugationPart returns SysML::Feature :
+	( '~' | 'conjugates' ) ownedRelationship += FeatureConjugation
+;
+
+FeatureConjugation returns SysML::Conjugation :
+	originalType = [SysML::Feature | QualifiedName ]
+
+FeatureChainPrefix returns SysML::Feature :
+	( ownedRelationship += OwnedFeatureChaining '.' )+
+	ownedRelationship += OwnedFeatureChaining '.'
+;
+;

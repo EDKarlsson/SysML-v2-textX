@@ -1,0 +1,74 @@
+/* Namespace Bodies */
+
+NamespaceBodyElement returns SysML::Namespace :
+	  ownedRelationship += OwnedDocumentation
+	| ownedRelationship += NamespaceMember
+	| ownedRelationship += AliasMember
+	| ownedRelationship += Import
+;
+
+MemberPrefix returns SysML::Membership :
+	( ownedRelationship += PrefixDocumentation )*
+    ( visibility = VisibilityIndicator )?
+;
+
+NamespaceMember returns SysML::Membership :
+	  NonFeatureMember
+	| NamespaceFeatureMember
+	| ChainFeatureMember
+;
+
+NonFeatureMember returns SysML::Membership :
+	MemberPrefix ownedRelatedElement += NonFeatureElement // ownedMemberElement = NonFeatureElement
+;
+
+NamespaceFeatureMember returns SysML::Membership :
+	MemberPrefix ownedRelatedElement += FeatureElement // ownedMemberElement = FeatureElement
+;
+
+ChainFeatureMember returns SysML::Membership :
+	MemberPrefix 'feature'? ( memberName = Name )? 'is' ownedRelatedElement += FeatureChain ';' // ownedMemberElement = Feature ';'
+;
+
+AliasMember returns SysML::Membership :
+	MemberPrefix
+	'alias' memberName = Name 'for' memberElement = [SysML::Element|QualifiedName] ';'
+;
+
+Import returns SysML::Import :
+	( ownedRelationship += PrefixDocumentation )*
+	( visibility = VisibilityIndicator )?
+	'import' ( isImportAll ?= 'all' )?
+	( ImportedNamespace | ImportedFilterPackage ) ';'
+;
+
+fragment ImportedNamespace returns SysML::Import :
+	( importedNamespace = [SysML::Namespace|Qualification] )?
+	( importedMemberName = Name | '*' )
+	( '::' isRecursive ?= '**' )?
+;
+
+fragment ImportedFilterPackage returns SysML::Import :
+	ownedRelatedElement += FilterPackage
+;
+
+FilterPackage returns SysML::Package :
+	ownedRelationship += FilterPackageImport
+	( ownedRelationship += FilterPackageMember )+
+;
+
+FilterPackageImport returns SysML::Import :
+	ImportedNamespace
+;
+
+FilterPackageMember returns SysML::ElementFilterMembership :
+	visibility = FilterPackageMemberVisibility ownedRelatedElement += OwnedExpression ']' // condition = OwnedExpression ']'
+;
+
+enum FilterPackageMemberVisibility returns SysML::VisibilityKind :
+	private = '['
+;
+
+enum VisibilityIndicator returns SysML::VisibilityKind :
+	public = 'public' | private = 'private' | protected = 'protected'
+;

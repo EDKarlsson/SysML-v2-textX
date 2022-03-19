@@ -1,0 +1,46 @@
+
+/* Functions */
+
+Function returns SysML::Function :
+	( isAbstract ?= 'abstract' )? 'function'
+	FunctionDeclaration FunctionBody
+;
+
+fragment FunctionDeclaration returns SysML::Function :
+	ClassifierDeclaration ParameterPart?
+;
+
+fragment ParameterPart returns SysML::Type :
+	  ParameterList ReturnParameterPart?
+;
+
+fragment ReturnParameterPart returns SysML::Type :
+	ownedRelationship += ReturnParameterMember
+;
+
+ReturnParameterMember returns SysML::ReturnParameterMembership :
+	'return'? ownedRelatedElement += Parameter // ownedMemberParameter = Parameter
+;
+
+fragment FunctionBody returns SysML::Type :
+	  ';'
+	| '{' ( ownedRelationship += OwnedDocumentation
+		  | ownedRelationship += NonFeatureMember
+		  | ownedRelationship += FeatureMember
+		  | ownedRelationship += AliasMember
+		  | ownedRelationship += Import
+		  | ownedRelationship += ReturnFeatureMember
+		  )*
+		  ( ownedRelationship += ResultExpressionMember )?
+	  '}'
+;
+
+ReturnFeatureMember returns SysML::ReturnParameterMembership :
+	MemberPrefix 'return'
+	ownedRelatedElement += FeatureElement // ownedMemberParameter = FeatureElement
+;
+
+@Override
+ResultExpressionMember returns SysML::ResultExpressionMembership :
+	MemberPrefix ownedRelatedElement += OwnedExpression // ownedResultExpression = OwnedExpression
+;

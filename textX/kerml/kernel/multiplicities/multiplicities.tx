@@ -1,0 +1,32 @@
+
+/* MULTIPLICITIES */
+
+Multiplicity returns SysML::Multiplicity :
+	MultiplicitySubset | MultiplicityRange
+;
+
+MultiplicitySubset returns SysML::Multiplicity :
+	'multiplicity' Identification? Subsets
+;
+
+MultiplicityRange returns SysML::MultiplicityRange :
+	'multiplicity' Identification? MultiplicityBounds ';'
+;
+
+OwnedMultiplicity returns SysML::Membership :
+	ownedRelatedElement += OwnedMultiplicityRange // ownedMemberElement = OwnedMultiplicityRange
+;
+
+OwnedMultiplicityRange returns SysML::MultiplicityRange :
+	MultiplicityBounds
+;
+
+fragment MultiplicityBounds returns SysML::MultiplicityRange :
+	// TODO: Allow general expressions for bounds. (Causes LL parsing issues.)
+	'[' ownedRelationship += MultiplicityExpressionMember
+	      ( '..' ownedRelationship += MultiplicityExpressionMember )? ']'
+;
+
+MultiplicityExpressionMember returns SysML::Membership :
+	ownedRelatedElement += ( LiteralExpression | FeatureReferenceExpression ) // ownedMemberElement = ( LiteralExpression | FeatureReferenceExpression )
+;

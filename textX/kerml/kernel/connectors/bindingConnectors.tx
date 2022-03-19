@@ -1,0 +1,13 @@
+
+/* Binding Connectors */
+
+BindingConnector returns SysML::BindingConnector :
+	FeaturePrefix 'binding'
+	BindingConnectorDeclaration TypeBody
+;
+
+fragment BindingConnectorDeclaration returns SysML::BindingConnector :
+	( FeatureDeclaration? 'of' | isSufficient ?= 'all' 'of'? )?
+	ownedRelationship += ConnectorEndMember '='
+	ownedRelationship += ConnectorEndMember
+;

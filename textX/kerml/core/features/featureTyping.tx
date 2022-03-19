@@ -1,0 +1,17 @@
+/* Feature Typing */
+
+FeatureTyping returns SysML::FeatureTyping :
+	( 'specialization' Identification? )?
+    'typing' typedFeature = [SysML::Feature | QualifiedName]
+    (':' | 'typed' 'by') FeatureType ';'
+;
+
+@Override
+OwnedFeatureTyping returns SysML::FeatureTyping :
+	FeatureType
+;
+
+fragment FeatureType returns SysML::FeatureTyping :
+	  type = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain
+;

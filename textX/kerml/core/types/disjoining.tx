@@ -1,0 +1,16 @@
+/* Disjoining */
+
+Disjoining returns SysML::Disjoining :
+	( 'disjoining' Identification? )?
+	'disjoint'
+	( typeDisjoined = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain )
+	'from'
+	( disjoiningType = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain ) ';'
+;
+
+OwnedDisjoining returns SysML::Disjoining :
+	  disjoiningType = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain
+;

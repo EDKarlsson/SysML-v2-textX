@@ -1,0 +1,21 @@
+/* Elements */
+
+fragment Identification returns SysML::Element :
+	  '<' humanId = Name '>' ( name = Name )?
+	| name = Name
+;
+
+Element returns SysML::Element :
+    'element' Identification? ElementBody
+;
+
+fragment ElementBody returns SysML::Element :
+    ';' | '{' OwnedElement* '}'
+;
+
+fragment OwnedElement returns SysML::Element :
+      ownedRelationship += OwnedRelationship
+    | ownedRelationship += OwnedDocumentation
+    | ownedRelationship += OwnedTextualRepresentationAnnotation
+    | ownedRelationship += OwnedAnnotatingFeatureAnnotation
+;

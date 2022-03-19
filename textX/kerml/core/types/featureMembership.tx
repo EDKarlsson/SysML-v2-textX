@@ -1,0 +1,18 @@
+
+/* Feature Membership */
+
+FeatureMember returns SysML::Membership :
+	TypeFeatureMember | OwnedFeatureMember | UnownedFeatureMember | ChainFeatureMember
+;
+
+TypeFeatureMember returns SysML::Membership :
+	MemberPrefix 'member' ownedRelatedElement += FeatureElement // ownedMemberElement = FeatureElement
+;
+
+OwnedFeatureMember returns SysML::FeatureMembership :
+	MemberPrefix ownedRelatedElement += FeatureElement // ownedMemberFeature = FeatureElement
+;
+
+UnownedFeatureMember returns SysML::FeatureMembership :
+	MemberPrefix 'feature'? ( memberName = Name )? 'is' memberFeature = [SysML::Feature|QualifiedName] ';'
+;

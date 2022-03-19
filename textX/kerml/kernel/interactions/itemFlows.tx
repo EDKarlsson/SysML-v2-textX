@@ -1,0 +1,72 @@
+
+/* Item Flows */
+
+ItemFlow returns SysML::ItemFlow :
+	FeaturePrefix 'flow'
+	ItemFlowDeclaration TypeBody
+;
+
+SuccessionItemFlow returns SysML::SuccessionItemFlow :
+	FeaturePrefix 'succession' 'flow' ItemFlowDeclaration TypeBody
+;
+
+fragment ItemFlowDeclaration returns SysML::ItemFlow :
+	( FeatureDeclaration?
+      ( 'of'  ownedRelationship += ItemFeatureMember
+      | ownedRelationship += EmptyItemFeatureMember
+      ) 'from'
+    | ( isSufficient ?= 'all' )? ownedRelationship += EmptyItemFeatureMember
+    )
+	ownedRelationship += ItemFlowEndMember 'to'
+	ownedRelationship += ItemFlowEndMember
+;
+
+ItemFeatureMember returns SysML::FeatureMembership :
+	( memberName = Name ':' )? ownedRelatedElement += ItemFeature // ownedMemberFeature = ItemFeature
+;
+
+ItemFeature returns SysML::ItemFeature :
+	  ownedRelationship += OwnedFeatureTyping
+	  ( ownedRelationship += OwnedMultiplicity )?
+	| ownedRelationship += OwnedMultiplicity
+	  ( ownedRelationship += OwnedFeatureTyping )?
+;
+
+EmptyItemFeatureMember returns SysML::FeatureMembership :
+	ownedRelatedElement += EmptyItemFeature // ownedMemberFeature = EmptyItemFeature
+;
+
+EmptyItemFeature returns SysML::ItemFeature :
+	{SysML::ItemFeature}
+;
+
+ItemFlowEndMember returns SysML::EndFeatureMembership :
+	ownedRelatedElement += ItemFlowEnd // ownedMemberFeature = ItemFlowEnd
+;
+
+ItemFlowEnd returns SysML::ItemFlowEnd :
+	( ownedRelationship += ItemFlowEndSubsetting )?
+	ownedRelationship += ItemFlowFeatureMember
+;
+
+ItemFlowEndSubsetting returns SysML::Subsetting :
+	  subsettedFeature = [SysML::Feature | QualifiedName] '.'
+	| ownedRelatedElement += FeatureChainPrefix
+;
+
+FeatureChainPrefix returns SysML::Feature :
+	( ownedRelationship += OwnedFeatureChaining '.' )+
+	ownedRelationship += OwnedFeatureChaining '.'
+;
+
+ItemFlowFeatureMember returns SysML::FeatureMembership :
+	ownedRelatedElement += ItemFlowFeature // ownedMemberFeature = ItemFlowFeature
+;
+
+ItemFlowFeature returns SysML::ItemFlowFeature :
+	ownedRelationship += ItemFlowRedefinition
+;
+
+ItemFlowRedefinition returns SysML::Redefinition :
+	redefinedFeature = [SysML::Feature|QualifiedName]
+;

@@ -1,0 +1,18 @@
+
+/* Documentation */
+
+OwnedDocumentation returns SysML::Documentation :
+	ownedRelatedElement += DocumentationComment // documentingComment = DocumentationComment
+;
+
+DocumentationComment returns SysML::Comment :
+	'doc' ( '<' humanId = Name '>' )? body = REGULAR_COMMENT
+;
+
+PrefixDocumentation returns SysML::Annotation :
+	ownedRelatedElement += PrefixDocumentationComment
+;
+
+PrefixDocumentationComment returns SysML::Comment :
+	( 'doc' ( '<' humanId = Name '>' )? )? body = DOCUMENTATION_COMMENT
+;

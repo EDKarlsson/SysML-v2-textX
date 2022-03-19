@@ -1,0 +1,17 @@
+/* Subclassification */
+
+Subclassification returns SysML::Subclassification :
+	( 'specialization' Identification? )?
+    'subclassifier' subclassifier = [SysML::Classifier | QualifiedName]
+    ( ':>' | 'specializes') superclassifier = [SysML::Classifier | QualifiedName] ';'
+;
+
+Ownedsubclassification returns SysML::Subclassification :
+	superclassifier = [SysML::Classifier | QualifiedName]
+;
+
+/* Classifier Conjugation */
+
+ClassifierConjugation returns SysML::Conjugation :
+	originalType = [SysML::Classifier | QualifiedName]
+;

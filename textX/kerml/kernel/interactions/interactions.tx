@@ -1,0 +1,7 @@
+
+/* Interactions */
+
+Interaction returns SysML::Interaction :
+	( isAbstract ?= 'abstract' )? 'interaction'
+	BehaviorDeclaration TypeBody
+;

@@ -1,0 +1,18 @@
+
+/* Comments */
+
+Comment returns SysML::Comment :
+	( 'comment' Identification? 'about' ownedRelationship += Annotation
+	  ( ',' ownedRelationship += Annotation )*
+	| ( 'comment' Identification? )? ownedRelationship += EmptyAnnotation
+	)
+	body = REGULAR_COMMENT
+;
+
+Annotation returns SysML::Annotation :
+	annotatedElement = [SysML::Element|QualifiedName]
+;
+
+EmptyAnnotation returns SysML::Annotation :
+	{SysML::Annotation}
+;

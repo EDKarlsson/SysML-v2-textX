@@ -1,0 +1,27 @@
+
+/* PACKAGES */
+
+Package returns SysML::Package :
+	PackageDeclaration PackageBody
+;
+
+fragment PackageDeclaration returns SysML::Package :
+	'package' Identification?
+;
+
+fragment PackageBody returns SysML::Namespace :
+	  ';'
+	| '{' ( // Note: PackageBodyElement is expanded here to avoid
+			// infinite loops in the incremental parser.
+		    ownedRelationship += OwnedDocumentation
+	      | ownedRelationship += NamespaceMember
+	      | ownedRelationship += ElementFilterMember
+	      | ownedRelationship += AliasMember
+	      | ownedRelationship += Import )*
+	  '}'
+;
+
+ElementFilterMember returns SysML::ElementFilterMembership :
+	MemberPrefix
+	'filter' ownedRelatedElement += OwnedExpression ';' // condition = OwnedExpression ';'
+;

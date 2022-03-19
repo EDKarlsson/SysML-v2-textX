@@ -1,0 +1,16 @@
+/* Redefinition */
+
+Redefinition returns SysML::Redefinition :
+	( 'specialization' Identification? )?
+    'redefinition'
+    ( redefiningFeature = [SysML::Feature | QualifiedName]
+	| ownedRelatedElement += FeatureChain )
+    ( ':>>' | 'redefines' )
+    ( redefinedFeature = [SysML::Feature | QualifiedName]
+	| ownedRelatedElement += FeatureChain ) ';'
+;
+
+OwnedRedefinition returns SysML::Redefinition:
+	  redefinedFeature = [SysML::Feature | QualifiedName]
+	| ownedRelatedElement += FeatureChain
+;

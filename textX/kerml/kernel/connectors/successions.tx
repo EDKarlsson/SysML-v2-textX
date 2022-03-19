@@ -1,0 +1,13 @@
+
+/* Successions */
+
+Succession returns SysML::Succession :
+	FeaturePrefix 'succession'
+	SuccessionDeclaration TypeBody
+;
+
+fragment SuccessionDeclaration returns SysML::Succession :
+	( FeatureDeclaration? 'first' | isSufficient ?= 'all' 'first'? )?
+	ownedRelationship += ConnectorEndMember 'then'
+	ownedRelationship += ConnectorEndMember
+;

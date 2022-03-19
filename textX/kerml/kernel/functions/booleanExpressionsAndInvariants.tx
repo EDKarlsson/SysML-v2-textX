@@ -1,0 +1,14 @@
+
+/* Boolean Expressions */
+
+BooleanExpression returns SysML::BooleanExpression :
+	FeaturePrefix 'bool'
+	ExpressionDeclaration FunctionBody
+;
+
+/* Invariants */
+
+Invariant returns SysML::Invariant :
+	FeaturePrefix 'inv' ( 'true' | isNegated ?= 'false' )?
+	ExpressionDeclaration FunctionBody
+;

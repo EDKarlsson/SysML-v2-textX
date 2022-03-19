@@ -1,0 +1,11 @@
+
+/* Predicates */
+
+Predicate returns SysML::Predicate :
+	( isAbstract ?= 'abstract' )? 'predicate'
+	PredicateDeclaration FunctionBody
+;
+
+fragment PredicateDeclaration returns SysML::Predicate :
+	ClassifierDeclaration ParameterPart?
+;

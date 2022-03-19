@@ -1,0 +1,16 @@
+/* Specialization */
+
+Specialization returns SysML::Specialization :
+    ( 'specialization' Identification? )?
+    'subtype'
+	( specific = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain )
+    ( ':>' | 'specializes')
+	( general = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain ) ';'
+;
+
+OwnedSpecialization returns SysML::Specialization :
+	  general = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain
+;

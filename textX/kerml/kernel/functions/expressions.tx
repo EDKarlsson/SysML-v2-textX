@@ -1,0 +1,19 @@
+
+/* Expressions */
+
+Expression returns SysML::Expression :
+	FeaturePrefix 'expr'
+	ExpressionDeclaration FunctionBody
+;
+
+fragment ExpressionDeclaration returns SysML::Expression :
+	FeatureDeclaration?
+	( ValuePart | StepParameterList ReturnParameterPart? )?
+;
+
+/* EXPRESSIONS */
+
+@Override
+ExpressionBody returns SysML::Expression :
+	FunctionBody
+;

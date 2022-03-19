@@ -1,0 +1,43 @@
+
+/* Behaviors */
+
+Behavior returns SysML::Behavior :
+	( isAbstract ?= 'abstract')? 'behavior'
+	BehaviorDeclaration TypeBody
+;
+
+fragment BehaviorDeclaration returns SysML::Behavior :
+	ClassifierDeclaration ParameterList?
+;
+
+fragment ParameterList returns SysML::Type :
+	'(' ( ownedRelationship += ParameterMember
+		( ',' ownedRelationship += ParameterMember )* )? ')'
+;
+
+ParameterMember returns SysML::ParameterMembership :
+	ownedRelatedElement += Parameter // ownedMemberParameter = Parameter
+;
+
+Parameter returns SysML::Feature :
+      ( direction = FeatureDirection )? 'feature'? ParameterDeclaration
+    | {SysML::Step} ( direction = FeatureDirection )? 'step' ParameterDeclaration
+    | {SysML::Expression} ( direction = FeatureDirection )? 'expr' ParameterDeclaration
+    | {SysML::BooleanExpression} ( direction = FeatureDirection )? 'bool' ParameterDeclaration
+;
+
+fragment ParameterDeclaration returns SysML::Feature :
+	( isSufficient ?= 'all' )?
+    ( Identification ParameterSpecializationPart?
+	| ParameterSpecializationPart
+	)
+;
+
+fragment ParameterSpecializationPart returns SysML::Feature :
+	  ( -> ParameterSpecialization )+ MultiplicityPart? ParameterSpecialization*
+	| MultiplicityPart ParameterSpecialization*
+;
+
+fragment ParameterSpecialization returns SysML::Feature :
+	TypedBy | Subsets | Redefines
+;

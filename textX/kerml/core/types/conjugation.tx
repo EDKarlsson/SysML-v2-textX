@@ -1,0 +1,17 @@
+
+/* Conjugation */
+
+Conjugation returns SysML::Conjugation :
+	( 'conjugation' Identification? )?
+    'conjugate'
+    ( conjugatedType = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain )
+    ( '~' | 'conjugates')
+    ( originalType = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain ) ';'
+;
+
+OwnedConjugation returns SysML::Conjugation :
+	  originalType = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain
+;

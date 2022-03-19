@@ -1,0 +1,45 @@
+
+/* Annotating Features */
+
+OwnedAnnotatingFeatureAnnotation returns SysML::Annotation :
+	ownedRelatedElement += OwnedAnnotatingFeature
+;
+
+OwnedAnnotatingFeature returns SysML::AnnotatingFeature :
+	'metadata' ( humanId = Name ( ':' | 'typed' 'by' ) )? ownedRelationship += MetadataTyping
+	ownedRelationship += EmptyAnnotation
+	AnnotatingFeatureBody
+;
+
+AnnotatingFeature returns SysML::AnnotatingFeature :
+	( '@' | 'metadata' ) AnnotatingFeatureDeclaration
+	( 'about' ownedRelationship += Annotation ( ',' ownedRelationship += Annotation )*
+	| ownedRelationship += EmptyAnnotation
+	)
+	AnnotatingFeatureBody
+;
+
+fragment AnnotatingFeatureDeclaration returns SysML::AnnotatingFeature :
+	( Identification ( ':' | 'typed' 'by' ) )? ownedRelationship += MetadataTyping
+;
+
+MetadataTyping returns SysML::FeatureTyping :
+	type = [SysML::DataType | QualifiedName]
+;
+
+fragment AnnotatingFeatureBody returns SysML::AnnotatingFeature :
+	';' | '{' ( ownedRelationship += MetadataFeatureMember )* '}'
+;
+
+MetadataFeatureMember returns SysML::FeatureMembership :
+	ownedRelatedElement += MetadataFeature // ownedMemberFeature = MetadataFeature
+;
+
+MetadataFeature returns SysML::MetadataFeature :
+	'feature'? ( ':>>' | 'redefines')? ownedRelationship += OwnedRedefinition
+	'=' ownedRelationship += MetadataFeatureValue ';' // metadataFeatureValue = MetadataFeatureValue ';'
+;
+
+MetadataFeatureValue returns SysML::MetadataFeatureValue :
+	ownedRelatedElement += OwnedExpression // metadataValue = OwnedExpression
+;

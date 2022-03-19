@@ -1,0 +1,723 @@
+ /* converted on Tue Feb 1, 2022, 09:37 (UTC-08) by xtext-to-w3c v0.57 which is Copyright (c) 2011-2022 by Gunther Rademacher <grd@gmx.net> */ 
+
+<RootNamespace> ::= PackageBodyElement*
+<Identification> ::= '<' Name '>' Name?  | Name
+Comment  ::= ( 'comment' Identification? 'about' Annotation ( ',' Annotation )* | ( 'comment' Identification? )? EmptyAnnotation ) REGULAR_COMMENT
+Annotation ::= QualifiedName
+EmptyAnnotation ::=
+OwnedDocumentation ::= DocumentationComment
+DocumentationComment ::= 'doc' ( '<' Name '>' )? REGULAR_COMMENT
+PrefixDocumentation ::= PrefixDocumentationComment
+PrefixDocumentationComment ::= ( 'doc' ( '<' Name '>' )? )? DOCUMENTATION_COMMENT
+TextualRepresentation ::= ( 'rep' Identification? 'about' Annotation | ( 'rep' Identification? )? EmptyAnnotation ) 'language' STRING_VALUE REGULAR_COMMENT
+AnnotatingFeature ::= ( '@' | 'metadata' ) AnnotatingFeatureDeclaration ( 'about' Annotation ( ',' Annotation )* | EmptyAnnotation ) AnnotatingFeatureBody
+AnnotatingFeatureDeclaration ::= ( Identification DefinedByKeyword )? MetadataTyping
+MetadataTyping ::= QualifiedName
+AnnotatingFeatureBody ::= ';' | '{' MetadataFeatureMember* '}'
+MetadataFeatureMember ::= MetadataFeature
+MetadataFeature ::= 'feature'? ( ':>>' | 'redefines' )? OwnedRedefinition '=' MetadataFeatureValue ';'
+MetadataFeatureValue ::= OwnedExpression
+Package  ::= PackageDeclaration PackageBody
+PackageDeclaration ::= 'package' Identification?
+PackageBody ::= ';' | '{' ( OwnedDocumentation | PackageMember | ElementFilterMember | AliasMember | Import )* '}'
+PackageBodyElement ::= OwnedDocumentation | PackageMember | ElementFilterMember | AliasMember | Import
+MemberPrefix ::= PrefixDocumentation* VisibilityIndicator?
+PackageMember ::= MemberPrefix ( DefinitionElement | UsageElement )
+ElementFilterMember ::= MemberPrefix 'filter' OwnedExpression ';'
+AliasMember ::= MemberPrefix 'alias' Name 'for' QualifiedName ';'
+Import   ::= PrefixDocumentation* VisibilityIndicator? 'import' 'all'? ( ImportedNamespace | ImportedFilterPackage ) ';'
+ImportedNamespace ::= Qualification? ( Name | '*' ) ( '::' '**' )?
+ImportedFilterPackage ::= FilterPackage
+FilterPackage ::= FilterPackageImport FilterPackageMember+
+FilterPackageImport ::= ImportedNamespace
+FilterPackageMember ::= FilterPackageMemberVisibility OwnedExpression ']'
+DefinitionElement ::= Package | Comment | TextualRepresentation | AnnotatingFeature | Dependency | AttributeDefinition | EnumerationDefinition | OccurrenceDefinition | IndividualDefinition | ItemDefinition | PartDefinition | ConnectionDefinition | InterfaceDefinition | AllocationDefinition | PortDefinition | ActionDefinition | CalculationDefinition | StateDefinition | ConstraintDefinition | RequirementDefinition | ConcernDefinition | CaseDefinition | AnalysisCaseDefinition | VerificationCaseDefinition | UseCaseDefinition | ViewDefinition | ViewpointDefinition | RenderingDefinition
+UsageElement ::= NonOccurrenceUsageElement | OccurrenceUsageElement
+SubclassificationPart ::= SpecializesKeyword OwnedSubclassification ( ',' OwnedSubclassification )*
+SpecializesKeyword ::= ':>' | 'specializes'
+OwnedSubclassification ::= QualifiedName
+FeatureDeclaration ::= Identification FeatureSpecializationPart?  | FeatureSpecializationPart
+FeatureSpecializationPart ::= ( FeatureSpecialization+ MultiplicityPart? | MultiplicityPart ) FeatureSpecialization*
+MultiplicityPart ::= OwnedMultiplicity | OwnedMultiplicity? ( 'ordered' 'nonunique'? | 'nonunique' 'ordered'? )
+FeatureSpecialization ::= Typings | Subsettings | Redefinitions
+Typings  ::= TypedBy ( ',' FeatureTyping )*
+TypedBy  ::= DefinedByKeyword FeatureTyping
+DefinedByKeyword ::= ':' | 'defined' 'by'
+Subsettings ::= Subsets ( ',' OwnedSubsetting )*
+Subsets  ::= SubsetsKeyword OwnedSubsetting
+SubsetsKeyword ::= ':>' | 'subsets'
+Redefinitions ::= Redefines ( ',' OwnedRedefinition )*
+Redefines ::= RedefinesKeyword OwnedRedefinition
+RedefinesKeyword ::= ':>>' | 'redefines'
+FeatureTyping ::= OwnedFeatureTyping | ConjugatedPortTyping
+OwnedSubsetting ::= QualifiedName | FeatureChain
+OwnedRedefinition ::= QualifiedName | FeatureChain
+OwnedMultiplicity ::= MultiplicityRange
+MultiplicityRange ::= '[' MultiplicityExpressionMember ( '..' MultiplicityExpressionMember )? ']'
+MultiplicityExpressionMember ::= LiteralExpression | FeatureReferenceExpression
+Dependency ::= 'dependency' ( Identification? 'from' )? QualifiedName ( ',' QualifiedName )* 'to' QualifiedName ( ',' QualifiedName )* ';'
+DefinitionPrefix ::= 'abstract' | 'variation'
+Definition ::= DefinitionDeclaration DefinitionBody
+DefinitionDeclaration ::= Identification? SubclassificationPart?
+DefinitionBody ::= ';' | '{' DefinitionBodyItem* '}'
+DefinitionBodyItem ::= OwnedDocumentation | DefinitionMember | VariantUsageMember | NonOccurrenceUsageMember | EmptySuccessionMember? OccurrenceUsageMember | AliasMember | Import
+DefinitionMember ::= MemberPrefix DefinitionElement
+VariantUsageMember ::= MemberPrefix 'variant' VariantUsageElement
+NonOccurrenceUsageMember ::= MemberPrefix NonOccurrenceUsageElement
+OccurrenceUsageMember ::= MemberPrefix OccurrenceUsageElement
+StructureUsageMember ::= MemberPrefix StructureUsageElement
+BehaviorUsageMember ::= MemberPrefix BehaviorUsageElement
+RefPrefix ::= FeatureDirection? ( 'abstract' | 'variation' )? 'readonly'? 'derived'? 'end'?
+UsagePrefix ::= RefPrefix 'ref'?
+Usage    ::= UsageDeclaration? UsageCompletion
+UsageDeclaration ::= FeatureDeclaration
+UsageCompletion ::= ValueOrFlowPart? UsageBody
+UsageBody ::= DefinitionBody
+ValueOrFlowPart ::= ValuePart | SourceItemFlowMember
+ValuePart ::= FeatureValue | FeatureValueExpression EmptyAssignmentActionMember
+FeatureValue ::= ( '=' | 'default' ( '=' | ':=' )? ) OwnedExpression
+FeatureValueExpression
+         ::= ':=' OwnedExpression
+EmptyAssignmentActionMember
+         ::= EmptyAssignmentAction
+EmptyAssignmentAction
+         ::= EmptyTargetMember EmptyParameterMember
+EmptyTargetMember
+         ::= EmptyTargetParameter
+EmptyTargetParameter
+         ::= TargetFeatureMember
+SourceItemFlowMember
+         ::= SourceItemFlow
+SourceItemFlow
+         ::= ( 'flow' | SuccessionFlowConnectionKeyword ) EmptyItemFeatureMember 'from' ItemFlowEndMember EmptyItemFlowEndMember
+DefaultReferenceUsage
+         ::= RefPrefix UsageDeclaration ValueOrFlowPart? UsageBody
+ReferenceUsage
+         ::= RefPrefix 'ref' Usage
+VariantReference
+         ::= OwnedSubsetting FeatureSpecialization* UsageBody
+NonOccurrenceUsageElement
+         ::= DefaultReferenceUsage
+           | ReferenceUsage
+           | AttributeUsage
+           | EnumerationUsage
+           | BindingConnector
+           | Succession
+OccurrenceUsageElement
+         ::= StructureUsageElement
+           | BehaviorUsageElement
+StructureUsageElement
+         ::= OccurrenceUsage
+           | IndividualUsage
+           | PortionUsage
+           | EventOccurrenceUsage
+           | ItemUsage
+           | PartUsage
+           | ViewUsage
+           | RenderingUsage
+           | PortUsage
+           | ConnectionUsage
+           | InterfaceUsage
+           | AllocationUsage
+           | Message
+           | FlowConnectionUsage
+           | SuccessionFlowConnectionUsage
+BehaviorUsageElement
+         ::= ActionUsage
+           | CalculationUsage
+           | StateUsage
+           | ConstraintUsage
+           | RequirementUsage
+           | ConcernUsage
+           | CaseUsage
+           | AnalysisCaseUsage
+           | VerificationCaseUsage
+           | UseCaseUsage
+           | ViewpointUsage
+           | PerformActionUsage
+           | ExhibitStateUsage
+           | IncludeUseCaseUsage
+           | AssertConstraintUsage
+           | SatisfyRequirementUsage
+VariantUsageElement
+         ::= VariantReference
+           | ReferenceUsage
+           | AttributeUsage
+           | BindingConnector
+           | Succession
+           | OccurrenceUsage
+           | IndividualUsage
+           | PortionUsage
+           | EventOccurrenceUsage
+           | ItemUsage
+           | PartUsage
+           | ViewUsage
+           | RenderingUsage
+           | PortUsage
+           | ConnectionUsage
+           | InterfaceUsage
+           | AllocationUsage
+           | Message
+           | FlowConnectionUsage
+           | SuccessionFlowConnectionUsage
+           | BehaviorUsageElement
+AttributeDefKeyword
+         ::= 'attribute' 'def'
+AttributeDefinition
+         ::= DefinitionPrefix? AttributeDefKeyword Definition
+AttributeUsage
+         ::= UsagePrefix 'attribute' Usage
+EnumerationDefKeyword
+         ::= 'enum' 'def'
+EnumerationDefinition
+         ::= EnumerationDefKeyword DefinitionDeclaration EnumerationBody
+EnumerationBody
+         ::= ';'
+           | '{' EnumerationUsageMember* '}'
+EnumerationUsageMember
+         ::= MemberPrefix EnumeratedValue
+EnumeratedValue
+         ::= 'enum'? Usage
+EnumerationUsage
+         ::= UsagePrefix 'enum' Usage
+OccurrenceDefKeyword
+         ::= 'occurrence' 'def'
+OccurrenceDefinitionPrefix
+         ::= DefinitionPrefix? ( 'individual' LifeClassMembership )?
+OccurrenceDefinition
+         ::= OccurrenceDefinitionPrefix OccurrenceDefKeyword Definition
+IndividualDefinition
+         ::= DefinitionPrefix? 'individual' 'def' Definition LifeClassMembership
+LifeClassMembership
+         ::= LifeClass
+LifeClass
+         ::=
+OccurrenceUsagePrefix
+         ::= UsagePrefix 'individual'? ( PortionKind PortioningFeatureMember )?
+OccurrenceUsage
+         ::= OccurrenceUsagePrefix 'occurrence' Usage
+IndividualUsage
+         ::= UsagePrefix 'individual' Usage
+PortionUsage
+         ::= UsagePrefix 'individual'? PortionKind PortioningFeatureMember Usage
+PortioningFeatureMember
+         ::= PortioningFeature
+PortioningFeature
+         ::=
+EventOccurrenceUsage
+         ::= OccurrenceUsagePrefix 'event' ( OwnedSubsetting FeatureSpecializationPart? | 'occurrence' UsageDeclaration? ) UsageCompletion
+EmptySuccessionMember
+         ::= EmptySuccession
+EmptySuccession
+         ::= 'then' MultiplicitySourceEndMember EmptyTargetEndMember
+MultiplicitySourceEndMember
+         ::= MultiplicitySourceEnd
+MultiplicitySourceEnd
+         ::= OwnedMultiplicity?
+EmptyTargetEndMember
+         ::= EmptyTargetEnd
+EmptyTargetEnd
+         ::=
+ItemDefKeyword
+         ::= 'item' 'def'
+ItemDefinition
+         ::= OccurrenceDefinitionPrefix ItemDefKeyword Definition
+ItemUsage
+         ::= OccurrenceUsagePrefix 'item' Usage
+PartDefKeyword
+         ::= 'part' 'def'
+PartDefinition
+         ::= OccurrenceDefinitionPrefix PartDefKeyword Definition
+PartUsage
+         ::= OccurrenceUsagePrefix 'part' Usage
+PortDefKeyword
+         ::= 'port' 'def'
+PortDefinition
+         ::= DefinitionPrefix? PortDefKeyword Definition ConjugatedPortDefinitionMember
+ConjugatedPortDefinitionMember
+         ::= ConjugatedPortDefinition
+ConjugatedPortDefinition
+         ::= PortConjugation
+PortConjugation
+         ::=
+ConjugatedPortTyping
+         ::= '~' QualifiedName
+PortUsage
+         ::= OccurrenceUsagePrefix 'port' Usage
+ConnectorEndMember
+         ::= ( Name ':>' )? ConnectorEnd
+ConnectorEnd
+         ::= OwnedSubsetting OwnedMultiplicity?
+BindingConnector
+         ::= UsagePrefix ( 'binding' UsageDeclaration? )? 'bind' ConnectorEndMember '=' ConnectorEndMember DefinitionBody
+Succession
+         ::= UsagePrefix ( 'succession' UsageDeclaration? )? 'first' ConnectorEndMember 'then' ConnectorEndMember DefinitionBody
+ConnectionDefKeyword
+         ::= 'connection' 'def'
+ConnectionDefinition
+         ::= OccurrenceDefinitionPrefix ConnectionDefKeyword Definition
+ConnectionUsage
+         ::= OccurrenceUsagePrefix ( 'connection' UsageDeclaration? ( 'connect' ConnectorPart )? | 'connect' ConnectorPart ) UsageBody
+ConnectorPart
+         ::= BinaryConnectorPart
+           | NaryConnectorPart
+BinaryConnectorPart
+         ::= ConnectorEndMember 'to' ConnectorEndMember
+NaryConnectorPart
+         ::= '(' ConnectorEndMember ( ',' ConnectorEndMember )+ ')'
+EmptySourceEndMember
+         ::= EmptySourceEnd
+EmptySourceEnd
+         ::=
+Message  ::= OccurrenceUsagePrefix 'message' MessageDeclaration DefinitionBody
+MessageDeclaration
+         ::= FeatureDeclaration? ( 'of' ItemFeatureMember )? ( 'from' BinaryConnectorPart | ValuePart )?
+FlowConnectionUsage
+         ::= OccurrenceUsagePrefix 'flow' FlowConnectionDeclaration DefinitionBody
+SuccessionFlowConnectionKeyword
+         ::= 'succession' 'flow'
+SuccessionFlowConnectionUsage
+         ::= OccurrenceUsagePrefix SuccessionFlowConnectionKeyword FlowConnectionDeclaration DefinitionBody
+FlowConnectionDeclaration
+         ::= ( FeatureDeclaration? ( 'of' ItemFeatureMember | EmptyItemFeatureMember ) 'from' | EmptyItemFeatureMember ) ItemFlowEndMember 'to' ItemFlowEndMember
+ItemFeatureMember
+         ::= ( Name DefinedByKeyword )? ItemFeature
+ItemFeature
+         ::= OwnedFeatureTyping OwnedMultiplicity?
+           | OwnedMultiplicity OwnedFeatureTyping?
+EmptyItemFeature
+         ::=
+ItemFlowEndMember
+         ::= ItemFlowEnd
+ItemFlowEnd
+         ::= ItemFlowEndSubsetting? ItemFlowFeatureMember
+ItemFlowEndSubsetting
+         ::= QualifiedName '.'
+           | FeatureChainPrefix
+FeatureChainPrefix
+         ::= OwnedFeatureChaining '.' ( OwnedFeatureChaining '.' )+
+EmptyItemFeatureMember
+         ::= EmptyItemFeature
+EmptyItemFlowEnd
+         ::= EmptyItemFlowFeatureMember ItemFlowFeatureMember
+         ::= ItemFlowFeature
+ItemFlowFeature
+         ::= ItemFlowRedefinition
+ItemFlowRedefinition
+         ::= QualifiedName
+EmptyItemFlowEndMember
+         ::= EmptyItemFlowEnd
+EmptyItemFlowFeatureMember ::= EmptyItemFlowFeature
+EmptyItemFlowFeature
+         ::=
+InterfaceDefKeyword
+         ::= 'interface' 'def'
+InterfaceDefinition
+         ::= OccurrenceDefinitionPrefix InterfaceDefKeyword DefinitionDeclaration InterfaceBody
+InterfaceBody
+         ::= ';'
+           | '{' InterfaceBodyItem* '}' InterfaceBodyItem
+         ::= OwnedDocumentation
+           | DefinitionMember
+           | VariantUsageMember
+           | InterfaceNonOccurrenceUsageMember
+           | EmptySuccessionMember? InterfaceOccurrenceUsageMember
+           | AliasMember
+           | Import
+InterfaceNonOccurrenceUsageMember
+         ::= MemberPrefix InterfaceNonOccurrenceUsageElement InterfaceNonOccurrenceUsageElement
+         ::= ReferenceUsage
+           | AttributeUsage
+           | EnumerationUsage
+           | BindingConnector
+           | Succession
+InterfaceOccurrenceUsageMember
+         ::= MemberPrefix InterfaceOccurrenceUsageElement
+InterfaceOccurrenceUsageElement
+         ::= DefaultInterfaceEnd
+           | StructureUsageElement
+           | BehaviorUsageElement
+DefaultInterfaceEnd
+         ::= FeatureDirection? ( 'abstract' | 'variation' )? 'end' Usage
+InterfaceUsage ::= OccurrenceUsagePrefix 'interface' InterfaceUsageDeclaration InterfaceBody
+InterfaceUsageDeclaration
+         ::= UsageDeclaration? ( 'connect' InterfacePart )?
+           | InterfacePart
+InterfacePart
+         ::= BinaryInterfacePart
+           | NaryInterfacePart
+BinaryInterfacePart
+         ::= InterfaceEndMember 'to' InterfaceEndMember
+NaryInterfacePart ::= '(' InterfaceEndMember ( ',' InterfaceEndMember )+ ')'
+InterfaceEndMember ::= ( Name ':>' )? InterfaceEnd
+InterfaceEnd ::= OwnedSubsetting OwnedMultiplicity?
+AllocationDefKeyword ::= 'allocation' 'def'
+AllocationDefinition ::= OccurrenceDefinitionPrefix AllocationDefKeyword Definition
+AllocationUsage ::= OccurrenceUsagePrefix AllocationUsageDeclaration UsageBody
+AllocationUsageDeclaration ::= 'allocation' UsageDeclaration? ( 'allocate' ConnectorPart )?  | 'allocate' ConnectorPart
+ActionDefKeyword ::= 'action' 'def'
+ActionDefinition ::= OccurrenceDefinitionPrefix ActionDefKeyword ActionDeclaration ActionBody
+ActionDeclaration ::= DefinitionDeclaration ParameterList?
+ParameterList ::= '(' ( ParameterMember ( ',' ParameterMember )* )? ')'
+ParameterMember ::= Parameter
+ActionBody ::= ';' | '{' ActionBodyItem* '}'
+ActionBodyItem ::= OwnedDocumentation | Import | AliasMember | DefinitionMember | VariantUsageMember | NonOccurrenceUsageMember | EmptySuccessionMember? ( StructureUsageMember | ( BehaviorUsageMember | ActionNodeMember ) TargetSuccessionMember* ) | InitialNodeMember TargetSuccessionMember* | GuardedSuccessionMember
+InitialNodeMember ::= MemberPrefix 'first' QualifiedName ';'
+ActionNodeMember ::= MemberPrefix ActionNode
+TargetSuccessionMember ::= MemberPrefix ActionTargetSuccession ';'
+GuardedSuccessionMember ::= GuardedSuccession ';'
+Parameter ::= FeatureDirection? ( ParameterDeclaration | ( 'ref' | 'attribute' | 'occurrence' | 'item' | 'part' | 'view' | 'rendering' | 'action' | 'calc' | 'state' | 'constraint' | 'requirement' | 'concern' | 'analysis' | 'verification' | UseCaseUsageKeyword | 'viewpoint' ) ParameterDeclaration? )
+ParameterDeclaration ::= Identification ParameterSpecializationPart?  | ParameterSpecializationPart
+ParameterSpecializationPart ::= ( ParameterSpecialization+ MultiplicityPart? | MultiplicityPart ) ParameterSpecialization*
+ParameterSpecialization ::= TypedBy | Subsets | Redefines
+ActionUsage ::= OccurrenceUsagePrefix 'action' ActionUsageDeclaration ActionBody
+PerformActionUsage ::= OccurrenceUsagePrefix 'perform' PerformActionUsageDeclaration ActionBody
+PerformActionUsageDeclaration ::= ( OwnedSubsetting FeatureSpecializationPart? | 'action' UsageDeclaration? ) ( ValuePart | ActionUsageParameterList )?
+ActionUsageDeclaration ::= UsageDeclaration? ( ValuePart | ActionUsageParameterList )?
+ActionUsageParameterList ::= '(' ( ActionUsageParameterMember ( ',' ActionUsageParameterMember )* )? ')'
+ActionUsageParameterMember ::= ActionUsageParameter
+ActionUsageParameter ::= Parameter ValueOrFlowPart?  | ValueOrFlowPart
+ActionNode ::= SendNode | AcceptNode | AssignmentNode | IfNode | WhileLoopNode | ForLoopNode | ControlNode
+ActionNodeUsageDeclaration ::= 'action' UsageDeclaration?
+ActionNodePrefix ::= OccurrenceUsagePrefix ActionNodeUsageDeclaration?
+AcceptNode ::= OccurrenceUsagePrefix AcceptNodeDeclaration ActionBody
+AcceptNodeDeclaration ::= ActionNodeUsageDeclaration? 'accept' AcceptParameterPart
+AcceptParameterPart ::= ItemParameterMember ( 'via' NodeParameterMember | EmptyParameterMember )
+ItemParameterMember
+         ::= ItemParameter
+ItemParameter
+         ::= Identification? ItemParameterSpecializationPart
+           | OwnedFeatureTyping OwnedMultiplicity?
+ItemParameterSpecializationPart
+         ::= ( FeatureSpecialization+ MultiplicityPart? | MultiplicityPart FeatureSpecialization ) FeatureSpecialization*
+SendNode ::= OccurrenceUsagePrefix SendNodeDeclaration ActionBody
+SendNodeDeclaration
+         ::= ActionNodeUsageDeclaration? 'send' NodeParameterMember 'to' NodeParameterMember
+NodeParameterMember
+         ::= NodeParameter
+NodeParameter
+         ::= FeatureBinding
+FeatureBinding
+         ::= OwnedExpression
+AssignmentNode
+         ::= OccurrenceUsagePrefix AssignmentNodeDeclaration ActionBody
+AssignmentNodeDeclaration
+         ::= ActionNodeUsageDeclaration? 'assign' AssignmentTargetMember FeatureChainMember ':=' NodeParameterMember
+AssignmentTargetMember
+         ::= TargetParameter
+TargetParameter
+         ::= ( TargetBinding '.' )? TargetFeatureMember
+TargetFeatureMember
+         ::= TargetFeature
+TargetFeature
+         ::= TargetAccessedFeatureMember
+TargetAccessedFeatureMember
+         ::= EmptyUsage
+TargetBinding
+         ::= TargetExpression
+TargetExpression
+         ::= BaseExpression ( ( '.' FeatureChainExpression )? ( '[' SequenceExpression ']' | '->' ReferenceTyping ( ExpressionBodyMember | FunctionReferenceMember | ArgumentList ) | '.' ExpressionBodyMember ) )*
+IfNode   ::= ActionNodePrefix 'if' NodeParameterMember ActionBodyParameterMember ( 'else' ( ActionBodyParameterMember | IfNodeParameterMember ) )?
+ActionBodyParameterMember
+         ::= ActionBodyParameter
+ActionBodyParameter
+         ::= ( 'action' UsageDeclaration? )? '{' ActionBodyItem* '}'
+IfNodeParameterMember
+         ::= IfNode
+WhileLoopNode
+         ::= ActionNodePrefix ( 'while' ExpressionParameterMember | 'loop' EmptyParameterMember ) ActionBodyParameterMember ( 'until' ExpressionParameterMember ';' )?
+ExpressionParameterMember
+         ::= OwnedExpression
+ForLoopNode
+         ::= ActionNodePrefix 'for' ForVariableDeclarationMember 'in' NodeParameterMember ActionBodyParameterMember
+ForVariableDeclarationMember
+         ::= ForVariableDeclaration
+ForVariableDeclaration
+         ::= UsageDeclaration
+ControlNode
+         ::= MergeNode
+           | DecisionNode
+           | JoinNode
+           | ForkNode
+ControlNodePrefix
+         ::= RefPrefix 'individual'? ( PortionKind PortioningFeatureMember )?
+MergeNode
+         ::= ControlNodePrefix 'merge' UsageDeclaration? ';'
+DecisionNode
+         ::= ControlNodePrefix 'decide' UsageDeclaration? ';'
+JoinNode ::= ControlNodePrefix 'join' UsageDeclaration? ';'
+ForkNode ::= ControlNodePrefix 'fork' UsageDeclaration? ';'
+EmptyParameterMember
+         ::= EmptyUsage
+EmptyUsage
+         ::=
+ActionTargetSuccession
+         ::= TargetSuccession
+           | GuardedTargetSuccession
+           | DefaultTargetSuccession
+TargetSuccession
+         ::= 'then' MultiplicitySourceEndMember ConnectorEndMember
+GuardedTargetSuccession
+         ::= EmptyParameterMember GuardExpressionMember 'then' TransitionSuccessionMember
+DefaultTargetSuccession
+         ::= EmptyParameterMember 'else' TransitionSuccessionMember
+GuardedSuccession
+         ::= ( 'succession' UsageDeclaration )? 'first' TransitionSourceMember EmptyParameterMember GuardExpressionMember 'then' TransitionSuccessionMember
+StateDefKeyword
+         ::= 'state' 'def'
+StateDefinition
+         ::= OccurrenceDefinitionPrefix StateDefKeyword ActionDeclaration StateDefBody
+StateDefBody
+         ::= ';'
+           | 'parallel'? '{' StateBodyPart '}'
+StateBodyPart
+         ::= StateBodyItem*
+StateBodyItem
+         ::= OwnedDocumentation
+           | Import
+           | AliasMember
+           | DefinitionMember
+           | VariantUsageMember
+           | NonOccurrenceUsageMember
+           | EmptySuccessionMember? ( StructureUsageMember | BehaviorUsageMember TargetTransitionUsageMember* )
+           | TransitionUsageMember
+           | EntryActionMember EntryTransitionMember*
+           | DoActionMember
+           | ExitActionMember
+EntryActionMember
+         ::= MemberPrefix 'entry' StateActionUsage
+DoActionMember
+         ::= MemberPrefix 'do' StateActionUsage
+ExitActionMember
+         ::= MemberPrefix 'exit' StateActionUsage
+EntryTransitionMember
+         ::= MemberPrefix ( GuardedTargetSuccession | 'then' TransitionSuccession ) ';'
+StateActionUsage
+         ::= EmptyActionUsage ';'
+           | PerformedActionUsage ActionBody
+EmptyActionUsage
+         ::=
+PerformedActionUsage
+         ::= PerformActionUsageDeclaration
+           | AcceptNodeDeclaration
+           | SendNodeDeclaration
+           | AssignmentNodeDeclaration
+TransitionUsageMember
+         ::= MemberPrefix TransitionUsage ';'
+TargetTransitionUsageMember
+         ::= MemberPrefix TargetTransitionUsage ';'
+StateUsage
+         ::= OccurrenceUsagePrefix 'state' ActionUsageDeclaration StateUsageBody
+StateUsageBody
+         ::= ';'
+           | 'parallel'? '{' StateBodyPart '}'
+ExhibitStateUsage
+         ::= OccurrenceUsagePrefix 'exhibit' ( OwnedSubsetting FeatureSpecializationPart? | 'state' UsageDeclaration? ) ( ValuePart | ActionUsageParameterList )? StateUsageBody
+TransitionUsage
+         ::= 'transition' ( UsageDeclaration? 'first' )? TransitionSourceMember EmptyParameterMember ( EmptyParameterMember TriggerActionMember )? GuardExpressionMember? EffectBehaviorMember? 'then' TransitionSuccessionMember
+TargetTransitionUsage
+         ::= EmptyParameterMember ( ( ( 'transition' ( EmptyParameterMember TriggerActionMember )? | EmptyParameterMember TriggerActionMember ) GuardExpressionMember? | GuardExpressionMember ) EffectBehaviorMember? )? 'then' TransitionSuccessionMember
+TransitionSourceMember
+         ::= QualifiedName
+           | FeatureChain
+TriggerActionMember
+         ::= TriggerFeatureKind TriggerAction
+TriggerAction
+         ::= AcceptParameterPart
+GuardExpressionMember
+         ::= GuardFeatureKind OwnedExpression
+EffectBehaviorMember
+         ::= EffectFeatureKind EffectBehaviorUsage
+EffectBehaviorUsage
+         ::= EmptyActionUsage
+           | PerformedActionUsage ( '{' ActionBodyItem* '}' )?
+TransitionSuccessionMember
+         ::= TransitionSuccession
+TransitionSuccession
+         ::= EmptySourceEndMember ConnectorEndMember
+CalculationDefKeyword
+         ::= 'calc' 'def'
+CalculationDefinition
+         ::= OccurrenceDefinitionPrefix CalculationDefKeyword CalculationDeclaration ( CalculationBody | '=' ResultExpressionMember ';' )
+CalculationDeclaration
+         ::= DefinitionDeclaration ( ParameterList ReturnParameterPart? )?
+ReturnParameterPart
+         ::= ReturnParameterMember
+ReturnParameterMember
+         ::= 'return'? Parameter
+CalculationBody
+         ::= ';'
+           | '{' CalculationBodyItem* ResultExpressionMember? '}'
+CalculationBodyItem
+         ::= ActionBodyItem
+           | ReturnParameterFlowUsageMember
+ReturnParameterFlowUsageMember
+         ::= MemberPrefix 'return' UsageElement
+ResultExpressionMember
+         ::= MemberPrefix OwnedExpression
+CalculationUsage
+         ::= OccurrenceUsagePrefix 'calc' CalculationUsageDeclaration CalculationBody
+CalculationUsageDeclaration
+         ::= UsageDeclaration? ( ValuePart | CalculationUsageParameterPart )?
+CalculationUsageParameterPart
+         ::= ActionUsageParameterList CalculationReturnParameterPart?
+CalculationReturnParameterPart
+         ::= CalculationReturnParameterMember
+CalculationReturnParameterMember
+         ::= 'return'? ActionUsageParameter
+ConstraintDefKeyword
+         ::= 'constraint' 'def'
+ConstraintDefinition
+         ::= OccurrenceDefinitionPrefix ConstraintDefKeyword ConstraintDeclaration CalculationBody
+ConstraintDeclaration
+         ::= DefinitionDeclaration ParameterList? EmptyReturnParameterPart
+EmptyReturnParameterPart
+         ::= EmptyReturnParameterMember
+EmptyReturnParameterMember
+         ::= EmptyUsage
+ConstraintUsage
+         ::= OccurrenceUsagePrefix 'constraint' CalculationUsageDeclaration CalculationBody
+AssertConstraintUsage
+         ::= OccurrenceUsagePrefix 'assert' 'not'? ( OwnedSubsetting FeatureSpecializationPart? | 'constraint' UsageDeclaration? ) CalculationUsageParameterPart? CalculationBody
+RequirementDefKeyword
+         ::= 'requirement' 'def'
+RequirementDefinition
+         ::= OccurrenceDefinitionPrefix RequirementDefKeyword ConstraintDeclaration RequirementBody
+RequirementBody
+         ::= ';'
+           | '{' RequirementBodyItem* '}'
+RequirementBodyItem
+         ::= DefinitionBodyItem
+           | SubjectMember
+           | RequirementConstraintMember
+           | FramedConcernMember
+           | RequirementVerificationMember
+           | ActorMember
+           | StakeholderMember
+SubjectMember
+         ::= MemberPrefix SubjectUsage
+SubjectUsage
+         ::= 'subject' Usage
+RequirementConstraintMember
+         ::= MemberPrefix RequirementConstraintKind RequirementConstraintUsage
+RequirementConstraintUsage
+         ::= OwnedSubsetting FeatureSpecialization* CalculationUsageParameterPart? RequirementBody
+           | 'constraint' CalculationUsageDeclaration CalculationBody
+FramedConcernMember
+         ::= MemberPrefix FramedConcernKind FramedConcernUsage
+FramedConcernUsage
+         ::= OwnedSubsetting FeatureSpecialization* CalculationUsageParameterPart? RequirementBody
+           | 'concern' CalculationUsageDeclaration CalculationBody
+ActorMember
+         ::= MemberPrefix ActorUsage
+ActorUsage
+         ::= 'actor' Usage
+StakeholderMember
+         ::= MemberPrefix StakeholderUsage
+StakeholderUsage
+         ::= 'stakeholder' Usage
+RequirementUsage
+         ::= OccurrenceUsagePrefix 'requirement' CalculationUsageDeclaration RequirementBody
+SatisfyRequirementUsage
+         ::= OccurrenceUsagePrefix 'assert'? 'not'? 'satisfy' ( OwnedSubsetting FeatureSpecializationPart? | 'requirement' UsageDeclaration? ) ( ValuePart | ActionUsageParameterList )? ( 'by' SatisfactionSubjectMember )? RequirementBody
+SatisfactionSubjectMember
+         ::= SatisfactionParameter
+SatisfactionParameter
+         ::= SatisfactionFeatureValue
+SatisfactionFeatureValue
+         ::= SatisfactionReferenceExpression
+SatisfactionReferenceExpression
+         ::= FeatureReferenceExpression ( '.' FeatureReferenceExpression )*
+ConcernDefKeyword
+         ::= 'concern' 'def'
+ConcernDefinition
+         ::= OccurrenceDefinitionPrefix ConcernDefKeyword ConstraintDeclaration RequirementBody
+ConcernUsage
+         ::= OccurrenceUsagePrefix 'concern' CalculationUsageDeclaration RequirementBody
+CaseDefKeyword
+         ::= 'case' 'def'
+CaseDefinition
+         ::= OccurrenceDefinitionPrefix CaseDefKeyword CalculationDeclaration CaseBody
+CaseBody ::= ';'
+           | '{' CaseBodyItem* ResultExpressionMember? '}'
+CaseBodyItem
+         ::= CalculationBodyItem
+           | SubjectMember
+           | ActorMember
+           | ObjectiveMember
+ObjectiveMember
+         ::= MemberPrefix 'objective' ObjectiveRequirementUsage
+ObjectiveRequirementUsage
+         ::= CalculationUsageDeclaration RequirementBody
+CaseUsage
+         ::= OccurrenceUsagePrefix 'case' CalculationUsageDeclaration CaseBody
+AnalysisCaseDefKeyword
+         ::= 'analysis' 'def'
+AnalysisCaseDefinition
+         ::= OccurrenceDefinitionPrefix AnalysisCaseDefKeyword CalculationDeclaration CaseBody
+AnalysisCaseUsage
+         ::= OccurrenceUsagePrefix 'analysis' CalculationUsageDeclaration CaseBody
+VerificationCaseDefKeyword
+         ::= 'verification' 'def'
+VerificationCaseDefinition
+         ::= OccurrenceDefinitionPrefix VerificationCaseDefKeyword CalculationDeclaration CaseBody
+VerificationCaseUsage
+         ::= OccurrenceUsagePrefix 'verification' CalculationUsageDeclaration CaseBody
+RequirementVerificationMember
+         ::= MemberPrefix RequirementVerificationKind RequirementVerificationUsage
+RequirementVerificationUsage
+         ::= ( OwnedSubsetting FeatureSpecialization* CalculationUsageParameterPart? | 'requirement' CalculationUsageDeclaration ) RequirementBody
+UseCaseKeyword
+         ::= 'use' 'case'
+UseCaseDefKeyword
+         ::= UseCaseKeyword 'def'
+UseCaseUsageKeyword
+         ::= UseCaseKeyword
+UseCaseDefinition
+         ::= OccurrenceDefinitionPrefix UseCaseDefKeyword CalculationDeclaration CaseBody
+UseCaseUsage
+         ::= OccurrenceUsagePrefix UseCaseUsageKeyword CalculationUsageDeclaration CaseBody
+IncludeUseCaseUsage
+         ::= OccurrenceUsagePrefix 'include' ( OwnedSubsetting FeatureSpecializationPart? | UseCaseUsageKeyword UsageDeclaration? ) ( ValuePart | ActionUsageParameterList )? CaseBody
+ViewDefKeyword
+         ::= 'view' 'def'
+ViewDefinition
+         ::= OccurrenceDefinitionPrefix ViewDefKeyword DefinitionDeclaration ViewDefinitionBody
+ViewDefinitionBody
+         ::= ';'
+           | '{' ViewDefinitionBodyItem* '}'
+ViewDefinitionBodyItem
+         ::= DefinitionBodyItem
+           | ElementFilterMember
+           | ViewRenderingMember
+ViewRenderingMember
+         ::= MemberPrefix 'render' ViewRenderingUsage
+ViewRenderingUsage
+         ::= OwnedSubsetting FeatureSpecialization* UsageBody
+ViewUsage
+         ::= OccurrenceUsagePrefix 'view' UsageDeclaration? ValueOrFlowPart? ViewBody
+ViewBody ::= ';'
+           | '{' ViewBodyItem* '}'
+ViewBodyItem
+         ::= DefinitionBodyItem
+           | ElementFilterMember
+           | Expose
+           | ViewRenderingMember
+Expose   ::= PrefixDocumentation* VisibilityIndicator? 'expose' ( ImportedNamespace | ImportedFilterPackage ) ';'
+ViewpointDefKeyword
+         ::= 'viewpoint' 'def'
+ViewpointDefinition
+         ::= OccurrenceDefinitionPrefix ViewpointDefKeyword ConstraintDeclaration RequirementBody
+ViewpointUsage
+         ::= OccurrenceUsagePrefix 'viewpoint' CalculationUsageDeclaration RequirementBody
+RenderingDefKeyword
+         ::= 'rendering' 'def'
+RenderingDefinition
+         ::= OccurrenceDefinitionPrefix RenderingDefKeyword Definition
+RenderingUsage
+         ::= OccurrenceUsagePrefix 'rendering' Usage
+ExpressionBody
+         ::= CalculationBody
+
+<?TOKENS?>
+

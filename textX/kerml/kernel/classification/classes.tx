@@ -1,0 +1,7 @@
+
+/* Classes */
+
+Class returns SysML::Class :
+	( isAbstract ?= 'abstract' )? 'class'
+	ClassifierDeclaration TypeBody
+;

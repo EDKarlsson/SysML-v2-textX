@@ -1,0 +1,42 @@
+
+    digraph textX {
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+    node[
+        shape=record,
+        style=filled,
+        fillcolor=aliceblue
+    ]
+    nodesep = 0.3
+    edge[dir=black,arrowtail=empty]
+
+
+140342354879824 -> 140342354879264 [label="simple_types:0" arrowtail=diamond dir=both]
+140342354879264[label="{string:SimpleType|}"]
+140342354879824 -> 140342354880720 [label="simple_types:1" arrowtail=diamond dir=both]
+140342354880720[label="{integer:SimpleType|}"]
+140342354879824 -> 140342354880832 [label="entities:0" arrowtail=diamond dir=both]
+140342354880832 -> 140342354880776 [label="properties:0" arrowtail=diamond dir=both]
+140342354880776 -> 140342354879264 [label="type" ]
+140342354880776[label="{name:Property|}"]
+140342354880832 -> 140342354881000 [label="properties:1" arrowtail=diamond dir=both]
+140342354881000 -> 140342354880888 [label="type" ]
+140342354880888 -> 140342354881168 [label="properties:0" arrowtail=diamond dir=both]
+140342354881168 -> 140342354879264 [label="type" ]
+140342354881168[label="{street:Property|}"]
+140342354880888 -> 140342354881392 [label="properties:1" arrowtail=diamond dir=both]
+140342354881392 -> 140342354879264 [label="type" ]
+140342354881392[label="{city:Property|}"]
+140342354880888 -> 140342354881448 [label="properties:2" arrowtail=diamond dir=both]
+140342354881448 -> 140342354879264 [label="type" ]
+140342354881448[label="{country:Property|}"]
+140342354880888[label="{Address:Entity|}"]
+140342354881000[label="{address:Property|}"]
+140342354880832 -> 140342354881056 [label="properties:2" arrowtail=diamond dir=both]
+140342354881056 -> 140342354880720 [label="type" ]
+140342354881056[label="{age:Property|}"]
+140342354880832[label="{Person:Entity|}"]
+140342354879824 -> 140342354880888 [label="entities:1" arrowtail=diamond dir=both]
+140342354879824[label="{:EntityModel|}"]
+
+}

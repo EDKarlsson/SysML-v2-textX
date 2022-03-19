@@ -1,0 +1,22 @@
+/* Classifiers */
+
+Classifier returns SysML::Classifier :
+	( isAbstract ?= 'abstract' )? 'classifier'
+	ClassifierDeclaration TypeBody
+;
+
+fragment ClassifierDeclaration returns SysML::Classifier :
+    (isSufficient ?= 'all' )? Identification?
+	( ownedRelationship += OwnedMultiplicity )?
+	( SuperclassingPart | ClassifierConjugationPart )?
+	DisjoiningPart?
+;
+
+fragment SuperclassingPart returns SysML::Classifier :
+	( ':>' | 'specializes' ) ownedRelationship += Ownedsubclassification
+	( ',' ownedRelationship += Ownedsubclassification )*
+;
+
+fragment ClassifierConjugationPart returns SysML::Classifier :
+	( '~' | 'conjugates' ) ownedRelationship += ClassifierConjugation
+;

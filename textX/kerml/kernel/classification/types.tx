@@ -1,0 +1,7 @@
+
+/* Data Types */
+
+DataType returns SysML::DataType :
+	( isAbstract ?= 'abstract' )? 'datatype'
+	ClassifierDeclaration TypeBody
+;

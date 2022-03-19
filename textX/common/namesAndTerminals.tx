@@ -1,0 +1,53 @@
+/* NAMES */
+Name
+    : ID | UNRESTRICTED_NAME
+    ;
+
+Qualification
+    : ( Name '::' )+
+    ;
+
+QualifiedName
+    : Qualification? Name
+    ;
+
+/* TERMINALS */
+DECIMAL_VALUE /* returns Ecore::EInt */
+    : '0'..'9' ('0'..'9')*
+    ;
+
+EXP_VALUE
+    : DECIMAL_VALUE ('e' | 'E') ('+' | '-')? DECIMAL_VALUE
+	;
+
+ID
+    : ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*
+    ;
+
+UNRESTRICTED_NAME /* returns Ecore::EString */
+    : '\'' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | "'" | '\\') | !('\\' | '\''))* '\''
+    ;
+
+STRING_VALUE /* returns Ecore::EString */
+    : '"' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | "'" | '\\') | !('\\' | '"'))* '"'
+    ;
+
+REGULAR_COMMENT
+    : '/*' !('*') ->'*/'
+    ;
+
+DOCUMENTATION_COMMENT
+    : '/**'->'*/'
+    ;
+
+ML_NOTE
+    : '//*'->'*/'
+    ;
+
+SL_NOTE
+    : '//' (!('\n' | '\r') !('\n' | '\r')*)? ('\r'? '\n')?
+    ;
+
+WS
+    : (' ' | '\t' | '\r' | '\n')+
+    ;

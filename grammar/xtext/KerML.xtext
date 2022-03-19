@@ -1,0 +1,1118 @@
+/*****************************************************************************
+ * SysML 2 Pilot Implementation
+ * Copyright (c) 2018, 2021 Model Driven Solutions, Inc.
+ * Copyright (c) 2018 IncQuery Labs Ltd.
+ * Copyright (c) 2019 Maplesoft (Waterloo Maple, Inc.)
+ * Copyright (c) 2019 Mgnite Inc.
+ *    
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of theGNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @license LGPL-3.0-or-later <http://spdx.org/licenses/LGPL-3.0-or-later>
+ * 
+ * Contributors:
+ *  Ed Seidewitz, MDS
+ *  Zoltan Kiss, IncQuery
+ *  Balazs Grill, IncQuery
+ *  Hisashi Miyashita, Maplesoft/Mgnite
+ * 
+ *****************************************************************************/
+
+grammar org.omg.kerml.xtext.KerML with org.omg.kerml.expressions.xtext.KerMLExpressions
+
+import "http://www.eclipse.org/emf/2002/Ecore" as Ecore
+import "http://www.omg.org/spec/SysML/2.0" as SysML
+
+/* ROOT NAMESPACE */
+
+RootNamespace returns SysML::Namespace :
+	{SysML::Namespace}NamespaceBodyElement*
+;
+
+/* ELEMENTS */
+
+/* Elements */
+
+fragment Identification returns SysML::Element :
+	  '<' humanId = Name '>' ( name = Name )?
+	| name = Name
+;
+
+Element returns SysML::Element :
+    'element' Identification? ElementBody
+;
+
+fragment ElementBody returns SysML::Element :
+    ';' | '{' OwnedElement* '}'
+;
+
+fragment OwnedElement returns SysML::Element :
+      ownedRelationship += OwnedRelationship
+    | ownedRelationship += OwnedDocumentation
+    | ownedRelationship += OwnedTextualRepresentationAnnotation
+    | ownedRelationship += OwnedAnnotatingFeatureAnnotation
+;
+
+/* Relationships */
+
+Relationship returns SysML::Relationship :
+    'relationship' Identification?
+    RelationshipRelatedElements
+    RelationshipBody
+;
+
+OwnedRelationship returns SysML::Relationship :
+    'relationship' Identification?
+    ( 'to' RelationshipTargetList )?
+    RelationshipBody
+;
+
+fragment RelationshipRelatedElements returns SysML::Relationship :
+      ('from' RelationshipSourceList)? ( 'to' RelationshipTargetList )?
+;
+
+fragment RelationshipSourceList returns SysML::Relationship :
+    RelationshipSource ( ',' RelationshipSource )*
+;
+
+fragment RelationshipSource returns SysML::Relationship :
+    source += [SysML::Element | QualifiedName]
+;
+
+fragment RelationshipTargetList returns SysML::Relationship :
+    RelationshipTarget ( ',' RelationshipTarget )*
+;
+
+fragment RelationshipTarget returns SysML::Relationship :
+    target += [SysML::Element | QualifiedName]
+;
+
+fragment RelationshipBody returns SysML::Relationship :
+    ';' | '{' RelationshipOwnedElement* '}'
+;
+
+fragment RelationshipOwnedElement returns SysML::Relationship:
+      ownedRelatedElement += OwnedRelatedElement
+    | ownedRelatedElement += OwnedRelatedRelationship
+    | ownedRelationship += OwnedDocumentation
+    | ownedRelationship += OwnedTextualRepresentationAnnotation
+;
+
+OwnedRelatedElement returns SysML::Element :
+    'element' ( '<' humanId = Name '>' )? ElementBody
+;
+
+OwnedRelatedRelationship returns SysML::Relationship :
+	'relationship' ( '<' humanId = Name '>' )? 
+	RelationshipRelatedElements
+	RelationshipBody
+;
+
+/* ANNOTATIONS */
+
+/* Comments */
+
+Comment returns SysML::Comment :
+	( 'comment' Identification? 'about' ownedRelationship += Annotation
+	  ( ',' ownedRelationship += Annotation )*
+	| ( 'comment' Identification? )? ownedRelationship += EmptyAnnotation
+	)
+	body = REGULAR_COMMENT
+;
+
+Annotation returns SysML::Annotation :
+	annotatedElement = [SysML::Element|QualifiedName]
+;
+
+EmptyAnnotation returns SysML::Annotation :
+	{SysML::Annotation}
+;
+
+/* Documentation */
+
+OwnedDocumentation returns SysML::Documentation :
+	ownedRelatedElement += DocumentationComment // documentingComment = DocumentationComment
+;
+
+DocumentationComment returns SysML::Comment :
+	'doc' ( '<' humanId = Name '>' )? body = REGULAR_COMMENT
+;
+
+PrefixDocumentation returns SysML::Annotation :
+	ownedRelatedElement += PrefixDocumentationComment
+;
+
+PrefixDocumentationComment returns SysML::Comment :
+	( 'doc' ( '<' humanId = Name '>' )? )? body = DOCUMENTATION_COMMENT
+;
+
+/* Textual Representation */
+
+OwnedTextualRepresentationAnnotation returns SysML::Annotation :
+	ownedRelatedElement += OwnedTextualRepresentation
+;
+
+OwnedTextualRepresentation returns SysML::TextualRepresentation :
+	( 'rep' ( humanId = Name )? )? 
+	'language' language = STRING_VALUE body = REGULAR_COMMENT
+	ownedRelationship += EmptyAnnotation
+;
+
+TextualRepresentation returns SysML::TextualRepresentation :
+    ( 'rep' Identification? 'about' ownedRelationship += Annotation
+    | ( 'rep' Identification? )? ownedRelationship += EmptyAnnotation
+    )
+    'language' language = STRING_VALUE 
+    body = REGULAR_COMMENT
+;
+
+/* Annotating Features */
+
+OwnedAnnotatingFeatureAnnotation returns SysML::Annotation :
+	ownedRelatedElement += OwnedAnnotatingFeature
+;
+
+OwnedAnnotatingFeature returns SysML::AnnotatingFeature :
+	'metadata' ( humanId = Name ( ':' | 'typed' 'by' ) )? ownedRelationship += MetadataTyping 
+	ownedRelationship += EmptyAnnotation 
+	AnnotatingFeatureBody
+;
+
+AnnotatingFeature returns SysML::AnnotatingFeature :
+	( '@' | 'metadata' ) AnnotatingFeatureDeclaration 
+	( 'about' ownedRelationship += Annotation ( ',' ownedRelationship += Annotation )* 
+	| ownedRelationship += EmptyAnnotation
+	)	
+	AnnotatingFeatureBody
+;
+
+fragment AnnotatingFeatureDeclaration returns SysML::AnnotatingFeature :
+	( Identification ( ':' | 'typed' 'by' ) )? ownedRelationship += MetadataTyping
+;
+
+MetadataTyping returns SysML::FeatureTyping :
+	type = [SysML::DataType | QualifiedName]
+;
+
+fragment AnnotatingFeatureBody returns SysML::AnnotatingFeature :
+	';' | '{' ( ownedRelationship += MetadataFeatureMember )* '}'
+;
+
+MetadataFeatureMember returns SysML::FeatureMembership :
+	ownedRelatedElement += MetadataFeature // ownedMemberFeature = MetadataFeature
+;
+
+MetadataFeature returns SysML::MetadataFeature :
+	'feature'? ( ':>>' | 'redefines')? ownedRelationship += OwnedRedefinition 
+	'=' ownedRelationship += MetadataFeatureValue ';' // metadataFeatureValue = MetadataFeatureValue ';'
+;
+
+MetadataFeatureValue returns SysML::MetadataFeatureValue :
+	ownedRelatedElement += OwnedExpression // metadataValue = OwnedExpression
+;
+
+/* NAMESPACES */
+
+Namespace returns SysML::Namespace :
+	NamespaceDeclaration NamespaceBody
+;
+
+fragment NamespaceDeclaration returns SysML::Namespace :
+	'namespace' Identification?
+;
+
+fragment NamespaceBody returns SysML::Namespace :
+	  ';' 
+	| '{' ( // Note: PackageBodyElement is expanded here to avoid
+			// infinite loops in the incremental parser.
+		    ownedRelationship += OwnedDocumentation
+	      | ownedRelationship += NamespaceMember 
+	      | ownedRelationship += AliasMember
+	      | ownedRelationship += Import )* 
+	  '}'
+;
+
+/* Namespace Bodies */
+
+fragment NamespaceBodyElement returns SysML::Namespace :
+	  ownedRelationship += OwnedDocumentation
+	| ownedRelationship += NamespaceMember
+	| ownedRelationship += AliasMember
+	| ownedRelationship += Import
+;
+
+fragment MemberPrefix returns SysML::Membership :
+	( ownedRelationship += PrefixDocumentation )*
+    ( visibility = VisibilityIndicator )?
+;
+
+NamespaceMember returns SysML::Membership : 
+	  NonFeatureMember
+	| NamespaceFeatureMember
+	| ChainFeatureMember
+;
+
+NonFeatureMember returns SysML::Membership : 
+	MemberPrefix ownedRelatedElement += NonFeatureElement // ownedMemberElement = NonFeatureElement
+;
+
+NamespaceFeatureMember returns SysML::Membership :
+	MemberPrefix ownedRelatedElement += FeatureElement // ownedMemberElement = FeatureElement
+;
+
+ChainFeatureMember returns SysML::Membership :
+	MemberPrefix 'feature'? ( memberName = Name )? 'is' ownedRelatedElement += FeatureChain ';' // ownedMemberElement = Feature ';'
+;
+
+AliasMember returns SysML::Membership :
+	MemberPrefix
+	'alias' memberName = Name 'for' memberElement = [SysML::Element|QualifiedName] ';'
+;
+
+Import returns SysML::Import :
+	( ownedRelationship += PrefixDocumentation )*
+	( visibility = VisibilityIndicator )?  
+	'import' ( isImportAll ?= 'all' )?
+	( ImportedNamespace | ImportedFilterPackage ) ';'
+;
+
+fragment ImportedNamespace returns SysML::Import :
+	( importedNamespace = [SysML::Namespace|Qualification] )?
+	( importedMemberName = Name | '*' )
+	( '::' isRecursive ?= '**' )?
+;
+
+fragment ImportedFilterPackage returns SysML::Import :
+	ownedRelatedElement += FilterPackage
+;
+
+FilterPackage returns SysML::Package :
+	ownedRelationship += FilterPackageImport
+	( ownedRelationship += FilterPackageMember )+
+;
+
+FilterPackageImport returns SysML::Import :
+	ImportedNamespace
+;
+
+FilterPackageMember returns SysML::ElementFilterMembership :
+	visibility = FilterPackageMemberVisibility ownedRelatedElement += OwnedExpression ']' // condition = OwnedExpression ']'
+;
+
+enum FilterPackageMemberVisibility returns SysML::VisibilityKind :
+	private = '['
+;
+
+enum VisibilityIndicator returns SysML::VisibilityKind :
+	public = 'public' | private = 'private' | protected = 'protected'
+;
+
+/* Namespace Elements */
+
+NonFeatureElement returns SysML::Element :
+	  Element
+	| Relationship
+	| Comment
+	| TextualRepresentation
+	| AnnotatingFeature
+	| Namespace
+	| Package 
+	| Multiplicity
+	| Type
+	| Classifier 
+	| Class
+	| Structure
+	| DataType 
+	| Association
+	| AssociationStructure
+	| Interaction
+	| Behavior
+	| Function
+	| Predicate
+	| Specialization
+	| Conjugation
+	| FeatureTyping
+	| Subclassification
+	| Disjoining
+	| Subsetting
+	| Redefinition
+	| TypeFeaturing
+;
+
+FeatureElement returns SysML::Feature :
+	  Feature
+	| Step
+	| Expression
+	| BooleanExpression
+	| Invariant
+	| Connector
+	| BindingConnector
+	| Succession
+	| ItemFlow
+	| SuccessionItemFlow
+;
+
+/* PACKAGES */
+
+Package returns SysML::Package :
+	PackageDeclaration PackageBody 
+;
+
+fragment PackageDeclaration returns SysML::Package :
+	'package' Identification?
+;
+
+fragment PackageBody returns SysML::Namespace :
+	  ';' 
+	| '{' ( // Note: PackageBodyElement is expanded here to avoid
+			// infinite loops in the incremental parser.
+		    ownedRelationship += OwnedDocumentation
+	      | ownedRelationship += NamespaceMember 
+	      | ownedRelationship += ElementFilterMember
+	      | ownedRelationship += AliasMember
+	      | ownedRelationship += Import )*
+	  '}'
+;
+
+ElementFilterMember returns SysML::ElementFilterMembership :
+	MemberPrefix
+	'filter' ownedRelatedElement += OwnedExpression ';' // condition = OwnedExpression ';'
+;
+
+/* TYPES */
+
+/* Types */
+
+Type returns SysML::Type :
+    ( isAbstract ?= 'abstract' )? 'type' 
+    TypeDeclaration TypeBody
+;
+
+fragment TypeDeclaration returns SysML::Type : 
+    ( isSufficient ?= 'all' )? Identification?
+    ( ownedRelationship += OwnedMultiplicity )? 
+    ( SpecializationPart | ConjugationPart )+
+    DisjoiningPart?
+;
+
+fragment SpecializationPart returns SysML::Type :
+      ( ':>' | 'specializes' ) ownedRelationship += OwnedSpecialization
+      ( ',' ownedRelationship += OwnedSpecialization )*
+;
+
+fragment ConjugationPart returns SysML::Type :
+	( '~' | 'conjugates' ) ownedRelationship += OwnedConjugation
+;
+
+fragment DisjoiningPart returns SysML::Type :
+	'disjoint' 'from' ownedRelationship += OwnedDisjoining
+	( ',' ownedRelationship += OwnedDisjoining )* 
+;
+
+fragment TypeBody returns SysML::Type :
+	';' | 
+	'{' ( ownedRelationship += OwnedDocumentation
+		| ownedRelationship += NonFeatureMember 
+		| ownedRelationship += FeatureMember 
+		| ownedRelationship += AliasMember
+		| ownedRelationship += Import
+	)* '}'
+;
+
+/* Feature Membership */
+
+FeatureMember returns SysML::Membership :
+	TypeFeatureMember | OwnedFeatureMember | UnownedFeatureMember | ChainFeatureMember
+;
+
+TypeFeatureMember returns SysML::Membership :
+	MemberPrefix 'member' ownedRelatedElement += FeatureElement // ownedMemberElement = FeatureElement
+;
+
+OwnedFeatureMember returns SysML::FeatureMembership :
+	MemberPrefix ownedRelatedElement += FeatureElement // ownedMemberFeature = FeatureElement
+;
+
+UnownedFeatureMember returns SysML::FeatureMembership :
+	MemberPrefix 'feature'? ( memberName = Name )? 'is' memberFeature = [SysML::Feature|QualifiedName] ';'
+;
+
+/* Specialization */
+
+Specialization returns SysML::Specialization :
+    ( 'specialization' Identification? )?
+    'subtype' 
+	( specific = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain )
+    ( ':>' | 'specializes') 
+	( general = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain ) ';'
+;
+
+OwnedSpecialization returns SysML::Specialization :
+	  general = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain
+;
+
+/* Conjugation */
+
+Conjugation returns SysML::Conjugation :
+	( 'conjugation' Identification? )?
+    'conjugate' 
+    ( conjugatedType = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain )
+    ( '~' | 'conjugates') 
+    ( originalType = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain ) ';'
+;
+
+OwnedConjugation returns SysML::Conjugation :
+	  originalType = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain
+;
+
+/* Disjoining */
+
+Disjoining returns SysML::Disjoining :
+	( 'disjoining' Identification? )?
+	'disjoint' 
+	( typeDisjoined = [SysML::Type | QualifiedName] 
+	| ownedRelatedElement += FeatureChain )
+	'from' 
+	( disjoiningType = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain ) ';'
+;
+
+OwnedDisjoining returns SysML::Disjoining :
+	  disjoiningType = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain
+;
+
+/* CLASSIFIERS */
+
+/* Classifiers */
+
+Classifier returns SysML::Classifier :
+	( isAbstract ?= 'abstract' )? 'classifier' 
+	ClassifierDeclaration TypeBody
+;
+
+fragment ClassifierDeclaration returns SysML::Classifier :	
+    (isSufficient ?= 'all' )? Identification?
+	( ownedRelationship += OwnedMultiplicity )?
+	( SuperclassingPart | ClassifierConjugationPart )?
+	DisjoiningPart?
+;
+
+fragment SuperclassingPart returns SysML::Classifier :
+	( ':>' | 'specializes' ) ownedRelationship += Ownedsubclassification 
+	( ',' ownedRelationship += Ownedsubclassification )*
+;
+
+fragment ClassifierConjugationPart returns SysML::Classifier :
+	( '~' | 'conjugates' ) ownedRelationship += ClassifierConjugation
+;
+
+/* Subclassification */
+
+Subclassification returns SysML::Subclassification :
+	( 'specialization' Identification? )?
+    'subclassifier' subclassifier = [SysML::Classifier | QualifiedName]
+    ( ':>' | 'specializes') superclassifier = [SysML::Classifier | QualifiedName] ';'
+;
+
+Ownedsubclassification returns SysML::Subclassification :
+	superclassifier = [SysML::Classifier | QualifiedName]
+;
+
+/* Classifier Conjugation */
+
+ClassifierConjugation returns SysML::Conjugation :
+	originalType = [SysML::Classifier | QualifiedName]
+;
+
+/* FEATURES */
+
+/* Features */
+
+fragment FeaturePrefix returns SysML::Feature :	
+	( direction = FeatureDirection )?
+	( isAbstract ?= 'abstract' )?
+	( isComposite ?= 'composite' | isPortion ?= 'portion' )? 
+	( isReadOnly ?= 'readonly' )?
+	( isDerived ?= 'derived' )?
+	( isEnd ?= 'end' )?
+;
+
+enum FeatureDirection returns SysML::FeatureDirectionKind:
+	in = 'in' | out = 'out' | inout = 'inout'
+;
+
+Feature returns SysML::Feature :
+	FeaturePrefix 
+	( 'feature'? FeatureDeclaration | 'feature' ) 
+	ValuePart? TypeBody
+;
+
+fragment FeatureDeclaration returns SysML::Feature :
+	( isSufficient ?= 'all' )? 
+	( Identification ( FeatureSpecializationPart | FeatureConjugationPart )?
+	| FeatureSpecializationPart
+	| FeatureConjugationPart
+	)
+	DisjoiningPart?
+	TypeFeaturingPart?
+;
+
+fragment TypeFeaturingPart returns SysML::Feature :
+	'featured' 'by' ownedRelationship += OwnedTypeFeaturing 
+	( ',' ownedRelationship += OwnedTypeFeaturing )*
+;
+
+fragment FeatureSpecializationPart returns SysML::Feature :
+	  ( -> FeatureSpecialization )+ MultiplicityPart? FeatureSpecialization*
+	| MultiplicityPart FeatureSpecialization*
+;
+
+fragment MultiplicityPart returns SysML::Feature :
+	  ownedRelationship += OwnedMultiplicity 
+	| ( ownedRelationship += OwnedMultiplicity )?
+	  ( isOrdered ?= 'ordered' isNonunique ?= 'nonunique'?
+	  | isNonunique ?= 'nonunique' isOrdered ?= 'ordered'?
+	  )
+;
+
+fragment FeatureSpecialization returns SysML::Feature :
+	Typings | Subsettings | Redefinitions
+;
+
+fragment Typings returns SysML::Feature :
+	TypedBy ( ',' ownedRelationship += OwnedFeatureTyping )*
+;
+
+fragment TypedBy returns SysML::Feature :
+	( ':' | 'typed' 'by' ) ownedRelationship += OwnedFeatureTyping
+;
+
+fragment Subsettings returns SysML::Feature :
+	Subsets ( ',' ownedRelationship += OwnedSubsetting )*
+;
+
+fragment Subsets returns SysML::Feature :
+	( ':>' | 'subsets' ) ownedRelationship += OwnedSubsetting 
+;
+
+fragment Redefinitions returns SysML::Feature :
+	Redefines ( ',' ownedRelationship += OwnedRedefinition )*
+;
+
+fragment Redefines returns SysML::Feature :
+	( ':>>' | 'redefines' ) ownedRelationship += OwnedRedefinition
+;
+
+/* Type Featuring */
+
+TypeFeaturing returns SysML::TypeFeaturing :
+	'featuring' ( Identification? 'of')?
+	featureOfType = [SysML::Feature | QualifiedName]
+	'by' featuringType = [SysML::Feature | QualifiedName] ';'
+;
+
+OwnedTypeFeaturing returns SysML::TypeFeaturing :
+	featuringType = [SysML::Type | QualifiedName]
+;
+
+/* Feature Typing */
+
+FeatureTyping returns SysML::FeatureTyping :
+	( 'specialization' Identification? )?
+    'typing' typedFeature = [SysML::Feature | QualifiedName]
+    (':' | 'typed' 'by') FeatureType ';'
+;
+
+@Override
+OwnedFeatureTyping returns SysML::FeatureTyping :
+	FeatureType
+;
+
+fragment FeatureType returns SysML::FeatureTyping :
+	  type = [SysML::Type | QualifiedName]
+	| ownedRelatedElement += FeatureChain
+;
+
+/* Subsetting */
+
+Subsetting returns SysML::Subsetting :
+	( 'specialization' Identification? )?
+    'subset' 
+    ( subsettingFeature = [SysML::Feature | QualifiedName]
+	| ownedRelatedElement += FeatureChain )
+    ( ':>' | 'subsets' ) 
+    ( subsettedFeature = [SysML::Feature | QualifiedName]
+	| ownedRelatedElement += FeatureChain ) ';'
+;
+
+OwnedSubsetting returns SysML::Subsetting:
+	  subsettedFeature = [SysML::Feature | QualifiedName]
+	| ownedRelatedElement += FeatureChain
+;
+
+/* Redefinition */
+
+Redefinition returns SysML::Redefinition :
+	( 'specialization' Identification? )?
+    'redefinition' 
+    ( redefiningFeature = [SysML::Feature | QualifiedName]
+	| ownedRelatedElement += FeatureChain )
+    ( ':>>' | 'redefines' ) 
+    ( redefinedFeature = [SysML::Feature | QualifiedName]
+	| ownedRelatedElement += FeatureChain ) ';'
+;
+
+OwnedRedefinition returns SysML::Redefinition:
+	  redefinedFeature = [SysML::Feature | QualifiedName]
+	| ownedRelatedElement += FeatureChain 
+;
+
+/* Feature Conjugation */
+
+fragment FeatureConjugationPart returns SysML::Feature :
+	( '~' | 'conjugates' ) ownedRelationship += FeatureConjugation
+;
+
+FeatureConjugation returns SysML::Conjugation :
+	originalType = [SysML::Feature | QualifiedName ]
+;
+
+/* FEATURE VALUES */
+
+fragment ValuePart returns SysML::Feature :
+	  ownedRelationship += FeatureValue
+	| ownedRelationship += FeatureValueExpression
+	  ownedRelationship += EmptyFeatureWriteMember
+;
+
+FeatureValue returns SysML::FeatureValue :
+	( '=' | isDefault ?= 'default' ( '=' | isInitial ?= ':=' )? )
+	ownedRelatedElement += OwnedExpression // value = OwnedExpression
+;
+
+FeatureValueExpression returns SysML::FeatureValue :
+	isInitial ?= ':='
+	ownedRelatedElement += OwnedExpression // value = OwnedExpression
+;
+
+EmptyFeatureWriteMember returns SysML::Membership :
+	ownedRelatedElement += EmptyFeatureWrite // ownedMemberElement = EmptyAssignmentAction
+;
+
+EmptyFeatureWrite returns SysML::Step :
+	ownedRelationship += EmptyTargetMember
+	ownedRelationship += EmptyParameterMember
+;
+
+EmptyTargetMember returns SysML::ParameterMembership :
+	ownedRelatedElement += EmptyTargetParameter // ownedMemberParameter = TargetParameter
+;
+
+EmptyTargetParameter returns SysML::ReferenceUsage :
+	ownedRelationship += TargetFeatureMember
+;
+
+TargetFeatureMember returns SysML::FeatureMembership :
+	ownedRelatedElement += TargetFeature // ownedMemberFeature = TargetFeature
+;
+
+TargetFeature returns SysML::Feature :
+	ownedRelationship += EmptyFeatureMember
+;
+
+EmptyFeatureMember returns SysML::FeatureMembership :
+	ownedRelatedElement += EmptyFeature // ownedMemberFeature = EmptyFeature
+;
+
+EmptyParameterMember returns SysML::ParameterMembership :
+	ownedRelatedElement += EmptyFeature
+;
+
+/* MULTIPLICITIES */
+
+Multiplicity returns SysML::Multiplicity :
+	MultiplicitySubset | MultiplicityRange
+;
+
+MultiplicitySubset returns SysML::Multiplicity :
+	'multiplicity' Identification? Subsets
+;
+
+MultiplicityRange returns SysML::MultiplicityRange :
+	'multiplicity' Identification? MultiplicityBounds ';'
+;
+
+OwnedMultiplicity returns SysML::Membership :
+	ownedRelatedElement += OwnedMultiplicityRange // ownedMemberElement = OwnedMultiplicityRange
+;
+
+OwnedMultiplicityRange returns SysML::MultiplicityRange :
+	MultiplicityBounds
+;
+
+fragment MultiplicityBounds returns SysML::MultiplicityRange :
+	// TODO: Allow general expressions for bounds. (Causes LL parsing issues.)
+	'[' ownedRelationship += MultiplicityExpressionMember
+	      ( '..' ownedRelationship += MultiplicityExpressionMember )? ']'
+;
+
+MultiplicityExpressionMember returns SysML::Membership :
+	ownedRelatedElement += ( LiteralExpression | FeatureReferenceExpression ) // ownedMemberElement = ( LiteralExpression | FeatureReferenceExpression )
+;
+
+/* CLASSIFICATION */
+
+/* Data Types */
+
+DataType returns SysML::DataType :
+	( isAbstract ?= 'abstract' )? 'datatype' 
+	ClassifierDeclaration TypeBody
+;
+
+/* Classes */
+
+Class returns SysML::Class :
+	( isAbstract ?= 'abstract' )? 'class' 
+	ClassifierDeclaration TypeBody
+;
+
+/* STRUCTURES */
+
+Structure returns SysML::Structure :
+	( isAbstract ?= 'abstract' )? 'struct' 
+	ClassifierDeclaration TypeBody
+;
+
+
+/* ASSOCIATIONS */
+
+Association returns SysML::Association :
+	( isAbstract ?= 'abstract' )? 'assoc' 
+	ClassifierDeclaration TypeBody
+;
+
+AssociationStructure returns SysML::AssociationStructure :
+	( isAbstract ?= 'abstract' )? 'assoc' 'struct'
+	ClassifierDeclaration TypeBody
+;
+
+/* CONNECTORS */
+
+/* Connectors */
+
+Connector returns SysML::Connector :	 
+	FeaturePrefix 'connector' 
+	ConnectorDeclaration TypeBody	  
+;
+
+fragment ConnectorDeclaration returns SysML::Connector :
+	BinaryConnectorDeclaration | NaryConnectorDeclaration
+;
+
+fragment BinaryConnectorDeclaration returns SysML::Connector :
+	( FeatureDeclaration? 'from' | isSufficient ?= 'all' 'from'? )?
+	ownedRelationship += ConnectorEndMember 'to' 
+	ownedRelationship += ConnectorEndMember
+;
+
+fragment NaryConnectorDeclaration returns SysML::Connector :
+	FeatureDeclaration?
+	( '(' ownedRelationship += ConnectorEndMember ',' 
+	      ownedRelationship += ConnectorEndMember
+	      ( ',' ownedRelationship += ConnectorEndMember )* 
+	  ')' )?
+;
+
+ConnectorEndMember returns SysML::EndFeatureMembership :
+	( memberName = Name ':>' )? ownedRelatedElement += ConnectorEnd // ownedMemberFeature = ConnectorEnd
+;
+
+ConnectorEnd returns SysML::Feature :
+	ownedRelationship += OwnedSubsetting
+	( ownedRelationship += OwnedMultiplicity )?
+;
+
+/* Binding Connectors */
+
+BindingConnector returns SysML::BindingConnector :
+	FeaturePrefix 'binding' 
+	BindingConnectorDeclaration TypeBody	
+;
+
+fragment BindingConnectorDeclaration returns SysML::BindingConnector :
+	( FeatureDeclaration? 'of' | isSufficient ?= 'all' 'of'? )?
+	ownedRelationship += ConnectorEndMember '=' 
+	ownedRelationship += ConnectorEndMember
+;
+
+/* Successions */
+
+Succession returns SysML::Succession :
+	FeaturePrefix 'succession' 
+	SuccessionDeclaration TypeBody
+;
+
+fragment SuccessionDeclaration returns SysML::Succession :
+	( FeatureDeclaration? 'first' | isSufficient ?= 'all' 'first'? )?
+	ownedRelationship += ConnectorEndMember 'then' 
+	ownedRelationship += ConnectorEndMember
+;
+
+/* BEHAVIORS */
+
+/* Behaviors */
+
+Behavior returns SysML::Behavior :
+	( isAbstract ?= 'abstract')? 'behavior' 
+	BehaviorDeclaration TypeBody
+;
+
+fragment BehaviorDeclaration returns SysML::Behavior :
+	ClassifierDeclaration ParameterList?
+;
+
+fragment ParameterList returns SysML::Type :
+	'(' ( ownedRelationship += ParameterMember 
+		( ',' ownedRelationship += ParameterMember )* )? ')'
+;
+
+ParameterMember returns SysML::ParameterMembership :
+	ownedRelatedElement += Parameter // ownedMemberParameter = Parameter
+;
+
+Parameter returns SysML::Feature :
+      ( direction = FeatureDirection )? 'feature'? ParameterDeclaration
+    | {SysML::Step} ( direction = FeatureDirection )? 'step' ParameterDeclaration
+    | {SysML::Expression} ( direction = FeatureDirection )? 'expr' ParameterDeclaration
+    | {SysML::BooleanExpression} ( direction = FeatureDirection )? 'bool' ParameterDeclaration
+;
+
+fragment ParameterDeclaration returns SysML::Feature :
+	( isSufficient ?= 'all' )? 
+    ( Identification ParameterSpecializationPart? 
+	| ParameterSpecializationPart
+	)
+;
+
+fragment ParameterSpecializationPart returns SysML::Feature :
+	  ( -> ParameterSpecialization )+ MultiplicityPart? ParameterSpecialization*
+	| MultiplicityPart ParameterSpecialization*
+;
+
+fragment ParameterSpecialization returns SysML::Feature :
+	TypedBy | Subsets | Redefines
+;
+
+/* Steps */
+
+Step returns SysML::Step :
+	FeaturePrefix 'step' 
+	StepDeclaration TypeBody
+;
+
+fragment StepDeclaration returns SysML::Step :
+	FeatureDeclaration? ( ValuePart | StepParameterList )?
+;
+
+fragment StepParameterList returns SysML::Step :
+	'(' ( ownedRelationship += StepParameterMember
+	    ( ',' ownedRelationship += StepParameterMember )* )? ')'
+;
+
+StepParameterMember returns SysML::ParameterMembership :
+	ownedRelatedElement += StepParameter // ownedMemberParameter = StepParameter
+;
+
+StepParameter returns SysML::Feature :
+	Parameter ValuePart? 
+;
+
+/* FUNCTIONS */
+
+/* Functions */
+
+Function returns SysML::Function :
+	( isAbstract ?= 'abstract' )? 'function' 
+	FunctionDeclaration FunctionBody  
+;
+
+fragment FunctionDeclaration returns SysML::Function :
+	ClassifierDeclaration ParameterPart?
+;
+
+fragment ParameterPart returns SysML::Type :
+	  ParameterList ReturnParameterPart?
+;
+
+fragment ReturnParameterPart returns SysML::Type :
+	ownedRelationship += ReturnParameterMember
+;
+
+ReturnParameterMember returns SysML::ReturnParameterMembership :
+	'return'? ownedRelatedElement += Parameter // ownedMemberParameter = Parameter
+;
+
+fragment FunctionBody returns SysML::Type :
+	  ';'
+	| '{' ( ownedRelationship += OwnedDocumentation
+		  | ownedRelationship += NonFeatureMember 
+		  | ownedRelationship += FeatureMember 
+		  | ownedRelationship += AliasMember
+		  | ownedRelationship += Import
+		  | ownedRelationship += ReturnFeatureMember
+		  )* 
+		  ( ownedRelationship += ResultExpressionMember )? 
+	  '}'
+;
+
+ReturnFeatureMember returns SysML::ReturnParameterMembership :
+	MemberPrefix 'return' 
+	ownedRelatedElement += FeatureElement // ownedMemberParameter = FeatureElement
+;
+
+@Override
+ResultExpressionMember returns SysML::ResultExpressionMembership :
+	MemberPrefix ownedRelatedElement += OwnedExpression // ownedResultExpression = OwnedExpression
+;
+
+/* Expressions */
+
+Expression returns SysML::Expression :
+	FeaturePrefix 'expr' 
+	ExpressionDeclaration FunctionBody
+;
+
+fragment ExpressionDeclaration returns SysML::Expression :
+	FeatureDeclaration? 
+	( ValuePart | StepParameterList ReturnParameterPart? )? 
+;
+
+/* Predicates */
+
+Predicate returns SysML::Predicate :
+	( isAbstract ?= 'abstract' )? 'predicate' 
+	PredicateDeclaration FunctionBody  
+;
+
+fragment PredicateDeclaration returns SysML::Predicate :
+	ClassifierDeclaration ParameterPart?
+;
+
+/* Boolean Expressions */ 
+
+BooleanExpression returns SysML::BooleanExpression :
+	FeaturePrefix 'bool' 
+	ExpressionDeclaration FunctionBody
+;
+
+/* Invariants */
+
+Invariant returns SysML::Invariant :
+	FeaturePrefix 'inv' ( 'true' | isNegated ?= 'false' )?
+	ExpressionDeclaration FunctionBody
+;
+
+/* INTERACTIONS */
+
+/* Interactions */
+
+Interaction returns SysML::Interaction :
+	( isAbstract ?= 'abstract' )? 'interaction' 
+	BehaviorDeclaration TypeBody
+;
+
+/* Item Flows */
+
+ItemFlow returns SysML::ItemFlow :
+	FeaturePrefix 'flow' 
+	ItemFlowDeclaration TypeBody
+;
+
+SuccessionItemFlow returns SysML::SuccessionItemFlow :
+	FeaturePrefix 'succession' 'flow' ItemFlowDeclaration TypeBody
+;
+
+fragment ItemFlowDeclaration returns SysML::ItemFlow :
+	( FeatureDeclaration? 
+      ( 'of'  ownedRelationship += ItemFeatureMember
+      | ownedRelationship += EmptyItemFeatureMember
+      ) 'from'
+    | ( isSufficient ?= 'all' )? ownedRelationship += EmptyItemFeatureMember
+    )
+	ownedRelationship += ItemFlowEndMember 'to' 
+	ownedRelationship += ItemFlowEndMember
+;
+
+ItemFeatureMember returns SysML::FeatureMembership :
+	( memberName = Name ':' )? ownedRelatedElement += ItemFeature // ownedMemberFeature = ItemFeature
+;
+
+ItemFeature returns SysML::ItemFeature :
+	  ownedRelationship += OwnedFeatureTyping 
+	  ( ownedRelationship += OwnedMultiplicity )?
+	| ownedRelationship += OwnedMultiplicity
+	  ( ownedRelationship += OwnedFeatureTyping )?
+;
+
+EmptyItemFeatureMember returns SysML::FeatureMembership :
+	ownedRelatedElement += EmptyItemFeature // ownedMemberFeature = EmptyItemFeature
+;
+
+EmptyItemFeature returns SysML::ItemFeature :
+	{SysML::ItemFeature}
+;
+
+ItemFlowEndMember returns SysML::EndFeatureMembership :
+	ownedRelatedElement += ItemFlowEnd // ownedMemberFeature = ItemFlowEnd
+;
+
+ItemFlowEnd returns SysML::ItemFlowEnd :
+	( ownedRelationship += ItemFlowEndSubsetting )?
+	ownedRelationship += ItemFlowFeatureMember
+;
+
+ItemFlowEndSubsetting returns SysML::Subsetting :
+	  subsettedFeature = [SysML::Feature | QualifiedName] '.'
+	| ownedRelatedElement += FeatureChainPrefix
+;
+
+FeatureChainPrefix returns SysML::Feature :
+	( ownedRelationship += OwnedFeatureChaining '.' )+
+	ownedRelationship += OwnedFeatureChaining '.'
+;
+
+ItemFlowFeatureMember returns SysML::FeatureMembership :
+	ownedRelatedElement += ItemFlowFeature // ownedMemberFeature = ItemFlowFeature
+;
+
+ItemFlowFeature returns SysML::ItemFlowFeature :
+	ownedRelationship += ItemFlowRedefinition
+;
+
+ItemFlowRedefinition returns SysML::Redefinition :
+	redefinedFeature = [SysML::Feature|QualifiedName]
+;
+
+/* EXPRESSIONS */
+
+@Override
+ExpressionBody returns SysML::Expression :
+	FunctionBody
+;

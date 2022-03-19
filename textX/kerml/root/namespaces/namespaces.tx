@@ -1,0 +1,25 @@
+/* ROOT NAMESPACE */
+
+RootNamespace returns SysML::Namespace :
+	{SysML::Namespace}NamespaceBodyElement*
+;
+
+/* Namespaces */
+Namespace returns SysML::Namespace :
+	NamespaceDeclaration NamespaceBody
+;
+
+fragment NamespaceDeclaration returns SysML::Namespace :
+	'namespace' Identification?
+;
+
+fragment NamespaceBody returns SysML::Namespace :
+	  ';'
+	| '{' ( // Note: PackageBodyElement is expanded here to avoid
+			// infinite loops in the incremental parser.
+		    ownedRelationship += OwnedDocumentation
+	      | ownedRelationship += NamespaceMember
+	      | ownedRelationship += AliasMember
+	      | ownedRelationship += Import )*
+	  '}'
+;
