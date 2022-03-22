@@ -96,7 +96,7 @@ lib-cov
 coverage
 *.lcov
 
-# nyc test coverage
+# nyc simple_test coverage
 .nyc_output
 
 # Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
@@ -228,7 +228,7 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
+# Unit simple_test / coverage reports
 htmlcov/
 .tox/
 .nox/
@@ -326,3 +326,4 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+.idea

@@ -1,15 +1,18 @@
 
 /* PACKAGES */
 
-Package returns SysML::Package :
+//Package returns SysML::Package :
+Package:
 	PackageDeclaration PackageBody
 ;
 
-fragment PackageDeclaration returns SysML::Package :
+//fragment PackageDeclaration returns SysML::Package :
+PackageDeclaration:
 	'package' Identification?
 ;
 
-fragment PackageBody returns SysML::Namespace :
+//fragment PackageBody returns SysML::Namespace :
+PackageBody:
 	  ';'
 	| '{' ( // Note: PackageBodyElement is expanded here to avoid
 			// infinite loops in the incremental parser.
@@ -21,7 +24,8 @@ fragment PackageBody returns SysML::Namespace :
 	  '}'
 ;
 
-ElementFilterMember returns SysML::ElementFilterMembership :
+//ElementFilterMember returns SysML::ElementFilterMembership :
+ElementFilterMember:
 	MemberPrefix
 	'filter' ownedRelatedElement += OwnedExpression ';' // condition = OwnedExpression ';'
 ;

@@ -12,7 +12,8 @@ QualifiedName
     ;
 
 /* TERMINALS */
-DECIMAL_VALUE /* returns Ecore::EInt */
+/* returns Ecore::EInt */
+DECIMAL_VALUE
     : '0'..'9' ('0'..'9')*
     ;
 
@@ -24,11 +25,13 @@ ID
     : ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*
     ;
 
-UNRESTRICTED_NAME /* returns Ecore::EString */
+/* returns Ecore::EString */
+UNRESTRICTED_NAME
     : '\'' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | "'" | '\\') | !('\\' | '\''))* '\''
     ;
 
-STRING_VALUE /* returns Ecore::EString */
+/* returns Ecore::EString */
+STRING_VALUE
     : '"' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | "'" | '\\') | !('\\' | '"'))* '"'
     ;
 

@@ -11,10 +11,12 @@ OwnedExpression /*returns  SysML::Expression*/:
 // Conditional Test Expressions
 
 ConditionalExpression /*returns  SysML::Expression*/:
-	  NullCoalescingExpression ( {SysML::OperatorExpression.operand += current}
+//	  NullCoalescingExpression ( {SysML::OperatorExpression.operand += current}
+	  NullCoalescingExpression ( {OperatorExpression.operand += current}
 		  operator = ConditionalOperator operand += OwnedExpression ':' operand += ConditionalExpression
 	  )?
-	| {SysML::OperatorExpression} 'if' operand += NullCoalescingExpression
+//	| {SysML::OperatorExpression} 'if' operand += NullCoalescingExpression
+	| {OperatorExpression} 'if' operand += NullCoalescingExpression
 		  operator = ConditionalOperator operand += OwnedExpression 'else' operand += ConditionalExpression
 ;
 
@@ -25,7 +27,8 @@ ConditionalOperator:
 // Null Coalescing Expressions
 
 NullCoalescingExpression /*returns  SysML::Expression*/:
-	ImpliesExpression ( {SysML::OperatorExpression.operand += current}
+//	ImpliesExpression ( {SysML::OperatorExpression.operand += current}
+	ImpliesExpression ( {OperatorExpression.operand += current}
 		operator = NullCoalescingOperator operand += ImpliesExpression )*
 ;
 
@@ -36,7 +39,8 @@ NullCoalescingOperator:
 // Logical Expressions
 
 ImpliesExpression /*returns  SysML::Expression*/:
-	OrExpression ( {SysML::OperatorExpression.operand += current}
+//	OrExpression ( {SysML::OperatorExpression.operand += current}
+	OrExpression ( {OperatorExpression.operand += current}
 		operator = ImpliesOperator operand += OrExpression )*
 ;
 
@@ -45,7 +49,8 @@ ImpliesOperator:
 ;
 
 OrExpression /*returns  SysML::Expression*/:
-	XorExpression ( {SysML::OperatorExpression.operand += current}
+//	XorExpression ( {SysML::OperatorExpression.operand += current}
+	XorExpression ( {OperatorExpression.operand += current}
 		operator = OrOperator operand += XorExpression )*
 ;
 
@@ -54,7 +59,8 @@ OrOperator:
 ;
 
 XorExpression /*returns  SysML::Expression*/:
-	AndExpression ( {SysML::OperatorExpression.operand += current}
+//	AndExpression ( {SysML::OperatorExpression.operand += current}
+	AndExpression ( {OperatorExpression.operand += current}
 		operator = XorOperator operand += AndExpression )*
 ;
 
@@ -63,7 +69,8 @@ XorOperator:
 ;
 
 AndExpression /*returns  SysML::Expression*/:
-	EqualityExpression ( {SysML::OperatorExpression.operand += current}
+//	EqualityExpression ( {SysML::OperatorExpression.operand += current}
+	EqualityExpression ( {OperatorExpression.operand += current}
 		operator = AndOperator operand += EqualityExpression )*
 ;
 
@@ -74,7 +81,8 @@ AndOperator:
 // Equality Expressions
 
 EqualityExpression /*returns  SysML::Expression*/:
-	ClassificationExpression ( {SysML::OperatorExpression.operand += current}
+//	ClassificationExpression ( {SysML::OperatorExpression.operand += current}
+	ClassificationExpression ( {OperatorExpression.operand += current}
 		operator = EqualityOperator operand += ClassificationExpression )*
 
 ;
@@ -86,7 +94,8 @@ EqualityOperator:
 // Classification Expressions
 
 ClassificationExpression /*returns  SysML::Expression*/:
-	  RelationalExpression ( {SysML::OperatorExpression.operand += current}
+//	  RelationalExpression ( {SysML::OperatorExpression.operand += current}
+	  RelationalExpression ( {OperatorExpression.operand += current}
 		operator = ClassificationOperator ownedRelationship += TypeReferenceMember )?
 	| {SysML::OperatorExpression} operand += SelfReferenceExpression
 		operator = ClassificationOperator ownedRelationship += TypeReferenceMember
@@ -106,7 +115,8 @@ TypeReference /*returns  SysML::Feature*/:
 ;
 
 ReferenceTyping /*returns  SysML::FeatureTyping*/:
-	  type = [SysML::Type | QualifiedName]
+//	  type = [SysML::Type | QualifiedName]
+	  type = [Type | QualifiedName]
 ;
 
 SelfReferenceExpression /*returns  SysML::FeatureReferenceExpression*/:
@@ -118,13 +128,15 @@ SelfReferenceMember /*returns  SysML::ReturnParameterMembership*/:
 ;
 
 EmptyFeature /*returns  SysML::Feature*/:
-	{SysML::Feature}
+//	{SysML::Feature}
+	{Feature}
 ;
 
 // Relational Expressions
 
 RelationalExpression /*returns  SysML::Expression*/:
-	RangeExpression ( {SysML::OperatorExpression.operand += current}
+//	RangeExpression ( {SysML::OperatorExpression.operand += current}
+	RangeExpression ( {OperatorExpression.operand += current}
 		operator = RelationalOperator operand += RangeExpression )*
 ;
 
@@ -135,14 +147,16 @@ RelationalOperator:
 // Range Expressions
 
 RangeExpression /*returns  SysML::Expression*/:
-	AdditiveExpression ( {SysML::OperatorExpression.operand += current}
+//	AdditiveExpression ( {SysML::OperatorExpression.operand += current}
+	AdditiveExpression ( {OperatorExpression.operand += current}
 		operator = '..' operand += AdditiveExpression )?
 ;
 
 // Arithmetic Expressions
 
 AdditiveExpression /*returns  SysML::Expression*/:
-	MultiplicativeExpression ( {SysML::OperatorExpression.operand += current}
+//	MultiplicativeExpression ( {SysML::OperatorExpression.operand += current}
+	MultiplicativeExpression ( {OperatorExpression.operand += current}
 		operator = AdditiveOperator operand += MultiplicativeExpression )*
 ;
 
@@ -151,7 +165,8 @@ AdditiveOperator:
 ;
 
 MultiplicativeExpression /*returns  SysML::Expression*/:
-	ExponentiationExpression ( {SysML::OperatorExpression.operand += current}
+//	ExponentiationExpression ( {SysML::OperatorExpression.operand += current}
+	ExponentiationExpression ( {OperatorExpression.operand += current}
 		operator = MultiplicativeOperator operand += ExponentiationExpression )*
 ;
 
@@ -160,7 +175,8 @@ MultiplicativeOperator:
 ;
 
 ExponentiationExpression /*returns  SysML::Expression*/:
-	UnaryExpression ( {SysML::OperatorExpression.operand += current}
+//	UnaryExpression ( {SysML::OperatorExpression.operand += current}
+	UnaryExpression ( {OperatorExpression.operand += current}
 		operator = ExponentiationOperator operand += UnaryExpression )*
 ;
 
@@ -171,7 +187,8 @@ ExponentiationOperator:
 // Unary Expressions
 
 UnaryExpression /*returns  SysML::Expression*/:
-	  {SysML::OperatorExpression} operator = UnaryOperator operand += ExtentExpression
+//	  {SysML::OperatorExpression} operator = UnaryOperator operand += ExtentExpression
+	  {OperatorExpression} operator = UnaryOperator operand += ExtentExpression
 	| ExtentExpression
 ;
 
@@ -182,7 +199,8 @@ UnaryOperator:
 // Extent Expressions
 
 ExtentExpression /*returns  SysML::Expression*/:
-	  {SysML::OperatorExpression} operator = 'all' ownedRelationship += TypeReferenceMember
+//	  {SysML::OperatorExpression} operator = 'all' ownedRelationship += TypeReferenceMember
+	  {OperatorExpression} operator = 'all' ownedRelationship += TypeReferenceMember
 	| PrimaryExpression
 ;
 
@@ -190,21 +208,26 @@ ExtentExpression /*returns  SysML::Expression*/:
 
 PrimaryExpression /*returns  SysML::Expression*/:
 	BaseExpression
-	( {SysML::PathStepExpression.operand += current} '.'
+//	( {SysML::PathStepExpression.operand += current} '.'
+	( {PathStepExpression.operand += current} '.'
 	  operand += FeatureChainExpression
 	)?
-	( ( {SysML::OperatorExpression.operand += current}
+//	( ( {SysML::OperatorExpression.operand += current}
+	( ( {OperatorExpression.operand += current}
 	    operator = '[' operand += SequenceExpression ']'
-	  | {SysML::OperatorExpression.operand += current} '->'
+//	  | {SysML::OperatorExpression.operand += current} '->'
+	  | {OperatorExpression.operand += current} '->'
 	    ownedRelationship += ReferenceTyping
 	    ( ownedRelationship += ExpressionBodyMember
 	    | ownedRelationship += FunctionReferenceMember
 	    | ArgumentList
 	    )
-	  | {SysML::PathSelectExpression.operand += current} '.'
+//	  | {SysML::PathSelectExpression.operand += current} '.'
+	  | {PathSelectExpression.operand += current} '.'
 	    ownedRelationship += ExpressionBodyMember
 	  )
-	  ( {SysML::PathStepExpression.operand += current} '.'
+//	  ( {SysML::PathStepExpression.operand += current} '.'
+	  ( {PathStepExpression.operand += current} '.'
 	    operand += FeatureChainExpression
 	  )?
 	)*
@@ -227,7 +250,8 @@ FeatureChainExpression /*returns  SysML::FeatureReferenceExpression*/:
 ;
 
 FeatureChainMember /*returns  SysML::Membership*/:
-	  memberElement = [SysML::Feature | QualifiedName]
+//	  memberElement = [SysML::Feature | QualifiedName]
+	  memberElement = [Feature | QualifiedName]
 	| ownedRelatedElement += FeatureChain
 ;
 
@@ -259,7 +283,8 @@ BodyParameterMember /*returns  SysML::ParameterMembership*/:
 ;
 
 BodyParameter /*returns  SysML::Feature*/:
-	{SysML::Feature}
+//	{SysML::Feature}
+	{Feature}
 ;
 
 // Sequence Expressions
@@ -267,7 +292,8 @@ BodyParameter /*returns  SysML::Feature*/:
 SequenceExpression /*returns  SysML::Expression*/:
 	OwnedExpression
 	( ','
-	| {SysML::OperatorExpression.operand += current} operator = ','
+//	| {SysML::OperatorExpression.operand += current} operator = ','
+	| {OperatorExpression.operand += current} operator = ','
 	  operand += SequenceExpression
 	)?
 ;
@@ -279,7 +305,8 @@ FeatureReferenceExpression /*returns  SysML::FeatureReferenceExpression*/:
 ;
 
 FeatureReferenceMember /*returns  SysML::Membership*/:
-	memberElement = [SysML::Feature | QualifiedName]
+//	memberElement = [SysML::Feature | QualifiedName]
+	memberElement = [Feature | QualifiedName]
 ;
 
 // Invocation Expressions
@@ -289,7 +316,8 @@ InvocationExpression /*returns  SysML::InvocationExpression*/:
 ;
 
 OwnedFeatureTyping /*returns  SysML::FeatureTyping*/:
-	  type = [SysML::Type | QualifiedName]
+//	  type = [SysML::Type | QualifiedName]
+	  type = [Type | QualifiedName]
 	| ownedRelatedElement += FeatureChain
 ;
 
@@ -299,7 +327,8 @@ FeatureChain /*returns  SysML::Feature*/:
 ;
 
 OwnedFeatureChaining /*returns  SysML::FeatureChaining*/:
-	chainingFeature = [SysML::Feature | QualifiedName]
+//	chainingFeature = [SysML::Feature | QualifiedName]
+	chainingFeature = [Feature | QualifiedName]
 
 ;
 
@@ -324,7 +353,8 @@ NamedExpressionMember /*returns  SysML::FeatureMembership*/:
 // Null Expressions
 
 NullExpression /*returns  SysML::NullExpression*/:
-	{SysML::NullExpression} ( 'null' | '(' ')' )
+//	{SysML::NullExpression} ( 'null' | '(' ')' )
+	{NullExpression} ( 'null' | '(' ')' )
 ;
 
 /* Literal Expressions */
@@ -362,7 +392,8 @@ RealValue /*returns  Ecore::EDouble*/:
 ;
 
 LiteralInfinity /*returns  SysML::LiteralInfinity*/:
-	{SysML::LiteralInfinity} '*'
+//	{SysML::LiteralInfinity} '*'
+	{LiteralInfinity} '*'
 ;
 
 /* NAMES */

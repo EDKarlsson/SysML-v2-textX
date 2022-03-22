@@ -1,18 +1,22 @@
 
 /* Documentation */
 
-OwnedDocumentation returns SysML::Documentation :
+//OwnedDocumentation returns SysML::Documentation :
+OwnedDocumentation:
 	ownedRelatedElement += DocumentationComment // documentingComment = DocumentationComment
 ;
 
-DocumentationComment returns SysML::Comment :
+//DocumentationComment returns SysML::Comment :
+DocumentationComment:
 	'doc' ( '<' humanId = Name '>' )? body = REGULAR_COMMENT
 ;
 
-PrefixDocumentation returns SysML::Annotation :
+//PrefixDocumentation returns SysML::Annotation :
+PrefixDocumentation:
 	ownedRelatedElement += PrefixDocumentationComment
 ;
 
-PrefixDocumentationComment returns SysML::Comment :
+//PrefixDocumentationComment returns SysML::Comment :
+PrefixDocumentationComment:
 	( 'doc' ( '<' humanId = Name '>' )? )? body = DOCUMENTATION_COMMENT
 ;

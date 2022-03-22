@@ -1,0 +1,93 @@
+/* Elements */
+/* fragment Identification returns SysML::Element : */
+Identification:
+/*	  '<' humanId = nat.Name '>' ( name = nat.Name )? */
+	  '<' humanId = ID '>' ( name = ID )?
+	| name = ID
+;
+
+/* Element returns SysML::Element : */
+Element:
+    'element' Identification? ElementBody
+;
+
+/* fragment ElementBody returns SysML::Element : */
+ElementBody:
+    ';' | '{' OwnedElement* '}'
+;
+
+/* fragment OwnedElement returns SysML::Element : */
+OwnedElement:
+      ownedRelationship += OwnedRelationship
+    | ownedRelationship += OwnedDocumentation
+    | ownedRelationship += OwnedTextualRepresentationAnnotation
+    | ownedRelationship += OwnedAnnotatingFeatureAnnotation
+;
+
+/* Relationships */
+
+//Relationship returns SysML::Relationship :
+Relationship:
+    'relationship' Identification?
+    RelationshipRelatedElements
+    RelationshipBody
+;
+
+//OwnedRelationship returns SysML::Relationship :
+OwnedRelationship:
+    'relationship' Identification?
+    ( 'to' RelationshipTargetList )?
+    RelationshipBody
+;
+
+//fragment RelationshipRelatedElements returns SysML::Relationship :
+RelationshipRelatedElements:
+      ('from' RelationshipSourceList)? ( 'to' RelationshipTargetList )?
+;
+
+//fragment RelationshipSourceList returns SysML::Relationship :
+RelationshipSourceList:
+    RelationshipSource ( ',' RelationshipSource )*
+;
+
+//fragment RelationshipSource returns SysML::Relationship :
+RelationshipSource:
+//    source += [SysML::Element | QualifiedName]
+    source += [Element | QualifiedName]
+;
+
+//fragment RelationshipTargetList returns SysML::Relationship :
+RelationshipTargetList:
+    RelationshipTarget ( ',' RelationshipTarget )*
+;
+
+//fragment RelationshipTarget returns SysML::Relationship :
+RelationshipTarget:
+//    target += [SysML::Element | QualifiedName]
+    target += [Element | QualifiedName]
+;
+
+//fragment RelationshipBody returns SysML::Relationship :
+RelationshipBody:
+    ';' | '{' RelationshipOwnedElement* '}'
+;
+
+//fragment RelationshipOwnedElement returns SysML::Relationship:
+RelationshipOwnedElement:
+      ownedRelatedElement += OwnedRelatedElement
+    | ownedRelatedElement += OwnedRelatedRelationship
+//    | ownedRelationship += OwnedDocumentation
+//    | ownedRelationship += OwnedTextualRepresentationAnnotation
+;
+
+//OwnedRelatedElement returns SysML::Element :
+OwnedRelatedElement:
+    'element' ( '<' humanId = ID '>' )? ElementBody
+;
+
+//OwnedRelatedRelationship returns SysML::Relationship :
+OwnedRelatedRelationship:
+	'relationship' ( '<' humanId = ID '>' )?
+	RelationshipRelatedElements
+	RelationshipBody
+;

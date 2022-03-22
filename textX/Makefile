@@ -1,7 +1,7 @@
 # Usage
 # make				# Build parser
 # make clean		# remove all generated files
-# make test			# Run tests and validate grammars
+# make simple_test			# Run tests and validate grammars
 
 .PHONY = all clean print
 
