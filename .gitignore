@@ -327,3 +327,5 @@ dmypy.json
 cython_debug/
 
 .idea
+_dot_files
+_sandbox

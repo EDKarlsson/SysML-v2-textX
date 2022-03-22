@@ -23,3 +23,6 @@ These are resources and links to information used while developing this project
 #### Parsing Algorithms
 - [Stereobooster - An-overview-of-parsing-algorithms](https://stereobooster.com/posts/an-overview-of-parsing-algorithms/)
 
+# Credits
+
+Initial project layout generated with `textx startproject`.

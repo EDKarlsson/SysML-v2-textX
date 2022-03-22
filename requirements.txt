@@ -1,0 +1,3 @@
+textx~=3.0.0
+jinja2~=3.0.3
+setuptools~=58.0.4
