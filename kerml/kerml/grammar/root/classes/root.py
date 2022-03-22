@@ -1,12 +1,16 @@
 import json
 
 
+def element_obj_processor(element):
+    pass
+
+
 class Element(object):
     """
     Attributes:
         aliasId:
         humanId:
-        name:
+        name: /name:String[0..1]
         ownedRelationship:
         owningMembership:
         parent:
@@ -23,14 +27,16 @@ class Element(object):
         qualifiedName: [Derived]
     """
 
-    def __init__(self, parent, name, ownedRelationship=None, owningMembership=None, aliasId=[], humanId=None, ownedElement=[]):
+    def __init__(self, parent, name, ownedRelationship=None, owningMembership=None, aliasId=[], humanId=None,
+                 ownedElement=[]):
         """
-        @param parent:
-        @param name:
+        @param parent: TextX Parent
+        @param name: TextX Parent
         @param aliasId:
         @param humanId:
         @param ownedElement:
         """
+        super(Element, self).__init__()
         self.name = name
         self.parent = parent
         self.owner = self.parent
@@ -58,11 +64,21 @@ class Element(object):
         # return self.parent.name + '::' + self.name
 
 
-class Relationship(object):
-    def __init__(self, name, parent, source, target):
-        self.parent = parent
-        self.name = name
+class Relationship(Element):
+    def __init__(self, name, parent, humanId=None, ownedRelatedElement=None, source=None, target=None):
+        super(Relationship, self).__init__(name=name, parent=parent, humanId=humanId)
         self.source = source
         self.target = target
-        self.ownedRelatedElements = None
-        self.ownedRelationship = None
+        self.ownedRelatedElement = ownedRelatedElement
+        if self.source is list and self.target is list:
+            self.relatedElements = self.source + self.target
+
+
+class Namespace(Element):
+    def __init__(self, name, parent):
+        super(Namespace, self).__init__(name=name, parent=parent)
+
+
+class AnnotatingElement(Element):
+    def __init__(self, name, parent):
+        super(AnnotatingElement, self).__init__(name=name, parent=parent)

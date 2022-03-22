@@ -12,7 +12,7 @@ def get_element_mm():
     """
     entity_mm = metamodel_from_file(join(this_folder, 'elements.tx'),
                                     classes=[root.Element, root.Relationship],
-                                    debug=True)
+                                    debug=False)
 
     return entity_mm
 
@@ -21,7 +21,7 @@ def main():
     root_elements = "./elements/test/elements.kerml"
     element_mm = get_element_mm()
     model = element_mm.model_from_file(root_elements)
-    model_export(model, join(this_folder,'dot_files', 'elements_mm.dot'))
+    model_export(model, join(this_folder, 'dot_files', 'elements_mm.dot'))
 
 
 if __name__ == "__main__":

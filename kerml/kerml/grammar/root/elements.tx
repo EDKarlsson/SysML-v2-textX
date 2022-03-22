@@ -1,84 +1,43 @@
 /* Elements */
-Namespace:
-	namespaceBodyElement*=Element
+Model:
+    ( elements*=Element | relationships+=Relationship )
 ;
 
 Element:
     'element' ('<' humanId=Name '>')? ( name=Name )?
-    (';' | '{' ownedElement=OwnedElement '}')
-;
-
-OwnedElement:
-      ownedRelationship += OwnedRelationship
+    (';' | '{'
+        ownedRelationship += OwnedRelationship
+    '}')
 ;
 
 /* Relationships */
 Relationship:
-    ref=[Element]
-//    type=[Element]
     'relationship' ('<' humanId=Name '>')? ( name=Name )?
-    RelationshipRelatedElements
-    RelationshipBody
+        ('from' source+=[Element|QualifiedName][','])?
+        ('to' target+=[Element|QualifiedName][','])?
+    (';' | '{' ownedRelatedElement+=RelationshipOwnedElement '}')
 ;
 
 OwnedRelationship:
-    'relationship' ('<' humanId=Name '>')?
-    ( 'to' RelationshipTargetList )?
-    RelationshipBody
-;
-
-RelationshipRelatedElements:
-      ('from' RelationshipSourceList)? ('to' RelationshipTargetList)?
-;
-
-RelationshipSourceList:
-    RelationshipSource ( ',' RelationshipSource )*
-;
-
-RelationshipSource:
-    source += [Element | QualifiedName]
-;
-
-RelationshipTargetList:
-    RelationshipTarget ( ',' RelationshipTarget )*
-;
-
-RelationshipTarget:
-    target += [Element | QualifiedName]
-;
-
-RelationshipBody:
-    ';' | '{' RelationshipOwnedElement* '}'
+    'relationship' ('<' humanId=Name '>')? ('to' target+=[Element|QualifiedName][','])?
+    (';' | '{'
+        ownedRelatedElement+=RelationshipOwnedElement
+    '}')
 ;
 
 RelationshipOwnedElement:
-      ownedRelatedElement += OwnedRelatedElement
-    | ownedRelatedElement += OwnedRelatedRelationship
+      Element | Relationship
 ;
 
-OwnedRelatedElement:
-    type=[Element]
-    'element' ('<' humanId=Name '>')? ( name=Name )?
-    (';' | '{' ownedElement=OwnedElement '}')
-;
-
-OwnedRelatedRelationship:
-    type=[Relationship]
-	'relationship' ('<' humanId=Name '>')? ( name=Name )?
-	RelationshipRelatedElements
-	RelationshipBody
-;
 
 // COMMON
-
 /* NAMES */
 Name
     : !Keyword (ID | UNRESTRICTED_NAME | STRING)
     ;
 
 Qualification
-   : ( Name '::' )+
-//    : Name*['::']
+    : Name('::')+
     ;
 
 QualifiedName
@@ -125,5 +84,5 @@ WS
     ;
 
 Keyword:
-    'element' | 'language' | 'to' | 'relationship' | 'package'
+    'element' | 'language' | 'to' | 'from' | 'relationship' | 'package'
     ;

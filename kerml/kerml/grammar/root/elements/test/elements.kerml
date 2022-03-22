@@ -2,8 +2,13 @@ element <e145>;
 
 element <'1.2.4'> MyName;
 
-element B;
+element A;
+element C;
 
-element <A> {
-    relationship to B;
+element B {
+    relationship <x> {
+        element <y>;
+        relationship from B to A;
+    }
+    relationship to C;
 }
