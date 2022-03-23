@@ -136,26 +136,95 @@ class Namespace(Element):
 
 
 class AnnotatingElement(Element):
+    """
+    An AnnotatingElement is an Element that provides additional description of or metadata on some other Element.
+    An AnnotatingElement is attached to its annotatedElement by an Annotation Relationship.
+    Attributes:
+        annotatedElement : Element [0..*] {ordered}
+            [Derived] The Elements that are annotated by this AnnotatingElement,
+            derived as the annotatedElements of the annotations of this AnnotatingElement.
+        annotation : Annotation [0..*] {subsets sourceRelationship, ordered}
+            The Annotations that relate this AnnotatingElement to its annotatedElements.
+    """
     def __init__(self, name, parent):
         super(AnnotatingElement, self).__init__(name=name, parent=parent)
+        self.annotatedElement = []
+        self.annotation = []
 
 
 class Annotation(Relationship):
+    """
+    An Annotation is a Relationship between an AnnotatingElement
+    and the Element that is annotated by that AnnotatingElement.
+    Attributes:
+        annotatedElement : Element {redefines target}
+            The Element that is annotated by the annotatingElement of this Annotation.
+        annotatingElement : AnnotatingElement {redefines source}
+            The AnnotatingElement that annotates the annotatedElement of this Annotation.
+        owningAnnotatedElement : Element [0..1] {subsets annotatedElement, redefines owningRelatedElement}
+            The annotatedElement of this Annotation, when it is also its owningRelatedElement.
+    """
     def __init__(self, name, parent):
         super(Annotation, self).__init__(name=name, parent=parent)
+        self.annotatedElement = None
+        self.annotatingElement = None
+        self.owningAnnotatedElement = None
 
 
 class ModelComment(AnnotatingElement):
+    """
+    A Comment is AnnotatingElement whose body in some way describes its annotatedElements.
+    Attributes:
+        body : String
+            The annotation text for the Comment.
+    """
     def __init__(self, parent, name=''):
         super(ModelComment, self).__init__(name=name, parent=parent)
+        self.body = ""
 
 
 class Documentation(Annotation):
+    """
+    Documentation is an Annotation whose annotatingElement is a Comment that provides documentation
+    of the annotatedElement. Documentation is always an ownedRelationship of its annotedElement.
+
+    Attributes:
+        documentingComment : Comment {subsets ownedRelatedElement, redefines annotatingElement}
+            The Comment, which is owned by the Documentation Relationship, that documents the
+            owningDocumentedElement of this Documentation.
+        owningDocumentedElement : Element {redefines owningAnnotatedElement}
+            The annotatedElement of this Documentation, which must own the Relationship.
+    """
     def __init__(self, parent, name=''):
         super(Documentation, self).__init__(name=name, parent=parent)
+        self.documentingComment = None
+        self.owningDocumentedElement = None
 
 
 class OwnedDocumentation(Documentation):
     def __init__(self, parent, documentingComment, name=''):
         super(OwnedDocumentation, self).__init__(name=name, parent=parent)
         self.documentingComment = documentingComment
+
+
+class TextualRepresentation(AnnotatingElement):
+    """
+    A TextualRepresentation is an AnnotatingElement that whose body represents the
+    representedElement in a given language. The named language can be a natural language,
+    in which case the body is an informal representation, or an artificial language,
+    in which case the body is expected to be a formal, machine-parsable representation.
+
+    Attributes:
+        body : String
+            A textual representation of the representedElement in the given language.
+        language : String
+            The natural or artificial language in which the body text is written.
+        representedElement : Element {redefines annotatedElement}
+            [Derived] The Element represented textually by this TextualRepresentation,
+            which is its single annotatedElement.
+    """
+    def __init__(self, parent, name=''):
+        super(TextualRepresentation, self).__init__(name=name, parent=parent)
+        self.language = None
+        self.body = None
+        self.representedElement = None

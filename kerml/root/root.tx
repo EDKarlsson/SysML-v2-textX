@@ -12,6 +12,7 @@ Element:
     '}')
 ;
 
+/* =============================================================== */
 /* Relationships */
 Relationship:
     'relationship' ('<' humanId=Name '>')? ( name=Name )?
@@ -31,6 +32,127 @@ OwnedRelationship:
 
 RelationshipOwnedElement:
       Element | Relationship
+;
+
+/* =============================================================== */
+/* Relationships */
+RootNamespace:
+    NamespaceBodyElement*
+;
+Namespace:
+    NamespaceDeclaration NamespaceBody
+;
+NamespaceDeclaration:
+    'namespace' ('<' humanId=Name '>')? ( name=Name )?
+;
+NamespaceBody:
+    ';' | '{' NamespaceBodyElement* '}'
+;
+NamespaceBodyElement:
+      ownedRelationship += OwnedDocumentation
+    | ownedRelationship += NamespaceMember
+    | ownedRelationship += AliasMember
+    | ownedRelationship += Import
+;
+MemberPrefix:
+    ( ownedRelationship += PrefixDocumentation )*
+    ( visibility = VisibilityIndicator )?
+;
+NamespaceMember:
+      NonFeatureMember
+    | FeatureNamespaceMember
+    | ChainFeatureMember
+;
+NonFeatureMember:
+    MemberPrefix
+    ownedMemberElement = NonFeatureElement
+;
+FeatureNamespaceMember:
+    MemberPrefix
+    ownedMemberElement = FeatureElement
+;
+ChainFeatureMember:
+    MemberPrefix
+    'feature'? ( memberName = Name )? 'is'
+    ownedMemberElement = 'FeatureChain'
+;
+AliasMember:
+    MemberPrefix
+    'alias' memberName = Name 'for'
+    memberElement = [QualifiedName] ';'
+;
+Import:
+    ( ownedRelationship += PrefixDocumentation )*
+    ( visibility = VisibilityIndicator )?
+    'import' ( isImportAll ?= 'all' )?
+        ( ImportedNamespace
+        | ImportedFilterPackage ) ';'
+;
+ImportedNamespace:
+    ( importedNamespace = [QualifiedName] '::' )?
+    ( importedName=Name | '*' )
+    ( '::' isRecursive ?= '**' )?
+;
+ImportedFilterPackage:
+    ownedRelatedElement += FilterPackage
+;
+FilterPackage:
+    ownedRelationship += FilterPackageImport
+    ( ownedRelationship += FilterPackageMember )+
+;
+FilterPackageImport:
+    ImportedNamespace
+;
+FilterPackageMember:
+    '[' condition='OwnedExpression' ']'
+    visibility='private'
+;
+VisibilityIndicator :
+    visibilityKind=Visibility
+;
+Visibility:
+    'public' | 'private' | 'protected'
+;
+NonFeatureElement:
+    Element
+    | Relationship
+    | ModelComment
+    | TextualRepresentation
+    | 'AnnotatingFeature'
+    | Namespace
+    | 'Type'
+    | 'Classifier'
+    | 'DataType'
+    | 'Class'
+    | 'Structure'
+    | 'Association'
+    | 'AssociationStructure'
+    | 'Interaction'
+    | 'Behavior'
+    | 'Function'
+    | 'Predicate'
+    | 'Multiplicity'
+    | 'Package'
+    | 'Specialization'
+    | 'Conjugation'
+    | 'Subclassification'
+    | 'Disjoining'
+    | 'FeatureTyping'
+    | 'Subsetting'
+    | 'Redefinition'
+    | 'TypeFeaturing'
+;
+FeatureElement:
+      'Feature'
+    | 'Step'
+    | 'Expression'
+    | 'BooleanExpression'
+    | 'Invariant'
+    | 'Connector'
+    | 'BindingConnector'
+    | 'Succession'
+    | 'ItemFlow'
+    | 'SuccessionItemFlow'
 ;
 
 /* =============================================================== */
@@ -73,12 +195,29 @@ PrefixDocumentation:
 PrefixDocumentationComment:
 	( 'doc' ( '<' humanId = Name '>' )? )? body = /(?ms)\/\*\*(.*?)\*\//
 ;
-
-
 /* =============================================================== */
-/* COMMENTS */
+/* Textual Representation */
+OwnedTextualRepresentationAnnotation:
+    ownedRelatedElement += OwnedTextualRepresentation
+;
+
+OwnedTextualRepresentation:
+    ( 'rep' ( humanId=Name )? )?
+    'language' language=STRING body=/(?ms)\/\*(.*?)\*\//
+    annotation+=[Annotation]
+    ;
+
+TextualRepresentation:
+    ( 'rep' ('<' humanId=Name '>')? ( name=Name )?
+      'about' annotation+=Annotation
+    | ( 'rep' ('<' humanId=Name '>')? ( name=Name )? )?
+      ElementAnnotation
+    )
+    'language' language=STRING body=/(?ms)\/\*(.*?)\*\//
+    ;
+/* =============================================================== */
+/* TEXTX COMMENTS */
 Comment:
-//    Note | RegularComment | DocumentationComment
     NoteBlock | NoteLine
 ;
 
@@ -90,7 +229,6 @@ NoteLine:
     /\/\/.*$/
 ;
 
-/*
 REGULAR_COMMENT:
     commentText=/(?ms)\/\*(.*?)\*\//
 ;
@@ -98,7 +236,6 @@ REGULAR_COMMENT:
 DOCUMENTATION_COMMENT:
     commentText=/(?ms)\/\*\*(.*?)\*\//
 ;
-*/
 
 /* QualifiedNames */
 Qualification
@@ -140,7 +277,7 @@ STRING_VALUE
     ;
 
 Keyword:
-    'element' | 'relationship' | 'from' | 'to' | 'doc'
+    'element' | 'relationship' | 'from' | 'to' | 'doc' | 'rep' | 'language' | 'about'
 ;
 
 //Keyword:
