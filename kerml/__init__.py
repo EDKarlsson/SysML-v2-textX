@@ -1,8 +1,8 @@
+from kerml.classes.root_layer import Element, Relationship
+from textx.export import model_export
 from textx import language, metamodel_from_file
-import argparse
+from os.path import join
 import os
-
-import root
 
 __version__ = "0.1.0.dev"
 
@@ -21,17 +21,26 @@ def kerml_language():
     return mm
 
 
-def root_mm():
-    root.main()
+def get_element_mm(debug=False):
+    """
+    Builds and returns a meta-model for Entity language.
+    """
+    entity_mm = metamodel_from_file(join(current_dir, 'root', 'elements.tx'),
+                                    classes=[Element, Relationship],
+                                    use_regexp_group=True,
+                                    autokwd=True,
+                                    debug=debug)
+
+    return entity_mm
 
 
-FUNCTION_CALLS = {
-    'root': root_mm,
-    'kerml': kerml_language
-}
+def main(debug=False):
+    element_mm = get_element_mm(debug)
+    kerml_test_file = "./root/test/elements.kerml"
+    # kerml_test_file = "../../SysML-v2-Release/kerml/src/examples/Simple Tests/Elements.kerml"
+    model = element_mm.model_from_file(join(current_dir, kerml_test_file))
+    model_export(model, join(current_dir, '../_dot_files', 'elements_mm.dot'))
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='KerML TextX Model CLI')
-    parser.add_argument('layer', metavar='L', type=str, nargs='+',
-                        help='Select Metamodel Layer of the Kernel Modeling Language to run textX on')
-    args = parser.parse_args()
+    main(True)

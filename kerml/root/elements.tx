@@ -1,6 +1,6 @@
 /* Elements */
 Model:
-    ( elements*=Element | relationships+=Relationship )
+    ( elements*=Element | relationships+=Relationship)
 ;
 
 Element:
@@ -30,12 +30,33 @@ RelationshipOwnedElement:
 ;
 
 
-// COMMON
-/* NAMES */
-Name
-    : !Keyword (ID | UNRESTRICTED_NAME | STRING)
+/* =============================================================== */
+/* COMMENTS */
+Comment:
+    Note | RegularComment | DocumentationComment
+;
+
+Note:
+    NoteBlock | NoteLine
+;
+
+NoteBlock:
+    /\/\/\*(.|\n)*?\*\//
+;
+
+NoteLine:
+    /\/\/.*$/
+;
+
+RegularComment:
+    commentText=/(?ms)\/\*(.*?)\*\//
     ;
 
+DocumentationComment:
+    commentText=/(?ms)\/\*\*(.*?)\*\//
+    ;
+
+/* QualifiedNames */
 Qualification
     : Name('::')+
     ;
@@ -43,6 +64,23 @@ Qualification
 QualifiedName
     : Qualification? Name
     ;
+
+/* NAMES */
+Name:
+    !Keyword (BASIC_NAME | '\'' UNRESTRICTED_NAME '\'')
+;
+
+BASIC_NAME:
+    /([a-zA-Z]|'_')([\w|\d]*)/
+    ;
+
+UNRESTRICTED_NAME:
+    /((?!['"])([ -~])|(\\(b|t|n|f|r)))*/
+    ;
+
+DECIMAL_DIGIT:
+    /\'[0-9]\'/
+;
 
 /* TERMINALS */
 DECIMAL_VALUE
@@ -53,36 +91,22 @@ EXP_VALUE
     : DECIMAL_VALUE ('e' | 'E') ('+' | '-')? DECIMAL_VALUE
 	;
 
-UNRESTRICTED_NAME
-//    : /'\'' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | "'" | '\\') | !('\\' | '\''))* '\''/
-    : ID
-    ;
-
 STRING_VALUE
     : /'"' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | "'" | '\\') | !('\\' | '"'))* '"'/
     ;
 
-REGULAR_COMMENT
-    : /\/\* !('*') -> \*\//
-    ;
-
-DOCUMENTATION_COMMENT
-    : /\/\*\* \w+ \*\//
-    ;
-
-ML_NOTE
-    : /\/\/\* -> \*\//
-    ;
-
-SL_NOTE
-//    : '//' (!('\n' | '\r') !('\n' | '\r')*)? ('\r'? '\n')?
-    : /\/\/.*$/
-    ;
-
-WS
-    : (' ' | '\t' | '\r' | '\n')+
-    ;
-
 Keyword:
-    'element' | 'language' | 'to' | 'from' | 'relationship' | 'package'
-    ;
+    'element' | 'relationship' | 'from' | 'to'
+;
+
+//Keyword:
+//    'about' | 'abstract' | 'alias' | 'all' | 'and' | 'as' | 'assign' | 'assoc' | 'behavior' | 'binding' | 'bool' | 'by' | 'class'
+//    | 'classifier' | 'comment' | 'composite' | 'conjugate' | 'conjugates' | 'conjugation' | 'connector'
+//    | 'datatype' | 'default' | 'disjoining' | 'disjoint' | 'doc' | 'element' | 'else' | 'end' | 'expr' | 'false'
+//    | 'feature' | 'featured' | 'featuring' | 'filter' | 'first' | 'flow' | 'for' | 'from' | 'function' | 'generalization'
+//    | 'hastype' | 'id' | 'if' | 'implies' | 'import' | 'in' | 'inout' | 'interaction' | 'inv' | 'is' | 'istype' | 'language'
+//    | 'member' | 'metadata' | 'multiplicity' | 'namespace' | 'nonunique' | 'not' | 'null' | 'of' | 'or' | 'ordered' | 'out'
+//    | 'package' | 'portion' | 'predicate' | 'private' | 'protected' | 'public' | 'redefines' | 'redefinition'
+//    | 'relationship' | 'rep' | 'return' | 'specialization' | 'specializes' | 'step' | 'stream' | 'struct'
+//    | 'subclassifier' | 'subset' | 'subsets' | 'subtype' | 'succession' | 'then' | 'to' | 'true' | 'type' | 'typed'
+//    ;

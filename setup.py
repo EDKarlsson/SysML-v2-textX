@@ -6,7 +6,7 @@ from setuptools import setup
 
 this_dir = os.path.abspath(os.path.dirname(__file__))
 
-VERSIONFILE = os.path.join(this_dir, "kerml/kerml", "__init__.py")
+VERSIONFILE = os.path.join(this_dir, "kerml", "__init__.py")
 VERSION = None
 for line in open(VERSIONFILE, "r").readlines():
     if line.startswith('__version__'):

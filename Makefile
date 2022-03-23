@@ -6,6 +6,7 @@
 .PHONY = all clean print
 
 #
+PYTHON_BIN := $(shell which python)
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 KERML := $(ROOT_DIR)/kerml
 
@@ -14,11 +15,9 @@ CORE:=$(KERML)/core
 KERNEL:=$(KERML)/kernel
 ROOT:=$(KERML)/root
 
-GRAMMAR_DIR = $(ROOT_DIR)/grammar
-LIBS = $(ROOT_DIR)/libs
 
-COMMON_TX = $(wildcard ./common/*.tx)
-
+kerml-root:
+	$(PYTHON_BIN) $(KERML)/kerml.py root
 
 print:
 	@echo ${ROOT_DIR}
