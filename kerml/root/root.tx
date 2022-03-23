@@ -33,7 +33,6 @@ RelationshipOwnedElement:
       Element | Relationship
 ;
 
-
 /* =============================================================== */
 /* Comments */
 ModelComment:
