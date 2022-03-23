@@ -161,10 +161,12 @@ ModelComment:
 	( 'comment' ('<' humanId=Name '>')? ( name=Name )?
 	  'about' ownedRelationship += Annotation
       //{ ownedRelationship += annotation }
+      ownedRelationship += [Annotation]
 	  ( ',' ownedRelationship += Annotation )*
 	  | ( 'comment' ('<' humanId=Name '>')? ( name=Name )? )?
 	  ownedRelationship += ElementAnnotation
       //{ ownedRelationship += annotation }
+      ownedRelationship += [Annotation]
 	)
 	body = /(?ms)\/\*(.*?)\*\//
 ;
@@ -252,7 +254,8 @@ Name:
 ;
 
 BASIC_NAME:
-    /([a-zA-Z]|'_')([\w|\d]*)/
+    /([a-zA-Z]|'_')([\w\d])*/
+//    /([a-zA-Z]|'_')([\w|\d]*)/
     ;
 
 UNRESTRICTED_NAME:
@@ -276,18 +279,18 @@ STRING_VALUE
     : /'"' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | "'" | '\\') | !('\\' | '"'))* '"'/
     ;
 
-Keyword:
-    'element' | 'relationship' | 'from' | 'to' | 'doc' | 'rep' | 'language' | 'about'
-;
-
 //Keyword:
-//    'about' | 'abstract' | 'alias' | 'all' | 'and' | 'as' | 'assign' | 'assoc' | 'behavior' | 'binding' | 'bool' | 'by' | 'class'
-//    | 'classifier' | 'comment' | 'composite' | 'conjugate' | 'conjugates' | 'conjugation' | 'connector'
-//    | 'datatype' | 'default' | 'disjoining' | 'disjoint' | 'doc' | 'element' | 'else' | 'end' | 'expr' | 'false'
-//    | 'feature' | 'featured' | 'featuring' | 'filter' | 'first' | 'flow' | 'for' | 'from' | 'function' | 'generalization'
-//    | 'hastype' | 'id' | 'if' | 'implies' | 'import' | 'in' | 'inout' | 'interaction' | 'inv' | 'is' | 'istype' | 'language'
-//    | 'member' | 'metadata' | 'multiplicity' | 'namespace' | 'nonunique' | 'not' | 'null' | 'of' | 'or' | 'ordered' | 'out'
-//    | 'package' | 'portion' | 'predicate' | 'private' | 'protected' | 'public' | 'redefines' | 'redefinition'
-//    | 'relationship' | 'rep' | 'return' | 'specialization' | 'specializes' | 'step' | 'stream' | 'struct'
-//    | 'subclassifier' | 'subset' | 'subsets' | 'subtype' | 'succession' | 'then' | 'to' | 'true' | 'type' | 'typed'
-//    ;
+//    'element' | 'relationship' | 'from' | 'to' | 'doc' | 'rep' | 'language' | 'about'
+//;
+
+Keyword:
+    'about' | 'abstract' | 'alias' | 'all' | 'and' | 'as' | 'assign' | 'assoc' | 'behavior' | 'binding' | 'bool' | 'by' | 'class'
+    | 'classifier' | 'comment' | 'composite' | 'conjugate' | 'conjugates' | 'conjugation' | 'connector'
+    | 'datatype' | 'default' | 'disjoining' | 'disjoint' | 'doc' | 'element' | 'else' | 'end' | 'expr' | 'false'
+    | 'feature' | 'featured' | 'featuring' | 'filter' | 'first' | 'flow' | 'for' | 'from' | 'function' | 'generalization'
+    | 'hastype' | 'id' | 'if' | 'implies' | 'import' | 'in' | 'inout' | 'interaction' | 'inv' | 'is' | 'istype' | 'language'
+    | 'member' | 'metadata' | 'multiplicity' | 'namespace' | 'nonunique' | 'not' | 'null' | 'of' | 'or' | 'ordered' | 'out'
+    | 'package' | 'portion' | 'predicate' | 'private' | 'protected' | 'public' | 'redefines' | 'redefinition'
+    | 'relationship' | 'rep' | 'return' | 'specialization' | 'specializes' | 'step' | 'stream' | 'struct'
+    | 'subclassifier' | 'subset' | 'subsets' | 'subtype' | 'succession' | 'then' | 'to' | 'true' | 'type' | 'typed'
+    ;
