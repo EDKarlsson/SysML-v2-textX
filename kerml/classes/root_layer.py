@@ -138,3 +138,24 @@ class Namespace(Element):
 class AnnotatingElement(Element):
     def __init__(self, name, parent):
         super(AnnotatingElement, self).__init__(name=name, parent=parent)
+
+
+class Annotation(Relationship):
+    def __init__(self, name, parent):
+        super(Annotation, self).__init__(name=name, parent=parent)
+
+
+class ModelComment(AnnotatingElement):
+    def __init__(self, parent, name=''):
+        super(ModelComment, self).__init__(name=name, parent=parent)
+
+
+class Documentation(Annotation):
+    def __init__(self, parent, name=''):
+        super(Documentation, self).__init__(name=name, parent=parent)
+
+
+class OwnedDocumentation(Documentation):
+    def __init__(self, parent, documentingComment, name=''):
+        super(OwnedDocumentation, self).__init__(name=name, parent=parent)
+        self.documentingComment = documentingComment

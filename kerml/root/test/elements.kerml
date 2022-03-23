@@ -1,5 +1,4 @@
 // Test Single Line Note
-/* Merpity derp derp */
 element <e145>;
 
 element <'1.2.4'> MyName;
@@ -13,5 +12,9 @@ element B {
         relationship from B to A;
     }
     relationship to C;
-    /* Documentation Comment */
+}
+// fmdosag
+element X {
+    doc <X_comment>
+        /* This is a documentation comment about X. */
 }

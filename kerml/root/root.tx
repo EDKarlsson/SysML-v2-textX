@@ -6,7 +6,9 @@ Model:
 Element:
     'element' ('<' humanId=Name '>')? ( name=Name )?
     (';' | '{'
-        ownedRelationship += OwnedRelationship
+        (   ownedRelationship += OwnedRelationship
+            | ownedRelationship += OwnedDocumentation
+        )
     '}')
 ;
 
@@ -15,7 +17,9 @@ Relationship:
     'relationship' ('<' humanId=Name '>')? ( name=Name )?
         ('from' source+=[Element|QualifiedName][','])?
         ('to' target+=[Element|QualifiedName][','])?
-    (';' | '{' ownedRelatedElement+=RelationshipOwnedElement '}')
+    (';' | '{'
+        ownedRelatedElement+=RelationshipOwnedElement
+    '}')
 ;
 
 OwnedRelationship:
@@ -31,12 +35,51 @@ RelationshipOwnedElement:
 
 
 /* =============================================================== */
-/* COMMENTS */
-Comment:
-    Note | RegularComment | DocumentationComment
+/* Comments */
+ModelComment:
+	( 'comment' ('<' humanId=Name '>')? ( name=Name )?
+	  'about' ownedRelationship += Annotation
+      //{ ownedRelationship += annotation }
+	  ( ',' ownedRelationship += Annotation )*
+	  | ( 'comment' ('<' humanId=Name '>')? ( name=Name )? )?
+	  ownedRelationship += ElementAnnotation
+      //{ ownedRelationship += annotation }
+	)
+	body = /(?ms)\/\*(.*?)\*\//
 ;
 
-Note:
+Annotation:
+	annotatedElement = [QualifiedName]
+;
+
+ElementAnnotation:
+    type=[Annotation]
+    annotatedElement = [Element]
+;
+
+/* =============================================================== */
+/* DOCUMENTATION */
+OwnedDocumentation:
+    documentingComment=DocumentationComment
+;
+
+DocumentationComment:
+    'doc' ('<' humanId = Name '>' )? body=/(?ms)\/\*(.*?)\*\//
+;
+
+PrefixDocumentation:
+	documentingComment = PrefixDocumentationComment
+;
+
+PrefixDocumentationComment:
+	( 'doc' ( '<' humanId = Name '>' )? )? body = /(?ms)\/\*\*(.*?)\*\//
+;
+
+
+/* =============================================================== */
+/* COMMENTS */
+Comment:
+//    Note | RegularComment | DocumentationComment
     NoteBlock | NoteLine
 ;
 
@@ -48,13 +91,15 @@ NoteLine:
     /\/\/.*$/
 ;
 
-RegularComment:
+/*
+REGULAR_COMMENT:
     commentText=/(?ms)\/\*(.*?)\*\//
-    ;
+;
 
-DocumentationComment:
+DOCUMENTATION_COMMENT:
     commentText=/(?ms)\/\*\*(.*?)\*\//
-    ;
+;
+*/
 
 /* QualifiedNames */
 Qualification
@@ -96,7 +141,7 @@ STRING_VALUE
     ;
 
 Keyword:
-    'element' | 'relationship' | 'from' | 'to'
+    'element' | 'relationship' | 'from' | 'to' | 'doc'
 ;
 
 //Keyword:

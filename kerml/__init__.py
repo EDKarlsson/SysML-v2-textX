@@ -1,4 +1,4 @@
-from kerml.classes.root_layer import Element, Relationship
+from kerml.classes.root_layer import *
 from textx.export import model_export
 from textx import language, metamodel_from_file
 from os.path import join
@@ -25,8 +25,9 @@ def get_element_mm(debug=False):
     """
     Builds and returns a meta-model for Entity language.
     """
-    entity_mm = metamodel_from_file(join(current_dir, 'root', 'elements.tx'),
-                                    classes=[Element, Relationship],
+    entity_mm = metamodel_from_file(join(current_dir, 'root', 'root.tx'),
+                                    classes=[Element, Relationship,
+                                             Annotation, ModelComment, OwnedDocumentation],
                                     use_regexp_group=True,
                                     autokwd=True,
                                     debug=debug)
@@ -39,7 +40,7 @@ def main(debug=False):
     kerml_test_file = "./root/test/elements.kerml"
     # kerml_test_file = "../../SysML-v2-Release/kerml/src/examples/Simple Tests/Elements.kerml"
     model = element_mm.model_from_file(join(current_dir, kerml_test_file))
-    model_export(model, join(current_dir, '../_dot_files', 'elements_mm.dot'))
+    model_export(model, join(current_dir, '../_dot_files', 'root_mm.dot'))
 
 
 if __name__ == "__main__":
