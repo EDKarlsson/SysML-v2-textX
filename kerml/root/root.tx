@@ -1,8 +1,4 @@
 /* Elements */
-//Model:
-//    ( elements*=Element | relationships+=Relationship)
-//;
-
 RootNamespace:
     type=Namespace
     ( ownedRelationship += OwnedDocumentation
@@ -75,13 +71,13 @@ FeatureNamespaceMember:
 ;
 ChainFeatureMember:
     MemberPrefix
-    'feature'? ( memberName = Name )? 'is'
+    'feature'? ( name=Name )? 'is'
     ownedMemberElement = 'FeatureChain'
 ;
 AliasMember:
     MemberPrefix
-    'alias' memberName=Name 'for'
-    memberElement=[QualifiedName] ';'
+    'alias' name=Name 'for'
+    memberElement=[Element|QualifiedName] ';'
 ;
 Import:
     ( ownedRelationship += PrefixDocumentation )*
@@ -91,7 +87,7 @@ Import:
         | ImportedFilterPackage ) ';'
 ;
 ImportedNamespace:
-    ( importedNamespace = [QualifiedName] '::' )?
+    ( importedNamespace = [Namespace|QualifiedName] '::' )?
     ( importedName=Name | '*' )
     ( '::' isRecursive ?= '**' )?
 ;
@@ -166,12 +162,12 @@ ModelComment:
 	( 'comment' ('<' humanId=Name '>')? ( name=Name )?
 	  'about' ownedRelationship += Annotation
       //{ ownedRelationship += annotation }
-      ownedRelationship += [Annotation]
+      ownedRelationship += [Annotation|QualifiedName]
 	  ( ',' ownedRelationship += Annotation )*
 	  | ( 'comment' ('<' humanId=Name '>')? ( name=Name )? )?
 	  ownedRelationship += ElementAnnotation
       //{ ownedRelationship += annotation }
-      ownedRelationship += [Annotation]
+      ownedRelationship += [Annotation|QualifiedName]
 	)
 	body = /(?ms)\/\*(.*?)\*\//
 ;
@@ -196,7 +192,7 @@ DocumentationComment:
 ;
 
 PrefixDocumentation:
-	documentingComment = PrefixDocumentationComment
+	documentingComment=PrefixDocumentationComment
 ;
 
 PrefixDocumentationComment:
@@ -206,10 +202,12 @@ PrefixDocumentationComment:
 /* =============================================================== */
 /* Textual Representation */
 OwnedTextualRepresentationAnnotation:
+    type=[Annotation]
     ownedRelatedElement += OwnedTextualRepresentation
 ;
 
 OwnedTextualRepresentation:
+    type=[TextualRepresentation]
     ( 'rep' ( humanId=Name )? )?
     'language' language=STRING body=/(?ms)\/\*(.*?)\*\//
     annotation+=[Annotation]

@@ -26,8 +26,9 @@ def get_element_mm(debug=False):
     Builds and returns a meta-model for Entity language.
     """
     entity_mm = metamodel_from_file(join(current_dir, 'root', 'root.tx'),
-                                    classes=[Element, Relationship,
-                                             Annotation, ModelComment, OwnedDocumentation],
+                                    classes=[Element, Relationship, Annotation, ModelComment,
+                                             OwnedDocumentation, Namespace, TextualRepresentation,
+                                             Import, NonFeatureMember, FeatureNamespaceMember, AliasMember],
                                     use_regexp_group=True,
                                     autokwd=True,
                                     debug=debug)
@@ -38,6 +39,7 @@ def main(debug=False):
     element_mm = get_element_mm(debug)
     kerml_test_file = "./root/test/elements.kerml"
     # kerml_test_file = "../../SysML-v2-Release/kerml/src/examples/Simple Tests/Elements.kerml"
+    # kerml_test_file = "../../SysML-v2-Release/kerml/src/examples/Simple Tests/Relationships.kerml"
     model = element_mm.model_from_file(join(current_dir, kerml_test_file))
     model_export(model, join(current_dir, '../_dot_files', 'root_mm.dot'))
 

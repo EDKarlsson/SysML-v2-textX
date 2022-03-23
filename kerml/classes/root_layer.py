@@ -265,10 +265,10 @@ class Import(Relationship):
             The visibility level of the imported members from this Import relative to the importOwningNamespace.
     """
 
-    def __init__(self, name, parent, importedMemberName=None, importNamespace=None, importOwningNamespace=None):
+    def __init__(self, name, parent, importedMemberName=None, importedNamespace=None, importOwningNamespace=None):
         super(Import, self).__init__(name=name, parent=parent)
         self.importedMemberName: str = importedMemberName
-        self.importedNamespace: Namespace = importNamespace
+        self.importedNamespace: Namespace = importedNamespace
         self.importOwningNamespace: Namespace = importOwningNamespace
         self.isImportAll: bool = False
         self.isRecursive: bool = False
@@ -309,9 +309,10 @@ class Namespace(Element):
             the membershipOwningNamespace.
     """
 
-    def __init__(self, name, parent, importedMembership=None, member=None,
-                 membership=None, ownedImport=None, ownedMember=None, ownedMembership=None):
-        super(Namespace, self).__init__(name=name, parent=parent)
+    def __init__(self, name, parent, humanId=None, ownedRelationship=None,
+                 importedMembership=None, member=None, membership=None,
+                 ownedImport=None, ownedMember=None, ownedMembership=None):
+        super(Namespace, self).__init__(name=name, parent=parent, humanId=humanId, ownedRelationship=ownedRelationship)
         self.importedMembership: [Membership] = importedMembership
         self.member: [Element] = member
         self.membership: [Membership] = membership
@@ -369,14 +370,16 @@ class Membership(Relationship):
             visible outside that Namespace.
     """
 
-    def __init__(self, name, parent):
+    def __init__(self, parent, name, effectiveMemberName=None, memberElement=None,
+                 membershipOwningNamespace=None, ownedMemberElement=None,
+                 visibility=None):
         super(Membership, self).__init__(name=name, parent=parent)
-        self.effectiveMemberName = None
-        self.memberElement = None
-        self.memberName = None
-        self.membershipOwningNamespace = None
-        self.ownedMemberElement = None
-        self.visibility = None
+        self.effectiveMemberName = effectiveMemberName
+        self.memberElement: Element = memberElement
+        self.memberName: str = name
+        self.membershipOwningNamespace: Namespace = membershipOwningNamespace
+        self.ownedMemberElement: Element = ownedMemberElement
+        self.visibility = visibility
 
     def isDistinguishableFrom(self, other) -> bool:
         """Whether this Membership is distinguishable from a given other Membership. By default, this is true if the
@@ -388,3 +391,108 @@ class Membership(Relationship):
         """
 
         return True
+
+
+class NamespaceMember(Membership):
+    def __init__(self, parent, name, effectiveMemberName=None, memberElement=None,
+                 membershipOwningNamespace=None, ownedMemberElement=None,
+                 visibility=None):
+        super(NamespaceMember, self).__init__(name=name, parent=parent)
+        self.effectiveMemberName = effectiveMemberName
+        self.memberElement: Element = memberElement
+        self.memberName: str = name
+        self.membershipOwningNamespace: Namespace = membershipOwningNamespace
+        self.ownedMemberElement: Element = ownedMemberElement
+        self.visibility = visibility
+
+
+class AliasMember(Membership):
+    def __init__(self, parent, name, effectiveMemberName=None, memberElement=None,
+                 membershipOwningNamespace=None, ownedMemberElement=None,
+                 visibility=None):
+        super(AliasMember, self).__init__(name=name, parent=parent)
+        self.effectiveMemberName = effectiveMemberName
+        self.memberElement: Element = memberElement
+        self.memberName: str = name
+        self.membershipOwningNamespace: Namespace = membershipOwningNamespace
+        self.ownedMemberElement: Element = ownedMemberElement
+        self.visibility = visibility
+
+
+class NonFeatureMember(Membership):
+    def __init__(self, parent, name='', effectiveMemberName=None, memberElement=None,
+                 membershipOwningNamespace=None, ownedMemberElement=None,
+                 visibility=None):
+        super(NonFeatureMember, self).__init__(name=name, parent=parent)
+        self.effectiveMemberName = effectiveMemberName
+        self.memberElement: Element = memberElement
+        self.memberName: str = name
+        self.membershipOwningNamespace: Namespace = membershipOwningNamespace
+        self.ownedMemberElement: Element = ownedMemberElement
+        self.visibility = visibility
+
+
+class FeatureNamespaceMember(Membership):
+    def __init__(self, parent, name='', effectiveMemberName=None, memberElement=None,
+                 memberName=None, membershipOwningNamespace=None, ownedMemberElement=None,
+                 visibility=None):
+        super(FeatureNamespaceMember, self).__init__(name=name, parent=parent)
+        self.effectiveMemberName = effectiveMemberName
+        self.memberElement: Element = memberElement
+        self.memberName: str = memberName
+        self.membershipOwningNamespace: Namespace = membershipOwningNamespace
+        self.ownedMemberElement: Element = ownedMemberElement
+        self.visibility = visibility
+
+
+class ImportedNamespace(Import):
+    """
+    An Import is a Relationship between an importOwningNamespace in which one or more of the visible
+    Memberships of the importedNamespace become importedMemberships of the importOwningNamespace.
+    If isImportAll = false (the default), then only public Memberships are considered "visible".
+    If isImportAll = true, then all Memberships are considered "visible", regardless of their
+    declared visibility.
+
+    If no importedMemberName is given, then all visible Memberships are imported from the
+    importedNamespace. If isRecursive = true, then visible Memberships are also recursively
+    imported from all visible ownedMembers of the Namespace that are also Namespaces.
+
+    If an importedMemberName is given, then the Membership whose effectiveMemberName is that
+    name is imported from the importedNamespace, if it is visible. If isRecursive = true and
+    the imported memberElement is a Namespace, then visible Memberships are also recursively
+    imported from that Namespace and its owned sub-Namespaces.
+
+    Attributes:
+        importedMemberName : String [0..1]
+            The effectiveMemberName of the Membership of the importedNamspace to be imported.
+            If not given, all public Memberships of the importedNamespace are imported.
+        importedNamespace : Namespace {redefines target}
+            The Namespace whose visible members are imported by this Import.
+        importOwningNamespace : Namespace {subsets owningRelatedElement, redefines source}
+            [Derived] The Namespace into which members are imported by this Import, which must be the
+            owningRelatedElement of the Import.
+        isImportAll : Boolean
+            Whether to import memberships without regard to declared visibility.
+        isRecursive : Boolean
+            Whether to recursively import Memberships from visible, owned sub-namespaces.
+        visibility : VisibilityKind
+            The visibility level of the imported members from this Import relative to the importOwningNamespace.
+    """
+
+    def __init__(self, name, parent, importedName=None, importedNamespace=None, importOwningNamespace=None):
+        super(ImportedNamespace, self).__init__(name=name, parent=parent, importedNamespace=importedNamespace,
+                                                importedMemberName=importedName)
+        self.importedMemberName: str = importedName
+        self.importedNamespace: Namespace = importedNamespace
+        self.importOwningNamespace: Namespace = importOwningNamespace
+        self.isImportAll: bool = False
+        self.isRecursive: bool = False
+        self.visibility = None
+
+    def isImportAll(self) -> bool:
+        return True
+
+    def isRecursive(self) -> bool:
+        if self.visibility == 'public':
+            return True
+        return False
