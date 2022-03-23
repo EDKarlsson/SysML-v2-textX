@@ -31,7 +31,6 @@ def get_element_mm(debug=False):
                                     use_regexp_group=True,
                                     autokwd=True,
                                     debug=debug)
-
     return entity_mm
 
 
@@ -44,4 +43,4 @@ def main(debug=False):
 
 
 if __name__ == "__main__":
-    main(True)
+    main()

@@ -1,6 +1,15 @@
 /* Elements */
-Model:
-    ( elements*=Element | relationships+=Relationship)
+//Model:
+//    ( elements*=Element | relationships+=Relationship)
+//;
+
+RootNamespace:
+    type=Namespace
+    ( ownedRelationship += OwnedDocumentation
+    | ownedRelationship += NamespaceMember
+    | ownedRelationship += AliasMember
+    | ownedRelationship += Import
+    )*
 ;
 
 Element:
@@ -35,25 +44,18 @@ RelationshipOwnedElement:
 ;
 
 /* =============================================================== */
-/* Relationships */
-RootNamespace:
-    NamespaceBodyElement*
-;
+/* Namespace */
 Namespace:
-    NamespaceDeclaration NamespaceBody
-;
-NamespaceDeclaration:
     'namespace' ('<' humanId=Name '>')? ( name=Name )?
+    (';' | '{'
+      ( ownedRelationship += OwnedDocumentation
+      | ownedRelationship += NamespaceMember
+      | ownedRelationship += AliasMember
+      | ownedRelationship += Import
+      )*
+    '}')
 ;
-NamespaceBody:
-    ';' | '{' NamespaceBodyElement* '}'
-;
-NamespaceBodyElement:
-      ownedRelationship += OwnedDocumentation
-    | ownedRelationship += NamespaceMember
-    | ownedRelationship += AliasMember
-    | ownedRelationship += Import
-;
+
 MemberPrefix:
     ( ownedRelationship += PrefixDocumentation )*
     ( visibility = VisibilityIndicator )?
@@ -65,11 +67,11 @@ NamespaceMember:
 ;
 NonFeatureMember:
     MemberPrefix
-    ownedMemberElement = NonFeatureElement
+    ownedMemberElement=NonFeatureElement
 ;
 FeatureNamespaceMember:
     MemberPrefix
-    ownedMemberElement = FeatureElement
+    ownedMemberElement=FeatureElement
 ;
 ChainFeatureMember:
     MemberPrefix
@@ -78,8 +80,8 @@ ChainFeatureMember:
 ;
 AliasMember:
     MemberPrefix
-    'alias' memberName = Name 'for'
-    memberElement = [QualifiedName] ';'
+    'alias' memberName=Name 'for'
+    memberElement=[QualifiedName] ';'
 ;
 Import:
     ( ownedRelationship += PrefixDocumentation )*
@@ -105,14 +107,17 @@ FilterPackageImport:
 ;
 FilterPackageMember:
     '[' condition='OwnedExpression' ']'
-    visibility='private'
+//    visibility='private'
 ;
 VisibilityIndicator :
-    visibilityKind=Visibility
-;
-Visibility:
+//    visibilityKind=Visibility
     'public' | 'private' | 'protected'
 ;
+
+//Visibility:
+//    'public' | 'private' | 'protected'
+//;
+
 NonFeatureElement:
     Element
     | Relationship
@@ -197,6 +202,7 @@ PrefixDocumentation:
 PrefixDocumentationComment:
 	( 'doc' ( '<' humanId = Name '>' )? )? body = /(?ms)\/\*\*(.*?)\*\//
 ;
+
 /* =============================================================== */
 /* Textual Representation */
 OwnedTextualRepresentationAnnotation:
@@ -279,18 +285,18 @@ STRING_VALUE
     : /'"' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | "'" | '\\') | !('\\' | '"'))* '"'/
     ;
 
-//Keyword:
-//    'element' | 'relationship' | 'from' | 'to' | 'doc' | 'rep' | 'language' | 'about'
-//;
-
 Keyword:
-    'about' | 'abstract' | 'alias' | 'all' | 'and' | 'as' | 'assign' | 'assoc' | 'behavior' | 'binding' | 'bool' | 'by' | 'class'
-    | 'classifier' | 'comment' | 'composite' | 'conjugate' | 'conjugates' | 'conjugation' | 'connector'
-    | 'datatype' | 'default' | 'disjoining' | 'disjoint' | 'doc' | 'element' | 'else' | 'end' | 'expr' | 'false'
-    | 'feature' | 'featured' | 'featuring' | 'filter' | 'first' | 'flow' | 'for' | 'from' | 'function' | 'generalization'
-    | 'hastype' | 'id' | 'if' | 'implies' | 'import' | 'in' | 'inout' | 'interaction' | 'inv' | 'is' | 'istype' | 'language'
-    | 'member' | 'metadata' | 'multiplicity' | 'namespace' | 'nonunique' | 'not' | 'null' | 'of' | 'or' | 'ordered' | 'out'
-    | 'package' | 'portion' | 'predicate' | 'private' | 'protected' | 'public' | 'redefines' | 'redefinition'
-    | 'relationship' | 'rep' | 'return' | 'specialization' | 'specializes' | 'step' | 'stream' | 'struct'
-    | 'subclassifier' | 'subset' | 'subsets' | 'subtype' | 'succession' | 'then' | 'to' | 'true' | 'type' | 'typed'
-    ;
+    'element' | 'relationship' | 'from' | 'to' | 'doc' | 'rep' | 'language' | 'about'
+;
+
+//Keyword:
+//    'about' | 'abstract' | 'alias' | 'all' | 'and' | 'as' | 'assign' | 'assoc' | 'behavior' | 'binding' | 'bool' | 'by' | 'class'
+//    | 'classifier' | 'comment' | 'composite' | 'conjugate' | 'conjugates' | 'conjugation' | 'connector'
+//    | 'datatype' | 'default' | 'disjoining' | 'disjoint' | 'doc' | 'element' | 'else' | 'end' | 'expr' | 'false'
+//    | 'feature' | 'featured' | 'featuring' | 'filter' | 'first' | 'flow' | 'for' | 'from' | 'function' | 'generalization'
+//    | 'hastype' | 'id' | 'if' | 'implies' | 'import' | 'in' | 'inout' | 'interaction' | 'inv' | 'is' | 'istype' | 'language'
+//    | 'member' | 'metadata' | 'multiplicity' | 'namespace' | 'nonunique' | 'not' | 'null' | 'of' | 'or' | 'ordered' | 'out'
+//    | 'package' | 'portion' | 'predicate' | 'private' | 'protected' | 'public' | 'redefines' | 'redefinition'
+//    | 'relationship' | 'rep' | 'return' | 'specialization' | 'specializes' | 'step' | 'stream' | 'struct'
+//    | 'subclassifier' | 'subset' | 'subsets' | 'subtype' | 'succession' | 'then' | 'to' | 'true' | 'type' | 'typed'
+//    ;

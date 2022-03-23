@@ -22,6 +22,7 @@ OPEN=0
 VERBOSE=0
 TARGET='dot'
 DEBUG_FLAG=
+OUTPUT=../_dot_files
 
 while (("$#")); do
   case $1 in
@@ -87,12 +88,16 @@ check)
 generate)
   if [[ ${VERBOSE} -eq 1 ]]; then
     echo "Generating Grammar: ${GRAMMAR} dot file"
-    echo "textx ${DEBUG_FLAG} generate ${GRAMMAR_FILE} --target ${TARGET} --overwrite"
+    echo "textx ${DEBUG_FLAG} generate ${GRAMMAR_FILE} --target ${TARGET} --overwrite -o ${OUTPUT}"
     echo "dot -Tpng -O $(find . -name "${GRAMMAR}".dot)"
+    echo "sed -i '' -e '/<b>Keyword/,/<\/b>/d' $(find . -name "${GRAMMAR}".dot)"
     echo "--------------------------------------------------------------------------------"
   fi
   textx ${DEBUG_FLAG} generate "${GRAMMAR_FILE}" --target ${TARGET} --overwrite
-  dot -Tpng -O "$(find . -name "${GRAMMAR}".dot)"
+  GRAMMAR_DOT=$(find . -name "${GRAMMAR}".dot)
+#  sed -i '' -e '/<b>Keyword/,/<\/b>/d' "${GRAMMAR_DOT}"
+#  sed -i '' -e '/<br>/<\/br>/d' "${GRAMMAR_DOT}"
+  dot -Tpng -O "${GRAMMAR_DOT}"
   ;;
 esac
 
