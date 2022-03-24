@@ -1,5 +1,14 @@
 # SysML v2 Grammar Parser
 
+## Development Notes
+Current work is focused on the `root` layer/library of the Kernel Modeling Language.
+There is a script `visualize_model.sh` that will run on a provided grammar and language file.
+example:
+```shell
+/visualize_model.sh generate root.tx baseline.kerml verbose
+```
+This will generate a `dot` file in `./kerml/root/` that can be viewed if Graphviz is installed.
+
 ## Resources and Links
 These are resources and links to information used while developing this project
 
