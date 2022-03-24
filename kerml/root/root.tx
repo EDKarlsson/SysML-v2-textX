@@ -13,7 +13,8 @@ Element:
     (';' | '{'
         (   ownedRelationship += OwnedRelationship
             | ownedRelationship += OwnedDocumentation
-        )
+            | ownedRelationship += OwnedTextualRepresentationAnnotation
+        )*
     '}')
 ;
 
@@ -102,7 +103,7 @@ FilterPackageImport:
     ImportedNamespace
 ;
 FilterPackageMember:
-    '[' condition='OwnedExpression' ']'
+    '[' condition=TEMP_RULE /*OwnedExpression*/ ']'
 //    visibility='private'
 ;
 VisibilityIndicator :
@@ -119,41 +120,41 @@ NonFeatureElement:
     | Relationship
     | ModelComment
     | TextualRepresentation
-    | 'AnnotatingFeature'
+//    | 'AnnotatingFeature'
     | Namespace
-    | 'Type'
-    | 'Classifier'
-    | 'DataType'
-    | 'Class'
-    | 'Structure'
-    | 'Association'
-    | 'AssociationStructure'
-    | 'Interaction'
-    | 'Behavior'
-    | 'Function'
-    | 'Predicate'
-    | 'Multiplicity'
-    | 'Package'
-    | 'Specialization'
-    | 'Conjugation'
-    | 'Subclassification'
-    | 'Disjoining'
-    | 'FeatureTyping'
-    | 'Subsetting'
-    | 'Redefinition'
-    | 'TypeFeaturing'
+//    | 'Type'
+//    | 'Classifier'
+//    | 'DataType'
+//    | 'Class'
+//    | 'Structure'
+//    | 'Association'
+//    | 'AssociationStructure'
+//    | 'Interaction'
+//    | 'Behavior'
+//    | 'Function'
+//    | 'Predicate'
+//    | 'Multiplicity'
+    | Package
+//    | 'Specialization'
+//    | 'Conjugation'
+//    | 'Subclassification'
+//    | 'Disjoining'
+//    | 'FeatureTyping'
+//    | 'Subsetting'
+//    | 'Redefinition'
+//    | 'TypeFeaturing'
 ;
 FeatureElement:
       'Feature'
-    | 'Step'
-    | 'Expression'
-    | 'BooleanExpression'
-    | 'Invariant'
-    | 'Connector'
-    | 'BindingConnector'
-    | 'Succession'
-    | 'ItemFlow'
-    | 'SuccessionItemFlow'
+//    | 'Step'
+//    | 'Expression'
+//    | 'BooleanExpression'
+//    | 'Invariant'
+//    | 'Connector'
+//    | 'BindingConnector'
+//    | 'Succession'
+//    | 'ItemFlow'
+//    | 'SuccessionItemFlow'
 ;
 
 /* =============================================================== */
@@ -178,7 +179,7 @@ Annotation:
 
 ElementAnnotation:
     type=[Annotation]
-    annotatedElement = [Element]
+    annotatedElement = [Element|QualifiedName]
 ;
 
 /* =============================================================== */
@@ -202,25 +203,124 @@ PrefixDocumentationComment:
 /* =============================================================== */
 /* Textual Representation */
 OwnedTextualRepresentationAnnotation:
-    type=[Annotation]
+//    type=[Annotation]
     ownedRelatedElement += OwnedTextualRepresentation
 ;
 
 OwnedTextualRepresentation:
-    type=[TextualRepresentation]
+//    type=[TextualRepresentation]
     ( 'rep' ( humanId=Name )? )?
     'language' language=STRING body=/(?ms)\/\*(.*?)\*\//
-    annotation+=[Annotation]
-    ;
+//    annotation+=[Annotation]
+;
 
 TextualRepresentation:
-    ( 'rep' ('<' humanId=Name '>')? ( name=Name )?
-      'about' annotation+=Annotation
-    | ( 'rep' ('<' humanId=Name '>')? ( name=Name )? )?
-      ElementAnnotation
+    (   'rep' (('<' humanId=Name '>')? ( name=Name )?) 'about' annotation+=Annotation
+    | ( 'rep' (('<' humanId=Name '>')? ( name=Name )?) )? ElementAnnotation
     )
     'language' language=STRING body=/(?ms)\/\*(.*?)\*\//
+;
+
+/* =============================================================== */
+/* CORE LAYER RULES */
+/* =============================================================== */
+
+/* =============================================================== */
+/* TYPES */
+//Type:
+//    ( isAbstract ?= 'abstract' )? 'type'
+//    TypeDeclaration TypeBody
+//    ;
+//TypeDeclaration:
+//    ( isSufficient ?= 'all' )?  ('<' humanId=Name '>')? ( name=Name )?
+////    ( ownedRelationship += OwnedMultiplicity )?
+//    ( SpecializationPart | ConjugationPart )+
+//    DisjoiningPart?
+//    ;
+//SpecializationPart:
+//    SPECIALIZES ownedRelationship += OwnedSpecialization
+//    ( ',' ownedRelationship += OwnedSpecialization )*
+//    ;
+//
+//ConjugationPart:
+//    CONJUGATES ownedRelationship += TEMP_RULE // OwnedConjugation
+//    ;
+
+//DisjoiningPart:
+//    'disjoint' 'from' ownedRelationship += TEMP_RULE // OwnedDisjoining
+//    ( ',' ownedRelationship += TEMP_RULE /*OwnedDisjoining*/ )*
+//    ;
+
+//TypeBody:
+//    ';' | '{' TypeBodyElement* '}'
+//    ;
+//TypeBodyElement :
+//      documentation += OwnedDocumentation
+//    | ownedRelationship += NonFeatureMember
+//    | ownedRelationship += TEMP_RULE /*FeatureMember*/
+//    | ownedRelationship += AliasMember
+//    | ownedRelationship += Import
+//;
+
+/* =============================================================== */
+/* SPECIALIZATION */
+//Specialization:
+//    ( 'specialization' ('<' humanId=Name '>')? ( name=Name )? )?
+//    'subtype' SpecificType
+//    SPECIALIZES GeneralType ';'
+//    ;
+//OwnedSpecialization :
+//    GeneralType
+//    ;
+//SpecificType :
+//      specific = [QualifiedName]
+//    | specific += TEMP_RULE /*FeatureChain*/
+//    { ownedRelatedElement += specific }
+//;
+//GeneralType :
+//    general = [QualifiedName]
+//    | general += FeatureChain
+//    { ownedRelatedElement += general }
+//;
+
+/* =============================================================== */
+/* KERNEL LAYER RULES */
+/* =============================================================== */
+
+/* =============================================================== */
+/* PACKAGES */
+Package:
+//    PackageDeclaration PackageBody*//*
+    'package' (('<' humanId=Name '>')? ( name=Name )? )
+    (';' | '{' (
+          ( ownedRelationship += OwnedDocumentation
+          | ownedRelationship += NamespaceMember
+          | ownedRelationship += AliasMember
+          | ownedRelationship += Import
+          )
+        | ownedRelationship += ElementFilterMember )*
+    '}')
+;
+
+
+PackageDeclaration:
+    'package' (('<' humanId=Name '>')? ( name=Name )? | (name=Name))
     ;
+PackageBody:
+    ';' | '{' (
+          ( ownedRelationship += OwnedDocumentation
+          | ownedRelationship += NamespaceMember
+          | ownedRelationship += AliasMember
+          | ownedRelationship += Import
+          )
+        | ownedRelationship += ElementFilterMember )*
+    '}'
+;
+ElementFilterMember:
+    MemberPrefix
+    'filter' condition = TEMP_RULE /*OwnedExpression*/ ';'
+;
+
 /* =============================================================== */
 /* TEXTX COMMENTS */
 Comment:
@@ -235,13 +335,13 @@ NoteLine:
     /\/\/.*$/
 ;
 
-REGULAR_COMMENT:
-    commentText=/(?ms)\/\*(.*?)\*\//
-;
-
-DOCUMENTATION_COMMENT:
-    commentText=/(?ms)\/\*\*(.*?)\*\//
-;
+//REGULAR_COMMENT:
+//    commentText=/(?ms)\/\*(.*?)\*\//
+//;
+//
+//DOCUMENTATION_COMMENT:
+//    commentText=/(?ms)\/\*\*(.*?)\*\//
+//;
 
 /* QualifiedNames */
 Qualification
@@ -259,7 +359,6 @@ Name:
 
 BASIC_NAME:
     /([a-zA-Z]|'_')([\w\d])*/
-//    /([a-zA-Z]|'_')([\w|\d]*)/
     ;
 
 UNRESTRICTED_NAME:
@@ -283,10 +382,19 @@ STRING_VALUE
     : /'"' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | "'" | '\\') | !('\\' | '"'))* '"'/
     ;
 
+TYPED_BY    : ':'   | 'typed' 'by';
+SPECIALIZES : ':>'  | 'specializes';
+SUBSETS     : ':>'  | 'subsets';
+REDEFINES   : ':>>' | 'redefines';
+CONJUGATES  : '~'   | 'conjugates';
+
 Keyword:
-    'element' | 'relationship' | 'from' | 'to' | 'doc' | 'rep' | 'language' | 'about'
+    'element' | 'from' | 'to' | 'doc' | 'rep' |  'about'
+//    'element' | 'from' | 'to' | 'doc' | 'rep' | 'language' | 'about'
+//    |'package' | 'specialization' | 'import' | 'typed by' | 'subsets' | 'redefines' | 'conjugates'
 ;
 
+TEMP_RULE: ID ;
 //Keyword:
 //    'about' | 'abstract' | 'alias' | 'all' | 'and' | 'as' | 'assign' | 'assoc' | 'behavior' | 'binding' | 'bool' | 'by' | 'class'
 //    | 'classifier' | 'comment' | 'composite' | 'conjugate' | 'conjugates' | 'conjugation' | 'connector'

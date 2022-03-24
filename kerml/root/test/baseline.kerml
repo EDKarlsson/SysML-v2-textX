@@ -14,10 +14,4 @@ namespace root {
         }
         relationship to C;
     }
-    // fmdosag
-    element X {
-        doc <X_comment>
-            /* This is a documentation comment about X. */
-        relationship to B;
-    }
 }

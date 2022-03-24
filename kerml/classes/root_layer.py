@@ -9,30 +9,37 @@ class Element(object):
     """
     Attributes:
         aliasId: String[0..*] {ordered}
-            Various alternative identifiers for this Element.
-        humanId: String[0..1] {subsets aliasId}
-            An identifier for this Element that is set by the modeler.
-        derivedName: String[0..1] (/name)
-            [Derived] Primary name of this Element. If the Element is owned by a Namespace, then
-            its name is derived as the memberName of the owningMembership of the Element.
+            Various alternative identifiers for this Element. Generally, these will be set by tools,
+            but one of them (the humanId), in particular, may be set by the modeler.
         documentation: Documentation[0..*] {subsets ownedAnnotation, ordered}
             [Derived] The ownedAnnotations of this Element that are Documentation, for which the Element
             is the annotatedElement.
         documentationComment: Comment[0..*] {subsetsOwnedAnnotation, ordered}
             [Derived] Comments that document this Element, derived as the documentingComments
             of the documentation of the Element.
-        effectiveName:
+        effectiveName: String [0..1]
             [Derived] The effective name to be used for this Element during name resolution within its
             owningNamespace.
-        identifier: String
-            Globally unique identifier for this Element. Intended to be set by tooling. Immutable.
+        humanId: String[0..1] {subsets aliasId}
+            An identifier for this Element that is set by the modeler. It is the responsibility of
+            the modeler to maintain the uniqueness of this identifier within a model or relative
+            to some other context. The humanId essentially acts as an alias for an Element that
+            is specifically tied to that Element, rather than being a name for it in the context
+            of some explicit namespace.
+        identifier : String
+            The globally unique identifier for this Element. This is intended to be set by tooling,
+            and it must not change during the lifetime of the Element.
+        derivedName: String[0..1] (/name)
+            [Derived] Primary name of this Element. If the Element is owned by a Namespace, then
+            its name is derived as the memberName of the owningMembership of the Element.
         ownedAnnotation: Annotation[0..*] {subsets ownedRelationship, annotation, ordered}
             [Derived] The ownedRelationships of this Element that are Annotations, for which this Element
             is the annotatedElement.
         ownedElement: Element[0..*] {ordered}
             [Derived] The Elements owned by this Element, derived as the ownedRelatedElements of the
             ownedRelationships of this Element.
-        ownedRelationship:
+        ownedRelationship: Relationship [0..*] {subsets relationship, ordered}
+            The Relationships for which this Element is the owningRelatedElement.
         ownedTextualRepresentation: TextualRepresentation[0..*] {subsets ownedElement, textualRepresentation}
             [Derived] The textualRepresentations that are ownedElements of this Element.
         owner: Element[0..1]
@@ -43,12 +50,14 @@ class Element(object):
         owningNamespace: Namespace [0..1] {subsets namespace}
             [Derived] The Namespace that owns this Element, derived as the membershipsOwningNamespace of the
             owningMembership of this Element, if any.
+        owningRelationship : Relationship [0..1] {subsets relationship}
+            The Relationship for which this Element is an ownedRelatedElement, if any.
         qualifiedName: String[0..1]
             [Derived] The name of this Element, if it has one, qualified by the name of its owningNamespace, if it has one.
     """
 
-    def __init__(self, parent, name, aliasId=[], humanId=None, ownedRelationship=None, owningMembership=None,
-                 ownedElement=[]):
+    def __init__(self, parent, name, aliasId = None, humanId=None, ownedRelationship=None, owningMembership=None,
+                 ownedElement=None):
         """
         @param parent: TextX Parent
         @param name: TextX Parent
@@ -66,7 +75,10 @@ class Element(object):
         self.ownedElement = ownedElement
         self.ownedRelationship = ownedRelationship
         self.owningMembership = owningMembership
-        self.aliasId = [self.humanId] + aliasId
+        if aliasId is None:
+            self.aliasId = [self.humanId]
+        else:
+            self.aliasId = aliasId.append(self.humanId)
 
         # Need to add logic to these
         if hasattr(self.parent, 'name'):
@@ -83,6 +95,7 @@ class Element(object):
         self.owningNamespace = None
         self.documentationComment = None
         self.ownedTextualRepresentation = None
+        self.owningRelationship = None
         self.ownedAnnotation = None
         self.documentation = None
         self.derivedName = None
@@ -177,7 +190,7 @@ class ModelComment(AnnotatingElement):
             The annotation text for the Comment.
     """
 
-    def __init__(self, parent, name='', body=''):
+    def __init__(self, parent, name=None, body=None):
         super(ModelComment, self).__init__(name=name, parent=parent)
         self.body = body
 
@@ -195,14 +208,14 @@ class Documentation(Annotation):
             The annotatedElement of this Documentation, which must own the Relationship.
     """
 
-    def __init__(self, parent, name='', documentingComment=None, owningDocumentedElement=None):
+    def __init__(self, parent, name=None, documentingComment=None, owningDocumentedElement=None):
         super(Documentation, self).__init__(name=name, parent=parent)
         self.documentingComment = documentingComment
         self.owningDocumentedElement = owningDocumentedElement
 
 
 class OwnedDocumentation(Documentation):
-    def __init__(self, parent, documentingComment, name=''):
+    def __init__(self, parent, documentingComment, name=None):
         super(OwnedDocumentation, self).__init__(name=name, parent=parent)
         self.documentingComment = documentingComment
 
@@ -224,7 +237,7 @@ class TextualRepresentation(AnnotatingElement):
             which is its single annotatedElement.
     """
 
-    def __init__(self, parent, name='', body='', language='', representedElement=None):
+    def __init__(self, parent, name=None, body=None, language=None, representedElement=None):
         super(TextualRepresentation, self).__init__(name=name, parent=parent)
         self.language = language
         self.body = body
@@ -273,6 +286,59 @@ class Import(Relationship):
         self.isImportAll: bool = False
         self.isRecursive: bool = False
         self.visibility = None
+
+
+class ImportedNamespace(Import):
+    """
+    An Import is a Relationship between an importOwningNamespace in which one or more of the visible
+    Memberships of the importedNamespace become importedMemberships of the importOwningNamespace.
+    If isImportAll = false (the default), then only public Memberships are considered "visible".
+    If isImportAll = true, then all Memberships are considered "visible", regardless of their
+    declared visibility.
+
+    If no importedMemberName is given, then all visible Memberships are imported from the
+    importedNamespace. If isRecursive = true, then visible Memberships are also recursively
+    imported from all visible ownedMembers of the Namespace that are also Namespaces.
+
+    If an importedMemberName is given, then the Membership whose effectiveMemberName is that
+    name is imported from the importedNamespace, if it is visible. If isRecursive = true and
+    the imported memberElement is a Namespace, then visible Memberships are also recursively
+    imported from that Namespace and its owned sub-Namespaces.
+
+    Attributes:
+        importedMemberName : String [0..1]
+            The effectiveMemberName of the Membership of the importedNamspace to be imported.
+            If not given, all public Memberships of the importedNamespace are imported.
+        importedNamespace : Namespace {redefines target}
+            The Namespace whose visible members are imported by this Import.
+        importOwningNamespace : Namespace {subsets owningRelatedElement, redefines source}
+            [Derived] The Namespace into which members are imported by this Import, which must be the
+            owningRelatedElement of the Import.
+        isImportAll : Boolean
+            Whether to import memberships without regard to declared visibility.
+        isRecursive : Boolean
+            Whether to recursively import Memberships from visible, owned sub-namespaces.
+        visibility : VisibilityKind
+            The visibility level of the imported members from this Import relative to the importOwningNamespace.
+    """
+
+    def __init__(self, name, parent, importedName=None, importedNamespace=None, importOwningNamespace=None):
+        super(ImportedNamespace, self).__init__(name=name, parent=parent, importedNamespace=importedNamespace,
+                                                importedMemberName=importedName)
+        self.importedMemberName: str = importedName
+        self.importedNamespace: Namespace = importedNamespace
+        self.importOwningNamespace: Namespace = importOwningNamespace
+        self.isImportAll: bool = False
+        self.isRecursive: bool = False
+        self.visibility = None
+
+    def isImportAll(self) -> bool:
+        return True
+
+    def isRecursive(self) -> bool:
+        if self.visibility == 'public':
+            return True
+        return False
 
 
 class Namespace(Element):
@@ -420,7 +486,7 @@ class AliasMember(Membership):
 
 
 class NonFeatureMember(Membership):
-    def __init__(self, parent, name='', effectiveMemberName=None, memberElement=None,
+    def __init__(self, parent, name=None, effectiveMemberName=None, memberElement=None,
                  membershipOwningNamespace=None, ownedMemberElement=None,
                  visibility=None):
         super(NonFeatureMember, self).__init__(name=name, parent=parent)
@@ -433,7 +499,7 @@ class NonFeatureMember(Membership):
 
 
 class FeatureNamespaceMember(Membership):
-    def __init__(self, parent, name='', effectiveMemberName=None, memberElement=None,
+    def __init__(self, parent, name=None, effectiveMemberName=None, memberElement=None,
                  memberName=None, membershipOwningNamespace=None, ownedMemberElement=None,
                  visibility=None):
         super(FeatureNamespaceMember, self).__init__(name=name, parent=parent)
@@ -445,54 +511,92 @@ class FeatureNamespaceMember(Membership):
         self.visibility = visibility
 
 
-class ImportedNamespace(Import):
+class NonFeatureElement(Element):
     """
-    An Import is a Relationship between an importOwningNamespace in which one or more of the visible
-    Memberships of the importedNamespace become importedMemberships of the importOwningNamespace.
-    If isImportAll = false (the default), then only public Memberships are considered "visible".
-    If isImportAll = true, then all Memberships are considered "visible", regardless of their
-    declared visibility.
-
-    If no importedMemberName is given, then all visible Memberships are imported from the
-    importedNamespace. If isRecursive = true, then visible Memberships are also recursively
-    imported from all visible ownedMembers of the Namespace that are also Namespaces.
-
-    If an importedMemberName is given, then the Membership whose effectiveMemberName is that
-    name is imported from the importedNamespace, if it is visible. If isRecursive = true and
-    the imported memberElement is a Namespace, then visible Memberships are also recursively
-    imported from that Namespace and its owned sub-Namespaces.
-
     Attributes:
-        importedMemberName : String [0..1]
-            The effectiveMemberName of the Membership of the importedNamspace to be imported.
-            If not given, all public Memberships of the importedNamespace are imported.
-        importedNamespace : Namespace {redefines target}
-            The Namespace whose visible members are imported by this Import.
-        importOwningNamespace : Namespace {subsets owningRelatedElement, redefines source}
-            [Derived] The Namespace into which members are imported by this Import, which must be the
-            owningRelatedElement of the Import.
-        isImportAll : Boolean
-            Whether to import memberships without regard to declared visibility.
-        isRecursive : Boolean
-            Whether to recursively import Memberships from visible, owned sub-namespaces.
-        visibility : VisibilityKind
-            The visibility level of the imported members from this Import relative to the importOwningNamespace.
+        aliasId: String[0..*] {ordered}
+            Various alternative identifiers for this Element.
+        humanId: String[0..1] {subsets aliasId}
+            An identifier for this Element that is set by the modeler.
+        derivedName: String[0..1] (/name)
+            [Derived] Primary name of this Element. If the Element is owned by a Namespace, then
+            its name is derived as the memberName of the owningMembership of the Element.
+        documentation: Documentation[0..*] {subsets ownedAnnotation, ordered}
+            [Derived] The ownedAnnotations of this Element that are Documentation, for which the Element
+            is the annotatedElement.
+        documentationComment: Comment[0..*] {subsetsOwnedAnnotation, ordered}
+            [Derived] Comments that document this Element, derived as the documentingComments
+            of the documentation of the Element.
+        effectiveName:
+            [Derived] The effective name to be used for this Element during name resolution within its
+            owningNamespace.
+        identifier: String
+            Globally unique identifier for this Element. Intended to be set by tooling. Immutable.
+        ownedAnnotation: Annotation[0..*] {subsets ownedRelationship, annotation, ordered}
+            [Derived] The ownedRelationships of this Element that are Annotations, for which this Element
+            is the annotatedElement.
+        ownedElement: Element[0..*] {ordered}
+            [Derived] The Elements owned by this Element, derived as the ownedRelatedElements of the
+            ownedRelationships of this Element.
+        ownedRelationship:
+        ownedTextualRepresentation: TextualRepresentation[0..*] {subsets ownedElement, textualRepresentation}
+            [Derived] The textualRepresentations that are ownedElements of this Element.
+        owner: Element[0..1]
+            [Derived] The owned of this Element, derived as the owningRelatedElement of the
+            owningRelationship of this Element, if any.
+        owningMembership: Membership[0..1] {subsets owningRelationship}
+            The owningRelationship of this Element, if that Relationships is a Membmership.
+        owningNamespace: Namespace [0..1] {subsets namespace}
+            [Derived] The Namespace that owns this Element, derived as the membershipsOwningNamespace of the
+            owningMembership of this Element, if any.
+        qualifiedName: String[0..1]
+            [Derived] The name of this Element, if it has one, qualified by the name of its owningNamespace, if it has one.
     """
 
-    def __init__(self, name, parent, importedName=None, importedNamespace=None, importOwningNamespace=None):
-        super(ImportedNamespace, self).__init__(name=name, parent=parent, importedNamespace=importedNamespace,
-                                                importedMemberName=importedName)
-        self.importedMemberName: str = importedName
-        self.importedNamespace: Namespace = importedNamespace
-        self.importOwningNamespace: Namespace = importOwningNamespace
-        self.isImportAll: bool = False
-        self.isRecursive: bool = False
-        self.visibility = None
+    def __init__(self, parent, name, ownedElement: Element, aliasId=None, humanId=None, ownedRelationship=None,
+                 owningMembership=None, owningNamespace=None, documentationComment=None,
+                 ownedTextualRepresentation=None, ownedAnnotation=None, documentation=None, derivedName=None, ):
+        """
+        @param owningNamespace:
+        @type owningNamespace:
+        @param parent: TextX Parent
+        @param name: TextX Parent
+        @param aliasId:
+        @param humanId:
+        @param ownedElement:
+        @param ownedRelationship:
+        @param owningMembership:
+        """
+        super(Element, self).__init__(name=name, parent=parent, humanId=humanId, aliasId=aliasId)
+        self.owner: Element = self.parent
+        self.ownedElement: Element = ownedElement
+        self.ownedRelationship: Relationship = ownedRelationship
+        self.owningMembership: Membership = owningMembership
+        self.aliasId = [self.humanId] + aliasId
 
-    def isImportAll(self) -> bool:
-        return True
+        # Need to add logic to these
+        if hasattr(self.parent, 'name'):
+            if self.parent.name == '':
+                self.qualifiedName = self.name
+            else:
+                self.qualifiedName = self.parent.name + '::' + self.name
+        else:
+            self.qualifiedName = self.name
+        self.effectiveName = self.effectiveName()
 
-    def isRecursive(self) -> bool:
-        if self.visibility == 'public':
-            return True
-        return False
+        # Derived Attributes
+        self.identifier = None
+        self.owningNamespace: Namespace = owningNamespace
+        self.documentationComment = documentationComment
+        self.ownedTextualRepresentation = ownedTextualRepresentation
+        self.ownedAnnotation = ownedAnnotation
+        self.documentation = documentation
+        self.derivedName = derivedName
+
+    def escapedName(self):
+        return json.dumps(self.name)
+
+    def effectiveName(self):
+        return self.name
+        # return self.parent.name + '::' + self.name
+
