@@ -1,8 +1,26 @@
 import json
+from pprint import pprint
+
+from textx import get_model, get_metamodel
 
 
-def element_obj_processor(element):
-    pass
+def relationship_definer_scope(element, attr, attr_ref):
+    # get the model of the currently processed element
+    m = get_model(element)
+    name = attr_ref.obj_name  # the name of currently looked up element
+    # pprint(attr_ref.cls.__dict__)
+    # humanId = attr_ref.humanId  # the name of currently looked up element
+    found_elements = list(filter(lambda e: e.name == name, m.ownedRelationship))
+    pprint(f"\n\nFOUND ELEMENTS: {found_elements}\n\n")
+    if len(found_elements) > 0:
+        return found_elements[0]  # if a person exists, return it
+    else:
+        mm = get_metamodel(m)  # else, create it and store it in the model
+        element = mm['Element']()
+        element.name = name
+        element.parent = m
+        m.persons.append(element)
+        return element
 
 
 class Element(object):
@@ -56,8 +74,8 @@ class Element(object):
             [Derived] The name of this Element, if it has one, qualified by the name of its owningNamespace, if it has one.
     """
 
-    def __init__(self, parent, name, aliasId = None, humanId=None, ownedRelationship=None, owningMembership=None,
-                 ownedElement=None):
+    def __init__(self, parent, name, humanId=None, aliasId=None, memberName=None, ownedRelationship=None,
+                 owningMembership=None, ownedElement=None):
         """
         @param parent: TextX Parent
         @param name: TextX Parent
@@ -68,10 +86,11 @@ class Element(object):
         @param owningMembership:
         """
         super(Element, self).__init__()
+        self.humanId = humanId
         self.name = name
         self.parent = parent
         self.owner = self.parent
-        self.humanId = humanId
+        self.memberName = memberName
         self.ownedElement = ownedElement
         self.ownedRelationship = ownedRelationship
         self.owningMembership = owningMembership
@@ -436,16 +455,14 @@ class Membership(Relationship):
             visible outside that Namespace.
     """
 
-    def __init__(self, parent, name, effectiveMemberName=None, memberElement=None,
-                 membershipOwningNamespace=None, ownedMemberElement=None,
-                 visibility=None):
+    def __init__(self, parent, name, memberElement=None, ownedMemberElement=None, visibility=None):
         super(Membership, self).__init__(name=name, parent=parent)
-        self.effectiveMemberName = effectiveMemberName
         self.memberElement: Element = memberElement
         self.memberName: str = name
-        self.membershipOwningNamespace: Namespace = membershipOwningNamespace
         self.ownedMemberElement: Element = ownedMemberElement
         self.visibility = visibility
+        self.effectiveMemberName = None
+        self.membershipOwningNamespace = None
 
     def isDistinguishableFrom(self, other) -> bool:
         """Whether this Membership is distinguishable from a given other Membership. By default, this is true if the
@@ -599,4 +616,3 @@ class NonFeatureElement(Element):
     def effectiveName(self):
         return self.name
         # return self.parent.name + '::' + self.name
-

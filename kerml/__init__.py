@@ -1,5 +1,5 @@
 import json
-
+from textx import metamodel_for_language
 from kerml.classes.root_layer import Element, NonFeatureElement, Relationship, Annotation, ModelComment, \
     TextualRepresentation, AliasMember, FeatureNamespaceMember, NonFeatureMember, Import, OwnedDocumentation, Namespace
 from textx.export import model_export
@@ -77,15 +77,26 @@ def load_examples(kerml_dirs: list):
 
 def main(test_file, debug=False):
     element_mm = get_element_mm(debug)
+    # element_mm.register_scope_providers({
+    #     "Element.*": root_layer.relationship_definer_scope,
+    #     "Relationship.*": root_layer.relationship_definer_scope,
+    #     "RelationshipOwnedElement.*": root_layer.relationship_definer_scope,
+    # })
     model = element_mm.model_from_file(test_file)
     model_export(model, join(current_dir, '../_dot_files', 'root_mm.dot'))
+
+
+def inspect_language(grammar_file):
+    textx_mm = metamodel_for_language("textx")
+    grammar_model = textx_mm.grammar_model_from_file(join(current_dir, grammar_file))
+    print(grammar_model)
 
 
 if __name__ == "__main__":
     test_files = load_examples(["/Users/dank/git/systems-modeling/SysML-v2-Release",
                                 "/Users/dank/git/systems-modeling/SysML-v2-Grammar-Parser/kerml/root/test"])
 
-    print(f"Testing {test_files}")
+    # print(f"Testing {test_files}")
     tfile = test_files.get_test_file("ElementDocRelationship.kerml", "test")
     print(f"Testing {tfile}")
     main(tfile, debug=True)

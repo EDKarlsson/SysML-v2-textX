@@ -1,15 +1,16 @@
 /* Elements */
 RootNamespace:
-    type=Namespace
-    ( ownedRelationship += OwnedDocumentation
-    | ownedRelationship += NamespaceMember
-    | ownedRelationship += AliasMember
-    | ownedRelationship += Import
-    )*
-;
+    'namespace' ('<' humanId=Name '>')? ( name=Name )?
+    (';' | '{'
+      ( ownedRelationship += OwnedDocumentation
+      | ownedRelationship += NamespaceMember
+      | ownedRelationship += AliasMember
+      | ownedRelationship += Import
+      )*
+    '}');
 
 Element:
-    'element' ('<' humanId=Name '>')? ( name=Name )?
+    'element' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)
     (';' | '{'
         (   ownedRelationship += OwnedRelationship
             | ownedRelationship += OwnedDocumentation
@@ -21,7 +22,7 @@ Element:
 /* =============================================================== */
 /* Relationships */
 Relationship:
-    'relationship' ('<' humanId=Name '>')? ( name=Name )?
+    'relationship' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
         ('from' source+=[Element|QualifiedName][','])?
         ('to' target+=[Element|QualifiedName][','])?
     (';' | '{'
@@ -30,7 +31,7 @@ Relationship:
 ;
 
 OwnedRelationship:
-    'relationship' ('<' humanId=Name '>')? ('to' target+=[Element|QualifiedName][','])?
+    'relationship' ('<' name=Name '>')? ('to' target+=[Element|QualifiedName][','])?
     (';' | '{'
         ownedRelatedElement+=RelationshipOwnedElement
     '}')
@@ -43,7 +44,7 @@ RelationshipOwnedElement:
 /* =============================================================== */
 /* Namespace */
 Namespace:
-    'namespace' ('<' humanId=Name '>')? ( name=Name )?
+    'namespace' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)
     (';' | '{'
       ( ownedRelationship += OwnedDocumentation
       | ownedRelationship += NamespaceMember
@@ -160,12 +161,12 @@ FeatureElement:
 /* =============================================================== */
 /* Comments */
 ModelComment:
-	( 'comment' ('<' humanId=Name '>')? ( name=Name )?
+	( 'comment' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)
 	  'about' ownedRelationship += Annotation
       //{ ownedRelationship += annotation }
       ownedRelationship += [Annotation|QualifiedName]
 	  ( ',' ownedRelationship += Annotation )*
-	  | ( 'comment' ('<' humanId=Name '>')? ( name=Name )? )?
+	  | ( 'comment' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name) )?
 	  ownedRelationship += ElementAnnotation
       //{ ownedRelationship += annotation }
       ownedRelationship += [Annotation|QualifiedName]
@@ -178,7 +179,7 @@ Annotation:
 ;
 
 ElementAnnotation:
-    type=[Annotation]
+//    type=[Annotation]
     annotatedElement = [Element|QualifiedName]
 ;
 
@@ -189,7 +190,8 @@ OwnedDocumentation:
 ;
 
 DocumentationComment:
-    'doc' ('<' humanId = Name '>' )? body=/(?ms)\/\*(.*?)\*\//
+    'doc' ('<' name = Name '>' )? body=/(?ms)\/\*(.*?)\*\//
+//    'doc' ('<' humanId = Name '>' )? body=/(?ms)\/\*(.*?)\*\//
 ;
 
 PrefixDocumentation:
@@ -197,28 +199,34 @@ PrefixDocumentation:
 ;
 
 PrefixDocumentationComment:
-	( 'doc' ( '<' humanId = Name '>' )? )? body = /(?ms)\/\*\*(.*?)\*\//
+	( 'doc' ( '<' name = Name '>' )? )? body=/(?ms)\/\*\*(.*?)\*\//
 ;
 
 /* =============================================================== */
 /* Textual Representation */
 OwnedTextualRepresentationAnnotation:
-//    type=[Annotation]
     ownedRelatedElement += OwnedTextualRepresentation
 ;
 
 OwnedTextualRepresentation:
-//    type=[TextualRepresentation]
     ( 'rep' ( humanId=Name )? )?
-    'language' language=STRING body=/(?ms)\/\*(.*?)\*\//
-//    annotation+=[Annotation]
+    'language' QuotedID body=REGULAR_COMMENT
 ;
 
 TextualRepresentation:
     (   'rep' (('<' humanId=Name '>')? ( name=Name )?) 'about' annotation+=Annotation
     | ( 'rep' (('<' humanId=Name '>')? ( name=Name )?) )? ElementAnnotation
     )
-    'language' language=STRING body=/(?ms)\/\*(.*?)\*\//
+    'language' name=QuotedID body=REGULAR_COMMENT
+;
+
+FullyQualifiedID[noskipws]:
+    /\s*/-
+    QuotedID+['.']
+    /\s*/-
+;
+QuotedID:
+    '"'?- ID '"'?-
 ;
 
 /* =============================================================== */
@@ -321,6 +329,11 @@ ElementFilterMember:
     'filter' condition = TEMP_RULE /*OwnedExpression*/ ';'
 ;
 
+// This is only here to allow the class to be pulled in
+Membership:
+    'membership' name=Name memberElement=Element ownedMemberElement=Element visibility=VisibilityIndicator
+;
+
 /* =============================================================== */
 /* TEXTX COMMENTS */
 Comment:
@@ -335,13 +348,14 @@ NoteLine:
     /\/\/.*$/
 ;
 
-//REGULAR_COMMENT:
-//    commentText=/(?ms)\/\*(.*?)\*\//
-//;
+REGULAR_COMMENT:
+//    commentText=/\/\*(.*?)\*\//
+    commentText=/(?ms)\/\*(.*?)\*\//
+;
 //
-//DOCUMENTATION_COMMENT:
-//    commentText=/(?ms)\/\*\*(.*?)\*\//
-//;
+DOCUMENTATION_COMMENT:
+    commentText=/\/\*\*(.*?)\*\//
+;
 
 /* QualifiedNames */
 Qualification
