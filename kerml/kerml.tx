@@ -105,10 +105,8 @@ FilterPackageImport:
 ;
 FilterPackageMember:
     '[' condition=TEMP_RULE /*OwnedExpression*/ ']'
-//    visibility='private'
 ;
 VisibilityIndicator :
-//    visibilityKind=Visibility
     'public' | 'private' | 'protected'
 ;
 
@@ -124,25 +122,25 @@ NonFeatureElement:
 //    | 'AnnotatingFeature'
     | Namespace
     | Type
-//    | 'Classifier'
-//    | 'DataType'
-//    | 'Class'
-//    | 'Structure'
-//    | 'Association'
-//    | 'AssociationStructure'
-//    | 'Interaction'
-//    | 'Behavior'
-//    | 'Function'
-//    | 'Predicate'
-//    | 'Multiplicity'
-    | Package
-//    | 'Conjugation'
-//    | 'Subclassification'
-//    | 'Disjoining'
-//    | 'FeatureTyping'
-//    | 'Subsetting'
-//    | 'Redefinition'
-//    | 'TypeFeaturing'
+//    | Classifier
+//    | DataType
+//    | Class
+//    | Structure
+//    | Association
+//    | AssociationStructure
+//    | Interaction
+//    | Behavior
+//    | Function
+//    | Predicate
+//    | Multiplicity
+//    | Package
+    | Conjugation
+//    | Subclassification
+//    | Disjoining
+//    | FeatureTyping
+//    | Subsetting
+//    | Redefinition
+//    | TypeFeaturing
 ;
 FeatureElement:
       'Feature'
@@ -241,24 +239,25 @@ Type:
     ( isSufficient ?= 'all' )? (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
 //    ( ownedRelationship += OwnedMultiplicity )?
     ( SpecializationPart | ConjugationPart )+
-    DisjoiningPart?
-    (';' | '{' (
+//    DisjoiningPart?
+    (';' | ('{'
           documentation += OwnedDocumentation
-        | ownedRelationship += NonFeatureMember
-        | ownedRelationship += TEMP_RULE /*FeatureMember*/
-        | ownedRelationship += AliasMember
-        | ownedRelationship += Import
-        *)
+         | ownedRelationship += NonFeatureMember
+//        | ownedRelationship += FeatureMember
+         | ownedRelationship += AliasMember
+         | ownedRelationship += Import
+        )*
     '}')
     ;
+
 SpecializationPart:
     SPECIALIZES ownedRelationship += OwnedSpecialization
     ( ',' ownedRelationship += OwnedSpecialization )*
     ;
 
 ConjugationPart:
-    CONJUGATES ownedRelationship += TEMP_RULE // OwnedConjugation
-    ;
+    CONJUGATES ownedRelationship += OwnedConjugation
+;
 
 DisjoiningPart:
     'disjoint' 'from' ownedRelationship += TEMP_RULE // OwnedDisjoining
@@ -268,7 +267,7 @@ DisjoiningPart:
 /* =============================================================== */
 /* SPECIALIZATION */
 Specialization:
-    ( 'specialization' ('<' humanId=Name '>')? ( name=Name )? )?
+    ( 'specialization' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?)?
     'subtype' SpecificType
     SPECIALIZES GeneralType ';'
     ;
@@ -287,13 +286,35 @@ GeneralType :
 ;
 
 /* =============================================================== */
+/* CONJUGATION */
+Conjugation:
+    ( 'conjugation' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
+    'conjugate'
+    ( conjugatedType=[Type|QualifiedName]
+//    | conjugatedType = FeatureChain
+//      { ownedRelatedElement += conjugatedType }
+    )
+    CONJUGATES
+    ( originalType=[Type|QualifiedName]
+//    | originalType = FeatureChain
+//      { ownedRelatedElement += originalType }
+      ) ';'
+;
+
+OwnedConjugation:
+//      originalType=ID
+      originalType=[Type|QualifiedName]
+//    | originalType = FeatureChain
+//      { ownedRelatedElement += originalType }
+;
+/* =============================================================== */
 /* KERNEL LAYER RULES */
 /* =============================================================== */
 
 /* =============================================================== */
 /* PACKAGES */
 Package:
-//    PackageDeclaration PackageBody*//*
+    PackageDeclaration PackageBody*//*
     'package' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
     (';' | '{' (
           ( ownedRelationship += OwnedDocumentation
@@ -353,12 +374,12 @@ DOCUMENTATION_COMMENT:
 ;
 
 /* QualifiedNames */
-Qualification
-    : Name('::')+
+Qualification:
+    (Name'::')+
     ;
 
 QualifiedName
-    : Qualification? Name
+    : Name Qualification?
     ;
 
 /* NAMES */

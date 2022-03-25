@@ -3,7 +3,7 @@ from textx import metamodel_for_language
 from kerml.classes.root_layer import Element, NonFeatureElement, Relationship, Annotation, ModelComment, \
     TextualRepresentation, AliasMember, FeatureNamespaceMember, NonFeatureMember, Import, OwnedDocumentation, Namespace, \
     Membership
-from kerml.classes.core_layer import Type, FeatureElement
+from kerml.classes.core_layer import Type, FeatureElement, Specialization, Conjugation
 from textx.export import model_export
 from textx import language, metamodel_from_file
 from os.path import join
@@ -18,7 +18,7 @@ def class_provider(name):
     classes = [Element, NonFeatureElement, Relationship, Annotation, ModelComment,
                TextualRepresentation, AliasMember, FeatureNamespaceMember, Type,
                NonFeatureMember, Import, OwnedDocumentation, Namespace, Membership,
-               FeatureElement]
+               FeatureElement, Specialization, Conjugation]
     classes = dict(map(lambda x: (x.__name__, x), classes))
     return classes.get(name)
 
@@ -40,7 +40,7 @@ def get_element_mm(debug=False):
     Builds and returns a meta-model for Entity language.
     """
     from kernel_layer import Package
-    entity_mm = metamodel_from_file(join(current_dir, '../_old_tx/root', 'kerml.tx'),
+    entity_mm = metamodel_from_file(join(current_dir, 'kerml.tx'),
                                     classes=class_provider,
                                     use_regexp_group=True,
                                     autokwd=True,
@@ -93,7 +93,7 @@ def main(test_file, debug=False):
     #     "RelationshipOwnedElement.*": root_layer.relationship_definer_scope,
     # })
     model = element_mm.model_from_file(test_file)
-    model_export(model, join(current_dir, '../_dot_files', 'root_mm.dot'))
+    model_export(model, join(current_dir, '../_dot_files', 'kerml_mm.dot'))
 
 
 def inspect_language(grammar_file):
@@ -104,10 +104,10 @@ def inspect_language(grammar_file):
 
 if __name__ == "__main__":
     test_files = load_examples(["/Users/dank/git/systems-modeling/SysML-v2-Release",
-                                "/Users/dank/git/systems-modeling/SysML-v2-Grammar-Parser/kerml/root/test"])
+                                "/Users/dank/git/systems-modeling/SysML-v2-Grammar-Parser/kerml/test"])
 
     # inspect_language("./root/kerml.tx")
     # print(f"Testing {test_files}")
-    tfile = test_files.get_test_file("simpletypes.kerml", "test")
+    tfile = test_files.get_test_file("typeconjugation.kerml", "test")
     print(f"Testing {tfile}")
     main(tfile, debug=False)

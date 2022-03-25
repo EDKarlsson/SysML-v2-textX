@@ -97,6 +97,8 @@ class FeatureElement(Element):
 
 
 class Type(Namespace):
+    __slots__ = ['name', 'parent', 'isAbstract', 'importedMembership', 'member', 'ownedMembership']
+
     def __init__(self, name, parent, humanId=None, aliasId=None, isAbstract=None, isSufficient=None,
                  documentation=None, ownedRelationship=None,
 
@@ -114,3 +116,81 @@ class Type(Namespace):
         self.ownedImport = ownedImport
         self.ownedMember = ownedMember
         self.ownedMembership = ownedMembership
+
+
+class Specialization(Relationship):
+    """
+    Attributes:
+        ownedRelatedElement : Element [0..*] {subsets relatedElement, ordered}
+            The relatedElements of this Relationship that are owned by the Relationship.
+        owningRelatedElement : Element [0..1] {subsets relatedElement}
+            The relatedElement of this Relationship that owns the Relationship, if any.
+        relatedElement : Element [2..*] {ordered, nonunique, union}
+            [Derived] The Elements that are related by this Relationship, derived as the
+            union of the source and target Elements of the Relationship. Every Relationship
+            must have at least two relatedElements.
+        source : Element [0..*] {subsets relatedElement, ordered}
+            The relatedElements from which this Relationship is considered to be directed.
+        target : Element [0..*] {subsets relatedElement, ordered}
+            The relatedElements to which this Relationship is considered to be directed.
+    """
+    __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement",
+                 "relatedElement"]
+
+    def __init__(self, name, parent, humanId=None, target=None, source=None,
+                 ownedRelatedElement=None, owningRelatedElement=None):
+        super(Specialization, self).__init__(name=name, parent=parent, humanId=humanId)
+        self.source = source
+        self.target = target
+        self.ownedRelatedElement = ownedRelatedElement
+        self.relatedElement = []
+        if self.source is list:
+            self.relatedElement += self.source
+        else:
+            self.relatedElement.append(self.source)
+        if self.target is list:
+            self.relatedElement += self.target
+        else:
+            self.relatedElement.append(self.target)
+
+        self.owningRelatedElement = owningRelatedElement
+
+
+class Conjugation(Relationship):
+    """
+    Attributes:
+        ownedRelatedElement : Element [0..*] {subsets relatedElement, ordered}
+            The relatedElements of this Relationship that are owned by the Relationship.
+        owningRelatedElement : Element [0..1] {subsets relatedElement}
+            The relatedElement of this Relationship that owns the Relationship, if any.
+        relatedElement : Element [2..*] {ordered, nonunique, union}
+            [Derived] The Elements that are related by this Relationship, derived as the
+            union of the source and target Elements of the Relationship. Every Relationship
+            must have at least two relatedElements.
+        source : Element [0..*] {subsets relatedElement, ordered}
+            The relatedElements from which this Relationship is considered to be directed.
+        target : Element [0..*] {subsets relatedElement, ordered}
+            The relatedElements to which this Relationship is considered to be directed.
+    """
+    __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement",
+                 "relatedElement", "conjugatedType", "originalType"]
+
+    def __init__(self, name, parent, humanId=None, target=None, source=None, conjugatedType=None,
+                 ownedRelatedElement=None, owningRelatedElement=None, originalType=None):
+        super(Conjugation, self).__init__(name=name, parent=parent, humanId=humanId)
+        self.source = source
+        self.target = target
+        self.ownedRelatedElement = ownedRelatedElement
+        self.relatedElement = []
+        self.conjugatedType = conjugatedType
+        self.originalType = originalType
+        if self.source is list:
+            self.relatedElement += self.source
+        else:
+            self.relatedElement.append(self.source)
+        if self.target is list:
+            self.relatedElement += self.target
+        else:
+            self.relatedElement.append(self.target)
+
+        self.owningRelatedElement = owningRelatedElement
