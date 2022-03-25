@@ -1,13 +1,11 @@
 /* Elements */
 RootNamespace:
-    'namespace' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
-    (';' | '{'
       ( ownedRelationship += OwnedDocumentation
       | ownedRelationship += NamespaceMember
       | ownedRelationship += AliasMember
       | ownedRelationship += Import
       )*
-    '}');
+;
 
 Element:
     'element' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)
@@ -133,10 +131,10 @@ NonFeatureElement:
 //    | Function
 //    | Predicate
 //    | Multiplicity
-//    | Package
+    | Package
     | Conjugation
 //    | Subclassification
-//    | Disjoining
+    | Disjoining
 //    | FeatureTyping
 //    | Subsetting
 //    | Redefinition
@@ -172,7 +170,7 @@ ModelComment:
 ;
 
 Annotation:
-	annotatedElement = [QualifiedName]
+	annotatedElement = [Element|QualifiedName]
 ;
 
 ElementAnnotation:
@@ -260,8 +258,8 @@ ConjugationPart:
 ;
 
 DisjoiningPart:
-    'disjoint' 'from' ownedRelationship += TEMP_RULE // OwnedDisjoining
-    ( ',' ownedRelationship += TEMP_RULE /*OwnedDisjoining*/ )*
+    'disjoint' 'from' ownedRelationship += OwnedDisjoining
+    ( ',' ownedRelationship += OwnedDisjoining )*
     ;
 
 /* =============================================================== */
@@ -302,11 +300,51 @@ Conjugation:
 ;
 
 OwnedConjugation:
-//      originalType=ID
       originalType=[Type|QualifiedName]
 //    | originalType = FeatureChain
 //      { ownedRelatedElement += originalType }
 ;
+
+/* =============================================================== */
+/* DISJOINING */
+Disjoining:
+    ( 'disjoining' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
+    'disjoint' ( typeDisjoined = [Type|QualifiedName]
+//    | typeDisjoined = FeatureChain
+//    { ownedRelatedElement += typeDisjoined }
+    )
+    'from' ( disjoiningType = [Type|QualifiedName]
+//    | disjoinginType = FeatureChain
+//    { ownedRelatedElement += disjoiningType }
+    ) ';'
+;
+OwnedDisjoining:
+    disjoiningType = [Type|QualifiedName]
+//    | disjoinginType = FeatureChain
+//    { ownedRelatedElement += disjoiningType }
+;
+
+/* =============================================================== */
+/* FEATURE MEMBER */
+FeatureMember :
+      TypeFeatureMember
+    | OwnedFeatureMember
+    | UnownedFeatureMember
+//    | ChainingFeatureMember
+;
+TypeFeatureMember:
+    MemberPrefix 'member' ownedMemberElement = FeatureElement
+;
+
+OwnedFeatureMember:
+    MemberPrefix ownedMemberFeature = FeatureElement
+;
+
+UnownedFeatureMember:
+    MemberPrefix 'feature'? ( memberName = Name )? 'is'
+    memberFeature = [Membership|QualifiedName]
+;
+
 /* =============================================================== */
 /* KERNEL LAYER RULES */
 /* =============================================================== */

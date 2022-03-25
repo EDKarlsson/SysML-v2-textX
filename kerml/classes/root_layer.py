@@ -149,7 +149,7 @@ class Relationship(Element):
         target : Element [0..*] {subsets relatedElement, ordered}
             The relatedElements to which this Relationship is considered to be directed.
     """
-    __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement"]
+    __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement", "relatedElement"]
 
     def __init__(self, name, parent, humanId=None, target=None, source=None,
                  ownedRelatedElement=None, owningRelatedElement=None):
@@ -245,7 +245,7 @@ class Documentation(Annotation):
 
 
 class OwnedDocumentation(Documentation):
-    __slots__ = ["parent", "name", "documentingComment"]
+    __slots__ = ["parent", "name", "documentingComment", "relatedElement"]
 
     def __init__(self, parent, documentingComment, name=None):
         super(OwnedDocumentation, self).__init__(name=name, parent=parent)
