@@ -75,6 +75,11 @@ class Element(object):
             [Derived] The name of this Element, if it has one, qualified by the name of its owningNamespace, if it has one.
     """
 
+    __slots__ = ['parent', 'name', 'owner', 'humanId', 'aliasId', 'memberName', 'ownedRelationship',
+                 'owningMembership', 'ownedElement', 'identifier', 'owningNamespace', 'documentationComment',
+                 'ownedTextualRepresentation', 'owningRelationship', 'ownedAnnotation', 'documentation',
+                 'derivedName', 'qualifiedName', 'effectiveName']
+
     def __init__(self, parent, name, humanId=None, aliasId=None, memberName=None, ownedRelationship=None,
                  owningMembership=None, ownedElement=None):
         """
@@ -108,7 +113,7 @@ class Element(object):
                 self.qualifiedName = self.parent.name + '::' + self.name
         else:
             self.qualifiedName = self.name
-        self.effectiveName = self.effectiveName()
+        self.effectiveName = self.getEffectiveName()
 
         # Derived Attributes
         self.identifier = uuid.uuid4()
@@ -120,10 +125,10 @@ class Element(object):
         self.documentation = None
         self.derivedName = None
 
-    def escapedName(self):
+    def getEscapedName(self):
         return json.dumps(self.name)
 
-    def effectiveName(self):
+    def getEffectiveName(self):
         return self.name
         # return self.parent.name + '::' + self.name
 
@@ -144,6 +149,7 @@ class Relationship(Element):
         target : Element [0..*] {subsets relatedElement, ordered}
             The relatedElements to which this Relationship is considered to be directed.
     """
+    __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement"]
 
     def __init__(self, name, parent, humanId=None, target=None, source=None,
                  ownedRelatedElement=None, owningRelatedElement=None):
@@ -175,6 +181,7 @@ class AnnotatingElement(Element):
         annotation : Annotation [0..*] {subsets sourceRelationship, ordered}
             The Annotations that relate this AnnotatingElement to its annotatedElements.
     """
+    __slots__ = ["annotatedElement", "annotation", "name", "parent"]
 
     def __init__(self, name, parent, annotatedElement=None, annotation=None):
         super(AnnotatingElement, self).__init__(name=name, parent=parent)
@@ -194,6 +201,7 @@ class Annotation(Relationship):
         owningAnnotatedElement : Element [0..1] {subsets annotatedElement, redefines owningRelatedElement}
             The annotatedElement of this Annotation, when it is also its owningRelatedElement.
     """
+    __slots__ = ["name", "parent", "annotatedElement", "annotatingElement", "owningAnnotatedElement"]
 
     def __init__(self, name, parent, annotatedElement=None, annotatingElement=None, owningAnnotatedElement=None):
         super(Annotation, self).__init__(name=name, parent=parent)
@@ -209,8 +217,9 @@ class ModelComment(AnnotatingElement):
         body : String
             The annotation text for the Comment.
     """
+    __slots__ = ["name", "parent", "body"]
 
-    def __init__(self, parent, name=None, body=None):
+    def __init__(self, parent, name, body=None):
         super(ModelComment, self).__init__(name=name, parent=parent)
         self.body = body
 
@@ -227,6 +236,7 @@ class Documentation(Annotation):
         owningDocumentedElement : Element {redefines owningAnnotatedElement}
             The annotatedElement of this Documentation, which must own the Relationship.
     """
+    __slots__ = ["parent", "name", "documentingComment", "owningDocumentedElement"]
 
     def __init__(self, parent, name=None, documentingComment=None, owningDocumentedElement=None):
         super(Documentation, self).__init__(name=name, parent=parent)
@@ -235,6 +245,8 @@ class Documentation(Annotation):
 
 
 class OwnedDocumentation(Documentation):
+    __slots__ = ["parent", "name", "documentingComment"]
+
     def __init__(self, parent, documentingComment, name=None):
         super(OwnedDocumentation, self).__init__(name=name, parent=parent)
         self.documentingComment = documentingComment
@@ -256,8 +268,9 @@ class TextualRepresentation(AnnotatingElement):
             [Derived] The Element represented textually by this TextualRepresentation,
             which is its single annotatedElement.
     """
+    __slots__ = ['parent', 'name', 'body', 'language', 'representedElement']
 
-    def __init__(self, parent, name=None, body=None, language=None, representedElement=None):
+    def __init__(self, parent, name, body=None, language=None, representedElement=None):
         super(TextualRepresentation, self).__init__(name=name, parent=parent)
         self.language = language
         self.body = body
@@ -297,6 +310,9 @@ class Import(Relationship):
         visibility : VisibilityKind
             The visibility level of the imported members from this Import relative to the importOwningNamespace.
     """
+
+    __slots__ = ['name', 'parent', 'importedMemberName', 'importedNamespace', 'importOwningNamespace', 'isImportAll',
+                 'isRecursive', 'visibility']
 
     def __init__(self, name, parent, importedMemberName=None, importedNamespace=None, importOwningNamespace=None):
         super(Import, self).__init__(name=name, parent=parent)
@@ -504,7 +520,7 @@ class AliasMember(Membership):
 
 
 class NonFeatureMember(Membership):
-    def __init__(self, parent, name=None, effectiveMemberName=None, memberElement=None,
+    def __init__(self, parent, name='', effectiveMemberName=None, memberElement=None,
                  membershipOwningNamespace=None, ownedMemberElement=None,
                  visibility=None):
         super(NonFeatureMember, self).__init__(name=name, parent=parent)
@@ -517,7 +533,7 @@ class NonFeatureMember(Membership):
 
 
 class FeatureNamespaceMember(Membership):
-    def __init__(self, parent, name=None, effectiveMemberName=None, memberElement=None,
+    def __init__(self, parent, name, effectiveMemberName=None, memberElement=None,
                  memberName=None, membershipOwningNamespace=None, ownedMemberElement=None,
                  visibility=None):
         super(FeatureNamespaceMember, self).__init__(name=name, parent=parent)

@@ -23,6 +23,8 @@ VERBOSE=0
 TARGET='dot'
 DEBUG_FLAG=
 OUTPUT=../_dot_files
+GEN_GRAMMAR=0
+GEN_LANGUAGE=0
 
 while (("$#")); do
   case $1 in
@@ -36,14 +38,20 @@ while (("$#")); do
     COMMAND=$1
     ;;
   *.kerml)
-    LANGUAGE=$(find . -name "$1")
+    LANGUAGE_FILE=$(find . -name "$1")
+    GEN_LANGUAGE=1
+    IFS='.'
+    read -r -a inFile <<<"$1"
+    MODEL=${inFile[0]}
+    IFS=\n
     ;;
   *.tx)
     GRAMMAR_FILE=$(find . -name "$1")
     IFS='.'
-    read -r -a inFile <<< "$1"
+    read -r -a inFile <<<"$1"
     GRAMMAR=${inFile[0]}
     IFS=\n
+    GEN_GRAMMAR=1
     ;;
   dot)
     TARGET='dot'
@@ -70,7 +78,7 @@ if [[ ${VERBOSE} -eq 1 ]]; then
   echo "--------------------------------------------------------------------------------"
   echo "Path to Grammar File: ${GRAMMAR_FILE}"
   echo "Grammar: ${GRAMMAR}"
-  echo "Language: ${LANGUAGE}"
+  echo "Language: ${LANGUAGE_FILE}"
   echo "Target: ${TARGET}"
   echo "Flags: ${DEBUG_FLAG}"
   echo "================================================================================"
@@ -79,31 +87,46 @@ fi
 case ${COMMAND} in
 check)
   if [[ ${VERBOSE} -eq 1 ]]; then
-    echo "Checking Language: ${LANGUAGE}"
-    echo "textx ${DEBUG_FLAG} check ${LANGUAGE} --grammar ${GRAMMAR_FILE}"
-    echo "--------------------------------------------------------------------------------"
-    fi
-  textx ${DEBUG_FLAG} check "${LANGUAGE}" --grammar "${GRAMMAR_FILE}"
-  ;;
-generate)
-  if [[ ${VERBOSE} -eq 1 ]]; then
-    echo "Generating Grammar: ${GRAMMAR} dot file"
-    echo "textx ${DEBUG_FLAG} generate ${GRAMMAR_FILE} --target ${TARGET} --overwrite -o ${OUTPUT}"
-    echo "dot -Tpng -O $(find . -name "${GRAMMAR}".dot)"
-    echo "sed -i '' -e '/<b>Keyword/,/<\/b>/d' $(find . -name "${GRAMMAR}".dot)"
+    echo "Checking Language: ${LANGUAGE_FILE}"
+    echo "textx ${DEBUG_FLAG} check ${LANGUAGE_FILE} --grammar ${GRAMMAR_FILE}"
     echo "--------------------------------------------------------------------------------"
   fi
-  textx ${DEBUG_FLAG} generate "${GRAMMAR_FILE}" --target ${TARGET} --overwrite
-  GRAMMAR_DOT=$(find . -name "${GRAMMAR}".dot)
-#  sed -i '' -e '/<b>Keyword/,/<\/b>/d' "${GRAMMAR_DOT}"
-#  sed -i '' -e '/<br>/<\/br>/d' "${GRAMMAR_DOT}"
-  dot -Tpng -O "${GRAMMAR_DOT}"
+  textx ${DEBUG_FLAG} check "${LANGUAGE_FILE}" --grammar "${GRAMMAR_FILE}"
+  ;;
+generate)
+  if [[ ${GEN_GRAMMAR} -eq 1 ]]; then
+    if [[ ${VERBOSE} -eq 1 ]]; then
+      echo "Generating Grammar: ${GRAMMAR} dot file"
+      echo "textx ${DEBUG_FLAG} generate ${GRAMMAR_FILE} --target ${TARGET} --overwrite -o ${OUTPUT}"
+      echo "dot -Tpng -O $(find . -name "${GRAMMAR}".dot)"
+      echo "--------------------------------------------------------------------------------"
+    fi
+    textx ${DEBUG_FLAG} generate "${GRAMMAR_FILE}" --target ${TARGET} --overwrite
+    GRAMMAR_DOT=$(find . -name "${GRAMMAR}".dot)
+    dot -Tpng -O "${GRAMMAR_DOT}"
+  fi
+  if [[ ${GEN_LANGUAGE} -eq 1 ]]; then
+    if [[ ${VERBOSE} -eq 1 ]]; then
+      echo "Generating Language: ${LANGUAGE_FILE} dot file"
+      echo "textx ${DEBUG_FLAG} generate --grammar ${GRAMMAR_FILE} --target ${TARGET} --overwrite -o ${OUTPUT}" "${LANGUAGE_FILE}"
+      echo "dot -Tpng -O $(find . -name "${MODEL}".dot)"
+      echo "--------------------------------------------------------------------------------"
+    fi
+      textx ${DEBUG_FLAG} generate --grammar "${GRAMMAR_FILE}" --target ${TARGET} --overwrite -o ${OUTPUT} "${LANGUAGE_FILE}"
+    LANGUAGE_DOT=$(find ${OUTPUT} -name "${MODEL}".dot)
+    dot -Tpng -O "${OUTPUT}/${LANGUAGE_DOT}"
+  fi
   ;;
 esac
 
 if [[ ${OPEN} -eq 1 ]]; then
-    echo "--------------------------------------------------------------------------------"
-    echo "Opening Generated: ${GRAMMAR}.dot.png"
-    echo "--------------------------------------------------------------------------------"
-    find . -name '*.dot.png' -exec open {} \;
+  echo "--------------------------------------------------------------------------------"
+  echo "Opening Generated: ${GRAMMAR}.dot.png"
+  echo "--------------------------------------------------------------------------------"
+  find . -name "${GRAMMAR}.dot.png" -exec open {} \;
+
+  echo "--------------------------------------------------------------------------------"
+  echo "Opening Generated: ${MODEL}.dot.png"
+  echo "--------------------------------------------------------------------------------"
+  find ${OUTPUT} -name "${MODEL}.dot.png" -exec open {} \;
 fi

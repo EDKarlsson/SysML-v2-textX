@@ -74,7 +74,7 @@ FeatureNamespaceMember:
 ChainFeatureMember:
     MemberPrefix
     'feature'? ( name=Name )? 'is'
-    ownedMemberElement = 'FeatureChain'
+//    ownedMemberElement = FeatureChain
 ;
 AliasMember:
     MemberPrefix
@@ -123,7 +123,7 @@ NonFeatureElement:
     | TextualRepresentation
 //    | 'AnnotatingFeature'
     | Namespace
-//    | 'Type'
+    | Type
 //    | 'Classifier'
 //    | 'DataType'
 //    | 'Class'
@@ -136,7 +136,6 @@ NonFeatureElement:
 //    | 'Predicate'
 //    | 'Multiplicity'
     | Package
-//    | 'Specialization'
 //    | 'Conjugation'
 //    | 'Subclassification'
 //    | 'Disjoining'
@@ -214,10 +213,12 @@ OwnedTextualRepresentation:
 ;
 
 TextualRepresentation:
-    (   'rep' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? 'about' annotation+=Annotation
-    | ( 'rep' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )? ElementAnnotation
+    (   'rep' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+        'about' annotation+=Annotation
+    | ( 'rep' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
+        ElementAnnotation
     )
-    'language' name=QuotedID body=REGULAR_COMMENT
+    'language' language=QuotedID body=REGULAR_COMMENT
 ;
 
 FullyQualifiedID[noskipws]:
@@ -235,61 +236,55 @@ QuotedID:
 
 /* =============================================================== */
 /* TYPES */
-//Type:
-//    ( isAbstract ?= 'abstract' )? 'type'
-//    TypeDeclaration TypeBody
-//    ;
-//TypeDeclaration:
-//    ( isSufficient ?= 'all' )?  ('<' humanId=Name '>')? ( name=Name )?
-////    ( ownedRelationship += OwnedMultiplicity )?
-//    ( SpecializationPart | ConjugationPart )+
-//    DisjoiningPart?
-//    ;
-//SpecializationPart:
-//    SPECIALIZES ownedRelationship += OwnedSpecialization
-//    ( ',' ownedRelationship += OwnedSpecialization )*
-//    ;
-//
-//ConjugationPart:
-//    CONJUGATES ownedRelationship += TEMP_RULE // OwnedConjugation
-//    ;
+Type:
+    ( isAbstract ?= 'abstract' )? 'type'
+    ( isSufficient ?= 'all' )? (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+//    ( ownedRelationship += OwnedMultiplicity )?
+    ( SpecializationPart | ConjugationPart )+
+    DisjoiningPart?
+    (';' | '{' (
+          documentation += OwnedDocumentation
+        | ownedRelationship += NonFeatureMember
+        | ownedRelationship += TEMP_RULE /*FeatureMember*/
+        | ownedRelationship += AliasMember
+        | ownedRelationship += Import
+        *)
+    '}')
+    ;
+SpecializationPart:
+    SPECIALIZES ownedRelationship += OwnedSpecialization
+    ( ',' ownedRelationship += OwnedSpecialization )*
+    ;
 
-//DisjoiningPart:
-//    'disjoint' 'from' ownedRelationship += TEMP_RULE // OwnedDisjoining
-//    ( ',' ownedRelationship += TEMP_RULE /*OwnedDisjoining*/ )*
-//    ;
+ConjugationPart:
+    CONJUGATES ownedRelationship += TEMP_RULE // OwnedConjugation
+    ;
 
-//TypeBody:
-//    ';' | '{' TypeBodyElement* '}'
-//    ;
-//TypeBodyElement :
-//      documentation += OwnedDocumentation
-//    | ownedRelationship += NonFeatureMember
-//    | ownedRelationship += TEMP_RULE /*FeatureMember*/
-//    | ownedRelationship += AliasMember
-//    | ownedRelationship += Import
-//;
+DisjoiningPart:
+    'disjoint' 'from' ownedRelationship += TEMP_RULE // OwnedDisjoining
+    ( ',' ownedRelationship += TEMP_RULE /*OwnedDisjoining*/ )*
+    ;
 
 /* =============================================================== */
 /* SPECIALIZATION */
-//Specialization:
-//    ( 'specialization' ('<' humanId=Name '>')? ( name=Name )? )?
-//    'subtype' SpecificType
-//    SPECIALIZES GeneralType ';'
-//    ;
-//OwnedSpecialization :
-//    GeneralType
-//    ;
-//SpecificType :
-//      specific = [QualifiedName]
-//    | specific += TEMP_RULE /*FeatureChain*/
+Specialization:
+    ( 'specialization' ('<' humanId=Name '>')? ( name=Name )? )?
+    'subtype' SpecificType
+    SPECIALIZES GeneralType ';'
+    ;
+OwnedSpecialization :
+    GeneralType
+    ;
+SpecificType :
+      specific = [QualifiedName]
+//    | specific += FeatureChain
 //    { ownedRelatedElement += specific }
-//;
-//GeneralType :
-//    general = [QualifiedName]
+;
+GeneralType :
+    general = [QualifiedName]
 //    | general += FeatureChain
 //    { ownedRelatedElement += general }
-//;
+;
 
 /* =============================================================== */
 /* KERNEL LAYER RULES */

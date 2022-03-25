@@ -1,7 +1,9 @@
 import json
 from textx import metamodel_for_language
 from kerml.classes.root_layer import Element, NonFeatureElement, Relationship, Annotation, ModelComment, \
-    TextualRepresentation, AliasMember, FeatureNamespaceMember, NonFeatureMember, Import, OwnedDocumentation, Namespace
+    TextualRepresentation, AliasMember, FeatureNamespaceMember, NonFeatureMember, Import, OwnedDocumentation, Namespace, \
+    Membership
+from kerml.classes.core_layer import Type, FeatureElement
 from textx.export import model_export
 from textx import language, metamodel_from_file
 from os.path import join
@@ -10,6 +12,15 @@ import os
 __version__ = "0.1.0.dev"
 
 current_dir = os.path.dirname(__file__)
+
+
+def class_provider(name):
+    classes = [Element, NonFeatureElement, Relationship, Annotation, ModelComment,
+               TextualRepresentation, AliasMember, FeatureNamespaceMember, Type,
+               NonFeatureMember, Import, OwnedDocumentation, Namespace, Membership,
+               FeatureElement]
+    classes = dict(map(lambda x: (x.__name__, x), classes))
+    return classes.get(name)
 
 
 @language('kerml', '*.kerml')
@@ -30,12 +41,11 @@ def get_element_mm(debug=False):
     """
     from kernel_layer import Package
     entity_mm = metamodel_from_file(join(current_dir, 'root', 'root.tx'),
-                                    classes=[Element, NonFeatureElement, Relationship, Annotation, ModelComment,
-                                             OwnedDocumentation, Namespace, TextualRepresentation,
-                                             Import, NonFeatureMember, FeatureNamespaceMember, AliasMember],
+                                    classes=class_provider,
                                     use_regexp_group=True,
                                     autokwd=True,
-                                    debug=debug)
+                                    debug=debug,
+                                    auto_init_attributes=False)
     return entity_mm
 
 
@@ -96,7 +106,8 @@ if __name__ == "__main__":
     test_files = load_examples(["/Users/dank/git/systems-modeling/SysML-v2-Release",
                                 "/Users/dank/git/systems-modeling/SysML-v2-Grammar-Parser/kerml/root/test"])
 
+    # inspect_language("./root/root.tx")
     # print(f"Testing {test_files}")
-    tfile = test_files.get_test_file("ElementDocRelationship.kerml", "test")
+    tfile = test_files.get_test_file("simpletypes.kerml", "test")
     print(f"Testing {tfile}")
-    main(tfile, debug=True)
+    main(tfile, debug=False)

@@ -1,4 +1,8 @@
-from root_layer import Element, Namespace, Relationship, Membership
+try:
+    from root_layer import Element, Namespace, Relationship, Membership
+except:
+    from kerml.classes.root_layer import Element, Namespace, Relationship, Membership
+
 import json
 
 
@@ -90,3 +94,23 @@ class FeatureElement(Element):
     def effectiveName(self):
         return self.name
         # return self.parent.name + '::' + self.name
+
+
+class Type(Namespace):
+    def __init__(self, name, parent, humanId=None, aliasId=None, isAbstract=None, isSufficient=None,
+                 documentation=None, ownedRelationship=None,
+
+                 importedMembership=None, member=None, membership=None,
+                 ownedImport=None, ownedMember=None, ownedMembership=None):
+        super(Namespace, self).__init__(name=name, parent=parent, humanId=humanId, aliasId=aliasId)
+        self.name = name
+        self.parent = parent
+        self.humanId = humanId
+        self.aliasId = aliasId
+        self.ownedRelationship = ownedRelationship
+        self.importedMembership = importedMembership
+        self.member = member
+        self.membership = membership
+        self.ownedImport = ownedImport
+        self.ownedMember = ownedMember
+        self.ownedMembership = ownedMembership
