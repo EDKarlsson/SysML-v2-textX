@@ -40,7 +40,7 @@ def get_element_mm(debug=False):
     Builds and returns a meta-model for Entity language.
     """
     from kernel_layer import Package
-    entity_mm = metamodel_from_file(join(current_dir, 'root', 'root.tx'),
+    entity_mm = metamodel_from_file(join(current_dir, '../_old_tx/root', 'kerml.tx'),
                                     classes=class_provider,
                                     use_regexp_group=True,
                                     autokwd=True,
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     test_files = load_examples(["/Users/dank/git/systems-modeling/SysML-v2-Release",
                                 "/Users/dank/git/systems-modeling/SysML-v2-Grammar-Parser/kerml/root/test"])
 
-    # inspect_language("./root/root.tx")
+    # inspect_language("./root/kerml.tx")
     # print(f"Testing {test_files}")
     tfile = test_files.get_test_file("simpletypes.kerml", "test")
     print(f"Testing {tfile}")

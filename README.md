@@ -5,7 +5,7 @@ Current work is focused on the `root` layer/library of the Kernel Modeling Langu
 There is a script `visualize_model.sh` that will run on a provided grammar and language file.
 example:
 ```shell
-/visualize_model.sh generate root.tx baseline.kerml verbose
+/visualize_model.sh generate kerml.tx baseline.kerml verbose
 ```
 This will generate a `dot` file in `./kerml/root/` that can be viewed if Graphviz is installed.
 
