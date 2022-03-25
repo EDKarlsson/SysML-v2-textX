@@ -1,4 +1,5 @@
 import json
+import uuid
 from pprint import pprint
 
 from textx import get_model, get_metamodel
@@ -103,14 +104,14 @@ class Element(object):
         if hasattr(self.parent, 'name'):
             if self.parent.name == '':
                 self.qualifiedName = self.name
-            else:
+            elif hasattr(self.name, 'name'):
                 self.qualifiedName = self.parent.name + '::' + self.name
         else:
             self.qualifiedName = self.name
         self.effectiveName = self.effectiveName()
 
         # Derived Attributes
-        self.identifier = None
+        self.identifier = uuid.uuid4()
         self.owningNamespace = None
         self.documentationComment = None
         self.ownedTextualRepresentation = None

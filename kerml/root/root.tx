@@ -1,6 +1,6 @@
 /* Elements */
 RootNamespace:
-    'namespace' ('<' humanId=Name '>')? ( name=Name )?
+    'namespace' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
     (';' | '{'
       ( ownedRelationship += OwnedDocumentation
       | ownedRelationship += NamespaceMember
@@ -209,13 +209,13 @@ OwnedTextualRepresentationAnnotation:
 ;
 
 OwnedTextualRepresentation:
-    ( 'rep' ( humanId=Name )? )?
+    ( 'rep' ( name=Name )? )?
     'language' QuotedID body=REGULAR_COMMENT
 ;
 
 TextualRepresentation:
-    (   'rep' (('<' humanId=Name '>')? ( name=Name )?) 'about' annotation+=Annotation
-    | ( 'rep' (('<' humanId=Name '>')? ( name=Name )?) )? ElementAnnotation
+    (   'rep' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? 'about' annotation+=Annotation
+    | ( 'rep' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )? ElementAnnotation
     )
     'language' name=QuotedID body=REGULAR_COMMENT
 ;
@@ -299,7 +299,7 @@ QuotedID:
 /* PACKAGES */
 Package:
 //    PackageDeclaration PackageBody*//*
-    'package' (('<' humanId=Name '>')? ( name=Name )? )
+    'package' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
     (';' | '{' (
           ( ownedRelationship += OwnedDocumentation
           | ownedRelationship += NamespaceMember
@@ -312,7 +312,7 @@ Package:
 
 
 PackageDeclaration:
-    'package' (('<' humanId=Name '>')? ( name=Name )? | (name=Name))
+    'package' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
     ;
 PackageBody:
     ';' | '{' (
