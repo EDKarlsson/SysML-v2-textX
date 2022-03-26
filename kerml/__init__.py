@@ -115,7 +115,7 @@ if __name__ == "__main__":
         "elements.kerml",
         # "features.kerml",
         # "simple_features.kerml",
-        # "simpletypes.kerml",
+        "simpletypes.kerml",
         "typeconjugation.kerml"
     ]
     for test in tests:

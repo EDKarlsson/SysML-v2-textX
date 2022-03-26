@@ -135,22 +135,22 @@ NonFeatureElement:
     | Conjugation
 //    | Subclassification
     | Disjoining
-//    | FeatureTyping
+    | FeatureTyping
 //    | Subsetting
 //    | Redefinition
-//    | TypeFeaturing
+    | TypeFeaturing
 ;
 FeatureElement:
       Feature
-//    | 'Step'
-//    | 'Expression'
-//    | 'BooleanExpression'
-//    | 'Invariant'
-//    | 'Connector'
-//    | 'BindingConnector'
-//    | 'Succession'
-//    | 'ItemFlow'
-//    | 'SuccessionItemFlow'
+//    | Step
+//    | Expression
+//    | BooleanExpression
+//    | Invariant
+//    | Connector
+//    | BindingConnector
+//    | Succession
+//    | ItemFlow
+//    | SuccessionItemFlow
 ;
 
 /* =============================================================== */
@@ -238,14 +238,17 @@ Type:
 //    ( ownedRelationship += OwnedMultiplicity )?
     ( SpecializationPart | ConjugationPart )+
 //    DisjoiningPart?
-    (';' | ('{'
-          documentation += OwnedDocumentation
-         | ownedRelationship += NonFeatureMember
-         | ownedRelationship += FeatureMember
-         | ownedRelationship += AliasMember
-         | ownedRelationship += Import
-        )*
-    '}')
+    (
+        ';' | '{'
+            (
+              documentation += OwnedDocumentation
+             | ownedRelationship += NonFeatureMember
+             | ownedRelationship += FeatureMember
+             | ownedRelationship += AliasMember
+             | ownedRelationship += Import
+            )*
+        '}'
+    )
     ;
 
 SpecializationPart:
@@ -434,32 +437,36 @@ OwnedFeatureTyping :
 /* =============================================================== */
 /* PACKAGES */
 Package:
-    PackageDeclaration PackageBody*//*
     'package' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
-    (';' | '{' (
-          ( ownedRelationship += OwnedDocumentation
-          | ownedRelationship += NamespaceMember
-          | ownedRelationship += AliasMember
-          | ownedRelationship += Import
-          )
-        | ownedRelationship += ElementFilterMember )*
-    '}')
+    (';'
+    | '{'
+         (
+           (
+             ownedRelationship += OwnedDocumentation
+             | ownedRelationship += NamespaceMember
+             | ownedRelationship += AliasMember
+             | ownedRelationship += Import
+           )
+           | ownedRelationship += ElementFilterMember
+         )*
+      '}'
+    )
 ;
 
-PackageDeclaration:
-    'package' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
-    ;
-
-PackageBody:
-    ';' | '{' (
-          ( ownedRelationship += OwnedDocumentation
-          | ownedRelationship += NamespaceMember
-          | ownedRelationship += AliasMember
-          | ownedRelationship += Import
-          )
-        | ownedRelationship += ElementFilterMember )*
-    '}'
-;
+//PackageDeclaration:
+//    'package' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+//    ;
+//
+//PackageBody:
+//    ';' | '{' (
+//          ( ownedRelationship += OwnedDocumentation
+//          | ownedRelationship += NamespaceMember
+//          | ownedRelationship += AliasMember
+//          | ownedRelationship += Import
+//          )
+//        | ownedRelationship += ElementFilterMember )*
+//    '}'
+//;
 ElementFilterMember:
     MemberPrefix
     'filter' condition = TEMP_RULE /*OwnedExpression*/ ';'

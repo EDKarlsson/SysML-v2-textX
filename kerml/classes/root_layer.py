@@ -454,11 +454,10 @@ class Membership(Relationship):
     """
     Membership is a Relationship between a Namespace and an Element that indicates the Element is
     a member of (i.e., is contained in) the Namespace. The Membership may define a memberName for
-    the Element as a member of the Namespace and specifies whether or not the Element is publicly
-    visible as a member of the Namespace from outside the Namespace. The Element may be owned by
-    the Namespace via the Membership, in which case it is an ownedMember of the Namespace, or it
-    may be referenced but not owned, in which the Membership provides an alias for the Element in
-    the Namespace.
+    the Element as a member of the Namespace and specifies if the Element is publicly visible as a
+    member of the Namespace from outside the Namespace. The Element may be owned by the Namespace
+    via the Membership, in which case it is an ownedMember of the Namespace, or it may be referenced
+    but not owned, in which the Membership provides an alias for the Element in the Namespace.
 
     Attributes:
         effectiveMemberName : String
