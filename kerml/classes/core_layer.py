@@ -48,6 +48,10 @@ class FeatureElement(Element):
             [Derived] The name of this Element, if it has one, qualified by the name of its owningNamespace, if it has one.
     """
 
+    # __slots__ = ["owner", "ownedElement", "ownedRelationship", "owningMembership", "aliasId", "owningNamespace",
+    #              "documentationComment", "ownedTextualRepresentation", "ownedAnnotation", "documentation",
+    #              "derivedName", "identifier"]
+
     def __init__(self, parent, name, ownedElement: Element, aliasId=None, humanId=None, ownedRelationship=None,
                  owningMembership=None, owningNamespace=None, documentationComment=None,
                  ownedTextualRepresentation=None, ownedAnnotation=None, documentation=None, derivedName=None, ):
@@ -96,8 +100,64 @@ class FeatureElement(Element):
         # return self.parent.name + '::' + self.name
 
 
+class TypeFeaturing(Relationship):
+    """
+    A TypeFeaturing is a Relationship between a Type and a Feature that is featured by that Type. Every instance in
+    the domain of the featureOfType must be classified by the featuringType. This means that sequences that are
+    classified by the featureOfType must have a prefix subsequence that is classified by the featuringType.
+
+    Attributes:
+        featureOfType : Feature {redefines source}
+            The Feature that is featured by the featuringType.
+        featuringType : Type {redefines target}
+            The Type that features the featureOfType.
+        /owningFeatureOfType : Feature [0..1] {subsets featureOfType, owningRelatedElement}
+            The Feature that owns this TypeFeaturing and is also the featureOfType.
+    """
+
+    # __slots__ = ['parent', 'name', "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement",
+    #              "relatedElement", 'featureOfType', 'featuringType', 'owningFeatureOfType']
+
+    def __init__(self, parent, name, featureOfType=None, featuringType=None):
+        """
+        @param parent:
+        @type parent:
+        @param name:
+        @type name:
+        """
+        super(TypeFeaturing, self).__init__(name=name, parent=parent)
+        self.featureOfType = featureOfType
+        self.featuringType = featuringType
+
+
+class FeatureMember(Membership, TypeFeaturing):
+    """
+    FeatureMembership is a Membership for a Feature in a Type that is also a TypeFeaturing Relationship between the
+    Feature and the Type.
+
+    Attributes:
+        memberFeature : Feature {redefines memberElement, featureOfType}
+            The Feature that this FeatureMembership relates to its owningType, making it a ownedFeature of the
+            owningType.
+        ownedMemberFeature : Feature [0..1] {subsets memberFeature, redefines ownedMemberElement}
+            A memberFeature that is owned by this FeatureMembership and hence an ownedFeature of the owningType.
+        /owningType : Type {subsets type, redefines membershipOwningNamespace}
+            The Type that owns this FeatureMembership.
+    """
+    # __slots__ = ["parent", "name", "derivedName", "identifier", "featureOfType", "featuringType", "owner",
+    #              'memberFeature', 'ownedMemberFeature', "ownedElement", "ownedRelationship", "owningMembership",
+    #              "aliasId", "owningNamespace", "documentationComment", "ownedTextualRepresentation", "ownedAnnotation",
+    #              "documentation", "owningFeatureOfType"]
+
+    def __init__(self, parent, name, memberFeature=None, ownedMemberFeature=None):
+        super(FeatureMember, self).__init__(name=name, parent=parent)
+        self.memberName: str = name
+        self.memberFeature = memberFeature
+        self.ownedMemberFeature = ownedMemberFeature
+
+
 class Type(Namespace):
-    __slots__ = ['name', 'parent', 'isAbstract', 'importedMembership', 'member', 'ownedMembership']
+    # __slots__ = ['name', 'parent', 'isAbstract', 'importedMembership', 'member', 'ownedMembership']
 
     def __init__(self, name, parent, humanId=None, aliasId=None, isAbstract=None, isSufficient=None,
                  documentation=None, ownedRelationship=None,
@@ -134,8 +194,8 @@ class Specialization(Relationship):
         target : Element [0..*] {subsets relatedElement, ordered}
             The relatedElements to which this Relationship is considered to be directed.
     """
-    __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement",
-                 "relatedElement"]
+    # __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement",
+    #              "relatedElement"]
 
     def __init__(self, name, parent, humanId=None, target=None, source=None,
                  ownedRelatedElement=None, owningRelatedElement=None):
@@ -172,8 +232,8 @@ class Conjugation(Relationship):
         target : Element [0..*] {subsets relatedElement, ordered}
             The relatedElements to which this Relationship is considered to be directed.
     """
-    __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement",
-                 "relatedElement", "conjugatedType", "originalType"]
+    # __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement",
+    #              "relatedElement", "conjugatedType", "originalType"]
 
     def __init__(self, name, parent, humanId=None, target=None, source=None, conjugatedType=None,
                  ownedRelatedElement=None, owningRelatedElement=None, originalType=None):
@@ -212,8 +272,8 @@ class Disjoining(Relationship):
         target : Element [0..*] {subsets relatedElement, ordered}
             The relatedElements to which this Relationship is considered to be directed.
     """
-    __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement",
-                 "relatedElement", "conjugatedType", "originalType"]
+    # __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement",
+    #              "relatedElement", "conjugatedType", "originalType"]
 
     def __init__(self, name, parent, humanId=None, target=None, source=None, conjugatedType=None,
                  ownedRelatedElement=None, owningRelatedElement=None, originalType=None):

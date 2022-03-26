@@ -141,7 +141,7 @@ NonFeatureElement:
 //    | TypeFeaturing
 ;
 FeatureElement:
-      'Feature'
+      Feature
 //    | 'Step'
 //    | 'Expression'
 //    | 'BooleanExpression'
@@ -241,7 +241,7 @@ Type:
     (';' | ('{'
           documentation += OwnedDocumentation
          | ownedRelationship += NonFeatureMember
-//        | ownedRelationship += FeatureMember
+         | ownedRelationship += FeatureMember
          | ownedRelationship += AliasMember
          | ownedRelationship += Import
         )*
@@ -341,8 +341,90 @@ OwnedFeatureMember:
 ;
 
 UnownedFeatureMember:
-    MemberPrefix 'feature'? ( memberName = Name )? 'is'
+    MemberPrefix 'feature'? ( name=Name )? 'is'
     memberFeature = [Membership|QualifiedName]
+;
+
+/* =============================================================== */
+/* PACKAGES */
+FeaturePrefix:
+    ( direction = FeatureDirection )?
+    ( isAbstract ?= 'abstract' )?
+    ( isComposite ?= 'composite' | isPortion ?= 'portion' )?
+    ( isReadOnly ?= 'readonly' )?
+    ( isDerived ?= 'derived' )?
+    ( isEnd ?= 'end' )?
+;
+FeatureDirection :
+    'in' | 'out' | 'inout'
+;
+Feature:
+    FeaturePrefix
+   'feature'?
+   // FeatureDeclaration
+    ( isSufficient ?= 'all' )? (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+    ( FeatureSpecializationPart | ConjugationPart )?
+    DisjoiningPart?
+    TypeFeaturingPart?
+   // FeatureDeclaration
+    ValuePart? TypeBody
+;
+TypeFeaturingPart:
+    'featured' 'by' ownedRelatioship += OwnedTypeFeaturing
+    ( ',' ownedTypeFeaturing += OwnedTypeFeaturing )*
+;
+FeatureSpecializationPart:
+      FeatureSpecialization + MultiplicityPart? FeatureSpecialization*
+    | MultiplicityPart FeatureSpecialization*
+    ;
+MultiplicityPart:
+      ownedRelationship += 'OwnedMultiplicity'
+    | ( ownedRelationship += 'OwnedMultiplicity' )?
+//      ( isOrdered ?= 'ordered' ( !isUnique ?= 'nonunique' )?
+//      | !isUnique ?= 'nonunique' ( isOrdered ?= 'ordered' )? )
+      ;
+FeatureSpecialization :
+    Typings | Subsettings | Redefinitions
+;
+Typings:
+      TypedBy ( ',' ownedRelationship += OwnedFeatureTyping )*
+  ;
+TypedBy:
+    TYPED_BY ownedRelationship += OwnedFeatureTyping
+;
+Subsettings:
+    Subsets ( ',' ownedRelationship += OwnedSubsetting )*
+;
+Subsets:
+    SUBSETS ownedRelationship += OwnedSubsetting
+;
+Redefinitions:
+    Redefines ( ',' ownedRelationship += OwnedRedefinition )*
+;
+Redefines:
+    REDEFINES ownedRelationship += OwnedRedefinition
+;
+
+/* =============================================================== */
+/* TYPE FEATURING */
+TypeFeaturing:
+    'featuring' ( (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? 'of')?
+    featureOfType = [Type|QualifiedName]
+    'by' featuringType = [Type|QualifiedName] ';'
+    ;
+OwnedTypeFeaturing:
+    featuringType = [TypeFeaturing|QualifiedName]
+    ;
+
+/* =============================================================== */
+/* FEATURING TYPE */
+FeatureTyping:
+    ( 'specialization' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
+    'typing' typedFeature = [Type|QualifiedName]
+    TYPED_BY general = [Type|QualifiedName] ';'
+;
+OwnedFeatureTyping :
+    general = [FeatureTyping|QualifiedName]
 ;
 
 /* =============================================================== */
@@ -388,6 +470,11 @@ Membership:
     'membership' name=Name memberElement=Element ownedMemberElement=Element visibility=VisibilityIndicator
 ;
 
+ValuePart: 'ValuePart' ;
+TypeBody: 'TypeBody' ;
+OwnedSubsetting: 'OwnedSubsetting' ;
+OwnedRedefinition: 'OwnedRedefinition' ;
+
 /* =============================================================== */
 /* TEXTX COMMENTS */
 Comment:
@@ -413,7 +500,7 @@ DOCUMENTATION_COMMENT:
 
 /* QualifiedNames */
 Qualification:
-    (Name'::')+
+    ('::'Name)+
     ;
 
 QualifiedName

@@ -3,7 +3,8 @@ from textx import metamodel_for_language
 from kerml.classes.root_layer import Element, NonFeatureElement, Relationship, Annotation, ModelComment, \
     TextualRepresentation, AliasMember, FeatureNamespaceMember, NonFeatureMember, Import, OwnedDocumentation, Namespace, \
     Membership
-from kerml.classes.core_layer import Type, FeatureElement, Specialization, Conjugation, Disjoining
+from kerml.classes.core_layer import Type, FeatureElement, Specialization, Conjugation, Disjoining, TypeFeaturing, \
+    FeatureMember
 from textx.export import model_export
 from textx import language, metamodel_from_file
 from os.path import join
@@ -18,7 +19,7 @@ def class_provider(name):
     classes = [Element, NonFeatureElement, Relationship, Annotation, ModelComment,
                TextualRepresentation, AliasMember, FeatureNamespaceMember, Type,
                NonFeatureMember, Import, OwnedDocumentation, Namespace, Membership,
-               FeatureElement, Specialization, Conjugation, Disjoining]
+               FeatureElement, Specialization, Conjugation, Disjoining, TypeFeaturing, FeatureMember]
     classes = dict(map(lambda x: (x.__name__, x), classes))
     return classes.get(name)
 
@@ -108,8 +109,15 @@ if __name__ == "__main__":
 
     # inspect_language("./root/kerml.tx")
     # print(f"Testing {test_files}")
-    tests = ["ElementDocRelationship.kerml", "baseline.kerml", "elements.kerml", "features.kerml",
-             "simple_features.kerml", "simpletypes.kerml", "typeconjugation.kerml"]
+    tests = [
+        "ElementDocRelationship.kerml",
+        "baseline.kerml",
+        "elements.kerml",
+        # "features.kerml",
+        # "simple_features.kerml",
+        # "simpletypes.kerml",
+        "typeconjugation.kerml"
+    ]
     for test in tests:
         tfile = test_files.get_test_file(test, "test")
         print(f"Testing {tfile}")

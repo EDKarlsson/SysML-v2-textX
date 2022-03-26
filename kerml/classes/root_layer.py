@@ -75,10 +75,10 @@ class Element(object):
             [Derived] The name of this Element, if it has one, qualified by the name of its owningNamespace, if it has one.
     """
 
-    __slots__ = ['parent', 'name', 'owner', 'humanId', 'aliasId', 'memberName', 'ownedRelationship',
-                 'owningMembership', 'ownedElement', 'identifier', 'owningNamespace', 'documentationComment',
-                 'ownedTextualRepresentation', 'owningRelationship', 'ownedAnnotation', 'documentation',
-                 'derivedName', 'qualifiedName', 'effectiveName']
+    # __slots__ = ['parent', 'name', 'owner', 'humanId', 'aliasId', 'memberName', 'ownedRelationship',
+    #              'owningMembership', 'ownedElement', 'identifier', 'owningNamespace', 'documentationComment',
+    #              'ownedTextualRepresentation', 'owningRelationship', 'ownedAnnotation', 'documentation',
+    #              'derivedName', 'qualifiedName', 'effectiveName']
 
     def __init__(self, parent, name, humanId=None, aliasId=None, memberName=None, ownedRelationship=None,
                  owningMembership=None, ownedElement=None):
@@ -149,7 +149,8 @@ class Relationship(Element):
         target : Element [0..*] {subsets relatedElement, ordered}
             The relatedElements to which this Relationship is considered to be directed.
     """
-    __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement", "relatedElement"]
+    # __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement",
+    #              "relatedElement"]
 
     def __init__(self, name, parent, humanId=None, target=None, source=None,
                  ownedRelatedElement=None, owningRelatedElement=None):
@@ -181,7 +182,7 @@ class AnnotatingElement(Element):
         annotation : Annotation [0..*] {subsets sourceRelationship, ordered}
             The Annotations that relate this AnnotatingElement to its annotatedElements.
     """
-    __slots__ = ["annotatedElement", "annotation", "name", "parent"]
+    # __slots__ = ["annotatedElement", "annotation", "name", "parent"]
 
     def __init__(self, name, parent, annotatedElement=None, annotation=None):
         super(AnnotatingElement, self).__init__(name=name, parent=parent)
@@ -201,7 +202,7 @@ class Annotation(Relationship):
         owningAnnotatedElement : Element [0..1] {subsets annotatedElement, redefines owningRelatedElement}
             The annotatedElement of this Annotation, when it is also its owningRelatedElement.
     """
-    __slots__ = ["name", "parent", "annotatedElement", "annotatingElement", "owningAnnotatedElement"]
+    # __slots__ = ["name", "parent", "annotatedElement", "annotatingElement", "owningAnnotatedElement"]
 
     def __init__(self, name, parent, annotatedElement=None, annotatingElement=None, owningAnnotatedElement=None):
         super(Annotation, self).__init__(name=name, parent=parent)
@@ -217,7 +218,7 @@ class ModelComment(AnnotatingElement):
         body : String
             The annotation text for the Comment.
     """
-    __slots__ = ["name", "parent", "body"]
+    # __slots__ = ["name", "parent", "body"]
 
     def __init__(self, parent, name, body=None):
         super(ModelComment, self).__init__(name=name, parent=parent)
@@ -236,7 +237,7 @@ class Documentation(Annotation):
         owningDocumentedElement : Element {redefines owningAnnotatedElement}
             The annotatedElement of this Documentation, which must own the Relationship.
     """
-    __slots__ = ["parent", "name", "documentingComment", "owningDocumentedElement"]
+    # __slots__ = ["parent", "name", "documentingComment", "owningDocumentedElement"]
 
     def __init__(self, parent, name=None, documentingComment=None, owningDocumentedElement=None):
         super(Documentation, self).__init__(name=name, parent=parent)
@@ -245,7 +246,7 @@ class Documentation(Annotation):
 
 
 class OwnedDocumentation(Documentation):
-    __slots__ = ["parent", "name", "documentingComment", "relatedElement"]
+    # __slots__ = ["parent", "name", "documentingComment", "relatedElement"]
 
     def __init__(self, parent, documentingComment, name=None):
         super(OwnedDocumentation, self).__init__(name=name, parent=parent)
@@ -268,7 +269,7 @@ class TextualRepresentation(AnnotatingElement):
             [Derived] The Element represented textually by this TextualRepresentation,
             which is its single annotatedElement.
     """
-    __slots__ = ['parent', 'name', 'body', 'language', 'representedElement']
+    # __slots__ = ['parent', 'name', 'body', 'language', 'representedElement']
 
     def __init__(self, parent, name, body=None, language=None, representedElement=None):
         super(TextualRepresentation, self).__init__(name=name, parent=parent)
@@ -311,8 +312,8 @@ class Import(Relationship):
             The visibility level of the imported members from this Import relative to the importOwningNamespace.
     """
 
-    __slots__ = ['name', 'parent', 'importedMemberName', 'importedNamespace', 'importOwningNamespace', 'isImportAll',
-                 'isRecursive', 'visibility']
+    # __slots__ = ['name', 'parent', 'importedMemberName', 'importedNamespace', 'importOwningNamespace', 'isImportAll',
+    #              'isRecursive', 'visibility']
 
     def __init__(self, name, parent, importedMemberName=None, importedNamespace=None, importOwningNamespace=None):
         super(Import, self).__init__(name=name, parent=parent)
@@ -357,6 +358,8 @@ class ImportedNamespace(Import):
         visibility : VisibilityKind
             The visibility level of the imported members from this Import relative to the importOwningNamespace.
     """
+
+    # __slots__ = ['importedMemberName', 'importedNamespace', 'importOwningNamespace', 'visibility']
 
     def __init__(self, name, parent, importedName=None, importedNamespace=None, importOwningNamespace=None):
         super(ImportedNamespace, self).__init__(name=name, parent=parent, importedNamespace=importedNamespace,
@@ -410,6 +413,8 @@ class Namespace(Element):
             [Derived] The ownedRelationships of this Namespace that are Memberships, for which the Namespace is
             the membershipOwningNamespace.
     """
+    # __slots__ = ['name', 'parent', 'importedMembership', 'member', 'membership', 'ownedImport', 'ownedMember',
+    #              'ownedMembership']
 
     def __init__(self, name, parent, humanId=None, ownedRelationship=None,
                  importedMembership=None, member=None, membership=None,
@@ -472,6 +477,10 @@ class Membership(Relationship):
             visible outside that Namespace.
     """
 
+    # __slots__ = ['parent', 'name', "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement",
+    #              "relatedElement", 'effectiveMemberName', 'memberElement', 'memberName', 'membershipOwningNamespace',
+    #              'ownedMemberElement', 'visibility']
+
     def __init__(self, parent, name, memberElement=None, ownedMemberElement=None, visibility=None):
         super(Membership, self).__init__(name=name, parent=parent)
         self.memberElement: Element = memberElement
@@ -494,6 +503,9 @@ class Membership(Relationship):
 
 
 class NamespaceMember(Membership):
+    # __slots__ = ["effectiveMemberName", "memberElement", "memberName", "membershipOwningNamespace",
+    #              "ownedMemberElement", "visibility"]
+
     def __init__(self, parent, name, effectiveMemberName=None, memberElement=None,
                  membershipOwningNamespace=None, ownedMemberElement=None,
                  visibility=None):
@@ -507,6 +519,9 @@ class NamespaceMember(Membership):
 
 
 class AliasMember(Membership):
+    # __slots__ = ["effectiveMemberName", "memberElement", "memberName", "membershipOwningNamespace",
+    #              "ownedMemberElement", "visibility"]
+
     def __init__(self, parent, name, effectiveMemberName=None, memberElement=None,
                  membershipOwningNamespace=None, ownedMemberElement=None,
                  visibility=None):
@@ -520,6 +535,9 @@ class AliasMember(Membership):
 
 
 class NonFeatureMember(Membership):
+    # __slots__ = ["effectiveMemberName", "memberElement", "memberName", "membershipOwningNamespace",
+    #              "ownedMemberElement", "visibility"]
+
     def __init__(self, parent, name='', effectiveMemberName=None, memberElement=None,
                  membershipOwningNamespace=None, ownedMemberElement=None,
                  visibility=None):
@@ -533,6 +551,9 @@ class NonFeatureMember(Membership):
 
 
 class FeatureNamespaceMember(Membership):
+    # __slots__ = ["effectiveMemberName", "memberElement", "memberName", "membershipOwningNamespace",
+    #              "ownedMemberElement", "visibility"]
+
     def __init__(self, parent, name, effectiveMemberName=None, memberElement=None,
                  memberName=None, membershipOwningNamespace=None, ownedMemberElement=None,
                  visibility=None):
@@ -586,6 +607,9 @@ class NonFeatureElement(Element):
         qualifiedName: String[0..1]
             [Derived] The name of this Element, if it has one, qualified by the name of its owningNamespace, if it has one.
     """
+    # __slots__ = ["owner", "ownedElement", "ownedRelationship", "owningMembership", "aliasId", "owningNamespace",
+    #              "documentationComment", "ownedTextualRepresentation", "ownedAnnotation", "documentation",
+    #              "derivedName", "identifier"]
 
     def __init__(self, parent, name, ownedElement: Element, aliasId=None, humanId=None, ownedRelationship=None,
                  owningMembership=None, owningNamespace=None, documentationComment=None,
