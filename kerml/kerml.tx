@@ -79,7 +79,6 @@ OwnedDocumentation:
 
 DocumentationComment:
     'doc' ('<' name = Name '>' )? body=/(?ms)\/\*(.*?)\*\//
-//    'doc' ('<' humanId = Name '>' )? body=/(?ms)\/\*(.*?)\*\//
 ;
 
 PrefixDocumentation:
@@ -306,18 +305,18 @@ Specialization:
     ;
 OwnedSpecialization :
     // <! GeneralType
-    general = [Element|QualifiedName]
+    general = [QualifiedName]
     | general += FeatureChain
     // !>
     ;
 SpecificType :
-      specific = [Element|QualifiedName]
+      specific = [QualifiedName]
     | specific += FeatureChain
     // TODO: Do this in the class instantiation
     // { s.ownedRelatedElement += s.specific }
 ;
 GeneralType :
-    general = [Element|QualifiedName]
+    general = [QualifiedName]
     | general += FeatureChain
     // TODO: Do this in the class instantiation
     // { ownedRelatedElement += general }
@@ -501,7 +500,8 @@ Subsettings:
     Subsets ( ',' ownedRelationship += OwnedSubsetting )*
 ;
 Subsets:
-    SUBSETS ownedRelationship += OwnedSubsetting
+//    SUBSETS ownedRelationship += OwnedSubsetting
+    ( ':>'  | 'subsets' ) ownedRelationship += OwnedSubsetting
 ;
 Redefinitions:
     Redefines ( ',' ownedRelationship += OwnedRedefinition )*
@@ -539,10 +539,11 @@ OwnedFeatureTyping :
 Subsetting:
     ( 'specialization' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
     'subset' SpecificType
-    SUBSETS
+    ( ':>'  | 'subsets' )
+//    SUBSETS
     // <! GeneralType
     (
-    general = [Type|QualifiedName]
+     general = [QualifiedName]
     | general += FeatureChain
     )
     // !>
@@ -551,7 +552,7 @@ Subsetting:
 
 OwnedSubsetting:
     // <! GeneralType
-    general = [Type|QualifiedName]
+    general = [QualifiedName]
     | general += FeatureChain
     // !>
 ;
@@ -576,7 +577,7 @@ FeatureChain:
 ;
 
 OwnedFeatureChaining:
-    chainingFeature = [Element|QualifiedName]
+    chainingFeature = [QualifiedName]
 ;
 
 
@@ -1218,8 +1219,8 @@ Qualification:
     ('::'Name)+
     ;
 
-QualifiedName
-    : Name Qualification?
+QualifiedName:
+    Name Qualification?
     ;
 
 /* NAMES */

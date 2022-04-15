@@ -74,7 +74,7 @@ class Type(Namespace):
 
     # __slots__ = ['name', 'parent', 'isAbstract', 'importedMembership', 'member', 'ownedMembership']
 
-    def __init__(self, name, parent, humanId=None, aliasId=None,
+    def __init__(self, name, parent, humanId=None, aliasId=None, documentation=None,
                  isAbstract=None, isSufficient=None, ownedRelationship=None,
                  importedMembership=None, member=None, membership=None,
                  ownedImport=None, ownedMember=None, ownedMembership=None):
@@ -95,6 +95,7 @@ class Type(Namespace):
         self.ownedRelationship = ownedRelationship
 
         self.isSufficient = isSufficient
+        self.documentation = documentation
 
 
 class FeatureElement(Element):
@@ -474,11 +475,11 @@ class Feature(Type):
     """
 
     def __init__(self, name, parent, humanId=None, direction=None,
-                 isAbstract=None, isSufficient=None,
+                 isAbstract=None, isSufficient=None, ownedRelationship=None,
                  owningFeatureMembership=None, isEnd=False, isComposite=False,
                  isDerived=False, isOrdered=False,
                  isPortion=False, isUnique=False, isReadOnly=False):
-        super(Feature, self).__init__(name=name, parent=parent, humanId=humanId)
+        super(Feature, self).__init__(name=name, parent=parent, humanId=humanId, ownedRelationship=ownedRelationship)
         self.name = name
         self.parent = parent
         self.humanId = humanId

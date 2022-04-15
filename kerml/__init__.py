@@ -150,10 +150,10 @@ if __name__ == "__main__":
         "ElementDocRelationship.kerml",
         "baseline.kerml",
         "elements.kerml",
-        "features.kerml",
+        # "features.kerml",
         "simple_features.kerml",
         "simpletypes.kerml",
-        # "typeconjugation.kerml"
+        "typeconjugation.kerml"
     ]
     for test in tests:
         tfile = test_files.get_test_file(test, "test")
