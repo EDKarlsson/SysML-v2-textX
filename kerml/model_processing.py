@@ -19,15 +19,15 @@ def owned_specialization_definer_scope(general, attr, attr_ref):
     found_general = []
     # If trying to Specialize a Type
     for ownedRel in m.ownedRelationship:
-        # print(f'Owned Relationship: {ownedRel} - Type: {type(ownedRel)}')
-        # print(f'Owned Relationship Dict: {ownedRel.__dict__}')
-        # print(f'Attributes:{dir(ownedRel.ownedMemberElement)}')
+        print(f'Owned Relationship: {ownedRel} - Type: {type(ownedRel)}')
+        print(f'Owned Relationship Dict: {ownedRel.__dict__}')
         from kerml import Type
         if isinstance(ownedRel, Type):
             if name == ownedRel.name:
                 # print(f"Found name == ownedRel.name : {name} == {ownedRel.name}")
                 found_general.append(ownedRel)
         elif 'name' in ownedRel.ownedMemberElement.name and name == ownedRel.ownedMemberElement.name:
+            print(f'Attributes:{dir(ownedRel.ownedMemberElement)}')
             # print(f"Found name == ownedMemberElement.name : {name} == {ownedRel.ownedMemberElement.name}")
             found_general.append(ownedRel)
         # print()

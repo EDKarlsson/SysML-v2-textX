@@ -474,11 +474,10 @@ class Feature(Type):
             Feature are derived from its ownedFeatureTypings and the types of its ownedSubsettings.
     """
 
-    def __init__(self, name, parent, humanId=None, direction=None,
-                 isAbstract=None, isSufficient=None, ownedRelationship=None,
-                 owningFeatureMembership=None, isEnd=False, isComposite=False,
-                 isDerived=False, isOrdered=False,
-                 isPortion=False, isUnique=False, isReadOnly=False):
+    def __init__(self, name, parent, humanId=None, direction=None, isAbstract=None,
+                 isSufficient=None, ownedRelationship=None, owningFeatureMembership=None,
+                 isEnd=False, isComposite=False, isDerived=False, isOrdered=False, isPortion=False,
+                 isUnique=False, isReadOnly=False):
         super(Feature, self).__init__(name=name, parent=parent, humanId=humanId,
                                       ownedRelationship=ownedRelationship)
         self.name = name
@@ -501,11 +500,12 @@ class Multiplicity(Feature):
     """
     A Multiplicity is a Feature whose co-domain is a set of natural numbers that includes the
     number of sequences determined below, based on the kind of typeWithMultiplicity:
-    • Classifiers: minimal sequences (the single length sequences of the Classifier).
-    • Features: sequences with the same feature-pair head. In the case of Features with Classifiers
-        as domain and co-domain, these sequences are pairs, with the first element in a
-        single-length sequence of the domain Classifier (head of the pair), and the number of pairs
-        with the same first element being among the Multiplicity co-domain numbers.
+        • Classifiers: minimal sequences (the single length sequences of the Classifier).
+        • Features: sequences with the same feature-pair head. In the case of Features with
+            Classifiers as domain and co-domain, these sequences are pairs, with the first element
+            in a single-length sequence of the domain Classifier (head of the pair), and the number
+            of pairs with the same first element being among the Multiplicity co-domain numbers.
+
     Multiplicity co-domains (in models) can be specified by Expression that might vary in their
     results. If the typeWithMultiplicity is a Classifier, the domain of the Multiplicity shall be
     Anything. If the typeWithMultiplicity is a Feature, the Multiplicity shall have the same domain

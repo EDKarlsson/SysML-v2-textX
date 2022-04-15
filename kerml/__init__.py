@@ -150,19 +150,15 @@ if __name__ == "__main__":
         "ElementDocRelationship.kerml",
         "baseline.kerml",
         "elements.kerml",
-        # "features.kerml",
         "simple_features.kerml",
         "simpletypes.kerml",
-        "typeconjugation.kerml"
+        "Conjugation.kerml"
+        # "features.kerml",
+        # "typeconjugation.kerml"
+        # "Base.kerml",
     ]
     for test in tests:
         tfile = test_files.get_test_file(test, "test")
         print(f"Testing {tfile}")
         main(tfile, debug=False)
         print(f"PASSED: {test}")
-
-    print("==========")
-    print("TESTING Model Library: Base.kerml")
-    base_kerml = "/Users/dank/git/systems-modeling/SysML-v2-Release/sysml.library/Kernel Library/Base.kerml"
-    main(base_kerml)
-    print("==========")

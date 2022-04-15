@@ -263,7 +263,9 @@ Type:
         SPECIALIZES ownedRelationship += OwnedSpecialization
         // !!>
     ( ',' ownedRelationship += OwnedSpecialization )*
-        | ConjugationPart
+        // <!! | ConjugationPart
+        | CONJUGATES ownedRelationship += OwnedConjugation
+        // !!>
     // !>
     )+
     DisjoiningPart?
@@ -281,6 +283,26 @@ Type:
     )
     // !>
     ;
+
+TypeBody:
+    ';' | '{'
+//    TypeBodyElement*
+    (
+      documentation += OwnedDocumentation
+    | ownedRelationship += NonFeatureMember
+    | ownedRelationship += FeatureMember
+    | ownedRelationship += AliasMember
+    | ownedRelationship += Import
+    )*
+    '}'
+    ;
+TypeBodyElement:
+    documentation += OwnedDocumentation
+    ownedRelationship += NonFeatureMember
+    | ownedRelationship += FeatureMember
+    | ownedRelationship += AliasMember
+    | ownedRelationship += Import
+;
 
 SpecializationPart:
     SPECIALIZES ownedRelationship += OwnedSpecialization
@@ -305,18 +327,18 @@ Specialization:
     ;
 OwnedSpecialization :
     // <! GeneralType
-    general = [QualifiedName]
+    general = [Type|QualifiedName]
     | general += FeatureChain
     // !>
     ;
 SpecificType :
-      specific = [QualifiedName]
+      specific = [Type|QualifiedName]
     | specific += FeatureChain
     // TODO: Do this in the class instantiation
     // { s.ownedRelatedElement += s.specific }
 ;
 GeneralType :
-    general = [QualifiedName]
+    general = [Type|QualifiedName]
     | general += FeatureChain
     // TODO: Do this in the class instantiation
     // { ownedRelatedElement += general }
@@ -327,24 +349,26 @@ GeneralType :
 Conjugation:
     ( 'conjugation' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
     'conjugate'
-    ( conjugatedType=[Type|QualifiedName]
-    | conjugatedType = FeatureChain
-    // TODO: Do this in the class instantiation
-//      { ownedRelatedElement += conjugatedType }
+    (
+        conjugatedType=[Type|QualifiedName]
+        | conjugatedType = FeatureChain
+        // TODO: Do this in the class instantiation
+        //  { ownedRelatedElement += conjugatedType }
     )
     CONJUGATES
-    ( originalType=[Type|QualifiedName]
-    | originalType = FeatureChain
-    // TODO: Do this in the class instantiation
-//      { ownedRelatedElement += originalType }
-      ) ';'
+    (
+        originalType=[Type|QualifiedName]
+        | originalType = FeatureChain
+        // TODO: Do this in the class instantiation
+        //  { ownedRelatedElement += originalType }
+    ) ';'
 ;
 
 OwnedConjugation:
-      originalType=[Type|QualifiedName]
+      originalType=[Element|QualifiedName]
     | originalType = FeatureChain
     // TODO: Do this in the class instantiation
-//      { ownedRelatedElement += originalType }
+    //  { ownedRelatedElement += originalType }
 ;
 
 /* =============================================================== */
@@ -354,20 +378,20 @@ Disjoining:
     'disjoint' ( typeDisjoined = [Type|QualifiedName]
     | typeDisjoined = FeatureChain
     // TODO: Do this in the class instantiation
-//    { ownedRelatedElement += typeDisjoined }
+    //  { ownedRelatedElement += typeDisjoined }
     )
     'from'
     ( disjoiningType = [Type|QualifiedName]
     | disjoinginType = FeatureChain
     // TODO: Do this in the class instantiation
-//    { ownedRelatedElement += disjoiningType }
+    //  { ownedRelatedElement += disjoiningType }
     ) ';'
 ;
 OwnedDisjoining:
     disjoiningType = [Type|QualifiedName]
     | disjoinginType = FeatureChain
     // TODO: Do this in the class instantiation
-//    { ownedRelatedElement += disjoiningType }
+    //  { ownedRelatedElement += disjoiningType }
 ;
 
 /* =============================================================== */
@@ -413,20 +437,20 @@ ClassifierDeclaration:
     ;
 
 SuperclassingPart:
-      SPECIALIZES ownedRelationship += OwnedSubclassification
-      ( ',' ownedRelationship += OwnedSubclassification )*
-      ;
+    SPECIALIZES ownedRelationship += OwnedSubclassification
+    ( ',' ownedRelationship += OwnedSubclassification )*
+    ;
 
 
 /* =============================================================== */
 /* SUBCLASSIFICATION */
 Subclassification:
     ( 'specialization' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
-    'subclassifier' subclassifer = [QualifiedName]
-    SPECIALIZES superclassifer = [QualifiedName] ';'
+    'subclassifier' subclassifer = [Element|QualifiedName]
+    SPECIALIZES superclassifer = [Element|QualifiedName] ';'
     ;
 OwnedSubclassification:
-    superclassifier = [QualifiedName]
+    superclassifier = [Element|QualifiedName]
     ;
 
 /* =============================================================== */
@@ -543,7 +567,7 @@ Subsetting:
 //    SUBSETS
     // <! GeneralType
     (
-     general = [QualifiedName]
+     general = [Element|QualifiedName]
     | general += FeatureChain
     )
     // !>
@@ -552,7 +576,7 @@ Subsetting:
 
 OwnedSubsetting:
     // <! GeneralType
-    general = [QualifiedName]
+    general = [Element|QualifiedName]
     | general += FeatureChain
     // !>
 ;
@@ -577,7 +601,7 @@ FeatureChain:
 ;
 
 OwnedFeatureChaining:
-    chainingFeature = [QualifiedName]
+    chainingFeature = [Element|QualifiedName]
 ;
 
 
@@ -862,7 +886,7 @@ TypeReference:
     ownedRelationship += ReferenceTyping
     ;
 ReferenceTyping:
-    type = [QualifiedName]
+    type = [Element|QualifiedName]
     ;
 /* =============================================================== */
 /* PRIMARY EXPRESSIONS */
@@ -929,7 +953,7 @@ FunctionReference :
     ownedRelationship += ReferenceTyping
     ;
 FeatureChainMember:
-      memberElement = [QualifiedName]
+      memberElement = [Element|QualifiedName]
     | ownedMemberElement = FeatureChain
     ;
 
@@ -949,12 +973,8 @@ FeatureReferenceExpression:
     ownedRelationship += FeatureReferenceMember
     ;
 FeatureReferenceMember:
-    memberElement = [QualifiedName]
-//    memberElement = FeatureReference
+    memberElement = [Element|QualifiedName]
     ;
-//FeatureReference:
-//    [QualifiedName]
-//    ;
 InvocationExpression:
     ownedRelationship += OwnedSpecialization
     ArgumentList
@@ -1063,7 +1083,7 @@ ItemFlowFeature:
     ownedRelationship += ItemFlowRedefinition
     ;
 ItemFlowRedefinition:
-    redefinedFeature = [QualifiedName]
+    redefinedFeature = [Element|QualifiedName]
     ;
 
 /* =============================================================== */
@@ -1172,24 +1192,6 @@ Membership:
     'membership' name=Name memberElement=Element ownedMemberElement=Element visibility=VisibilityIndicator
 ;
 
-TypeBody:
-    ';' | '{'
-//    TypeBodyElement*
-    (
-    ownedRelationship += NonFeatureMember
-    | ownedRelationship += FeatureMember
-    | ownedRelationship += AliasMember
-    | ownedRelationship += Import
-    )*
-    '}'
-    ;
-TypeBodyElement:
-    documentation += OwnedDocumentation
-    ownedRelationship += NonFeatureMember
-    | ownedRelationship += FeatureMember
-    | ownedRelationship += AliasMember
-    | ownedRelationship += Import
-;
 
 /* =============================================================== */
 /* TEXTX COMMENTS */
