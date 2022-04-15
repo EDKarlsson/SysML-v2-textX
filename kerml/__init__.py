@@ -147,11 +147,11 @@ if __name__ == "__main__":
     # inspect_language("./root/kerml.tx")
     # print(f"Testing {test_files}")
     tests = [
-        "ElementDocRelationship.kerml",
-        "baseline.kerml",
-        "elements.kerml",
-        "simple_features.kerml",
-        "simpletypes.kerml",
+        # "ElementDocRelationship.kerml",
+        # "baseline.kerml",
+        # "elements.kerml",
+        # "simple_features.kerml",
+        # "simpletypes.kerml",
         "Conjugation.kerml"
         # "features.kerml",
         # "typeconjugation.kerml"
