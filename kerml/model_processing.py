@@ -42,6 +42,8 @@ def owned_specialization_definer_scope(general, attr, attr_ref):
         general_type = mm['Type'](name, general.parent.name)
         general_type.name = name
         general_type.parent = m
+        # TODO: This isn't correct because it will not always be an owned relationship that is
+        #  created
         m.ownedRelationship.append(general_type)
         return general_type
 

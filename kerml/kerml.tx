@@ -129,13 +129,27 @@ MemberPrefix:
     ( visibility = VisibilityIndicator )?
 ;
 NamespaceMember:
-    (
-    // NonFeatureMember
+     (
+    // <! NonFeatureMember
         MemberPrefix
         ownedMemberElement=NonFeatureElement
+    // !>
+     )
+    |
+    // <! FeatureNamespaceMember
+     (
+        MemberPrefix
+        ownedMemberElement=FeatureElement
+     // !>
+     )
+    |
+    (
+    // <! ChainFeatureMember
+        MemberPrefix
+        'feature'? ( name=Name )? 'is'
+        ownedMemberElement = FeatureChain
+    // !>
     )
-    | FeatureNamespaceMember
-    | ChainFeatureMember
 ;
 NonFeatureMember:
     MemberPrefix
@@ -242,15 +256,19 @@ QuotedID:
 /* TYPES */
 Type:
     ( isAbstract ?= 'abstract' )? 'type'
+    // <! TypeDeclaration
     ( isSufficient ?= 'all' )? (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
-//    ( ownedRelationship += OwnedMultiplicity )?
+    ( ownedRelationship += OwnedMultiplicity )?
     (
-//        SpecializationPart
+        // <!! SpecializationPart
         SPECIALIZES ownedRelationship += OwnedSpecialization
+        // !!>
     ( ',' ownedRelationship += OwnedSpecialization )*
         | ConjugationPart
+    // !>
     )+
     DisjoiningPart?
+    // <! TypeBody
     (
         ';' | '{'
             (
@@ -262,6 +280,7 @@ Type:
             )*
         '}'
     )
+    // !>
     ;
 
 SpecializationPart:
@@ -286,9 +305,10 @@ Specialization:
     SPECIALIZES GeneralType ';'
     ;
 OwnedSpecialization :
-//    GeneralType
+    // <! GeneralType
     general = [Element|QualifiedName]
     | general += FeatureChain
+    // !>
     ;
 SpecificType :
       specific = [Element|QualifiedName]
@@ -383,8 +403,14 @@ Classifier:
 ClassifierDeclaration:
     ( isSufficient ?= 'all' )? (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
     ( ownedRelationship += OwnedMultiplicity )?
-    ( SuperclassingPart | ConjugationPart )?
-    DisjoiningPart
+    (
+    // <! SuperclassingPart
+          SPECIALIZES ownedRelationship += OwnedSubclassification
+          ( ',' ownedRelationship += OwnedSubclassification )*
+    // !>
+        | ConjugationPart
+    )?
+    DisjoiningPart?
     ;
 
 SuperclassingPart:
@@ -419,18 +445,30 @@ FeatureDirection :
 ;
 
 Feature:
-    FeaturePrefix
-   'feature'?
-   // FeatureDeclaration
-    ( isSufficient ?= 'all' )? (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
-    ( FeatureSpecializationPart | ConjugationPart )?
-    DisjoiningPart?
-    TypeFeaturingPart?
-    ValuePart? TypeBody
+    FeaturePrefix 'feature'?
+    // <! FeatureDeclaration
+    ( isSufficient ?= 'all' )?
+    (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+    ( FeatureSpecializationPart | ConjugationPart)?
+    DisjoiningPart? TypeFeaturingPart?
+    // !>
+    ValuePart?
+    // <! TypeBody
+    ( ';' | '{'
+        (
+            ownedRelationship += NonFeatureMember
+            | ownedRelationship += FeatureMember
+            | ownedRelationship += AliasMember
+            | ownedRelationship += Import
+        )*
+        '}'
+    )
+    // !>
 ;
 
 FeatureDeclaration:
-    ( isSufficient ?= 'all' )? (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+    ( isSufficient ?= 'all' )?
+    (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
     ( FeatureSpecializationPart | ConjugationPart )?
     DisjoiningPart?
     TypeFeaturingPart?
@@ -441,15 +479,15 @@ TypeFeaturingPart:
     ( ',' ownedTypeFeaturing += OwnedTypeFeaturing )*
 ;
 FeatureSpecializationPart:
-      FeatureSpecialization + MultiplicityPart? FeatureSpecialization*
+      FeatureSpecialization+ MultiplicityPart? FeatureSpecialization*
     | MultiplicityPart FeatureSpecialization*
     ;
 MultiplicityPart:
       ownedRelationship += OwnedMultiplicity
     | ( ownedRelationship += OwnedMultiplicity )?
-//      ( isOrdered ?= 'ordered' ( !isUnique ?= 'nonunique' )?
-//      | !isUnique ?= 'nonunique' ( isOrdered ?= 'ordered' )? )
-      ;
+    ( (isOrdered ?= 'ordered')? (isUnique ?= 'nonunique')? )#
+    ;
+
 FeatureSpecialization :
     Typings | Subsettings | Redefinitions
 ;
@@ -501,11 +539,21 @@ OwnedFeatureTyping :
 Subsetting:
     ( 'specialization' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
     'subset' SpecificType
-    SUBSETS GeneralType ';'
+    SUBSETS
+    // <! GeneralType
+    (
+    general = [Type|QualifiedName]
+    | general += FeatureChain
+    )
+    // !>
+    ';'
 ;
 
 OwnedSubsetting:
-    GeneralType
+    // <! GeneralType
+    general = [Type|QualifiedName]
+    | general += FeatureChain
+    // !>
 ;
 
 /* =============================================================== */
@@ -1124,11 +1172,19 @@ Membership:
 ;
 
 TypeBody:
-    ';' | '{' TypeBodyElement* '}'
+    ';' | '{'
+//    TypeBodyElement*
+    (
+    ownedRelationship += NonFeatureMember
+    | ownedRelationship += FeatureMember
+    | ownedRelationship += AliasMember
+    | ownedRelationship += Import
+    )*
+    '}'
     ;
 TypeBodyElement:
     documentation += OwnedDocumentation
-    | ownedRelationship += NonFeatureMember
+    ownedRelationship += NonFeatureMember
     | ownedRelationship += FeatureMember
     | ownedRelationship += AliasMember
     | ownedRelationship += Import
@@ -1180,12 +1236,15 @@ UNRESTRICTED_NAME:
     ;
 
 DECIMAL_DIGIT:
-    /\'[0-9]\'/
+//    /\'[0-9]\'/
+    /[0-9]/
 ;
 
 /* TERMINALS */
-DECIMAL_VALUE
-    : /'0'..'9' ('0'..'9')*/
+DECIMAL_VALUE:
+//    : /'0'..'9' ('0'..'9')*/
+//    : /\'[0-9]*\'/
+    DECIMAL_DIGIT+
     ;
 
 EXPONENTIAL_VALUE
