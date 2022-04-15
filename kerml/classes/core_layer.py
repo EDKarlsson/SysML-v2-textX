@@ -75,8 +75,7 @@ class Type(Namespace):
     # __slots__ = ['name', 'parent', 'isAbstract', 'importedMembership', 'member', 'ownedMembership']
 
     def __init__(self, name, parent, humanId=None, aliasId=None,
-                 isAbstract=None, isSufficient=None,
-                 documentation=None, ownedRelationship=None,
+                 isAbstract=None, isSufficient=None, ownedRelationship=None,
                  importedMembership=None, member=None, membership=None,
                  ownedImport=None, ownedMember=None, ownedMembership=None):
         super(Namespace, self).__init__(name=name, parent=parent,
