@@ -1,8 +1,7 @@
 try:
     from root_layer import Element, Namespace, Relationship, Membership
 except:
-    from kerml.classes.root_layer import Element, Namespace, Relationship, \
-        Membership
+    from kerml.classes.root_layer import Element, Namespace, Relationship,  Membership
 
 import json
 
@@ -80,7 +79,6 @@ class Type(Namespace):
         self.importedMembership = importedMembership
         self.ownedMembership = ownedMembership
 
-        self.humanId = humanId
         self.aliasId = aliasId
         self.member = member
         self.membership = membership
@@ -152,7 +150,10 @@ class FeatureElement(Element):
         self.ownedElement: Element = ownedElement
         self.ownedRelationship: Relationship = ownedRelationship
         self.owningMembership: Membership = owningMembership
-        self.aliasId = [self.humanId] + aliasId
+        if humanId is not None:
+            self.aliasId = [self.humanId] + aliasId
+        else:
+            self.aliasId = list(aliasId)
 
         # Need to add logic to these
         if hasattr(self.parent, 'name'):
@@ -209,21 +210,13 @@ class FeatureMember(Membership, TypeFeaturing):
     Relationship between the Feature and the Type.
 
     Attributes
-        memberFeature : Feature
-            {redefines memberElement, featureOfType}
-
+        memberFeature : Feature {redefines memberElement, featureOfType}
             The Feature that this FeatureMembership relates to its owningType, making it a
             ownedFeature of the owningType.
-
-        ownedMemberFeature : Feature [0..1]
-            {subsets memberFeature, redefines ownedMemberElement}
-
+        ownedMemberFeature : Feature [0..1] {subsets memberFeature, redefines ownedMemberElement}
             A memberFeature that is owned by this FeatureMembership and hence an ownedFeature of
             the owningType.
-
-        /owningType : Type
-            {subsets type, redefines membershipOwningNamespace}
-
+        /owningType : Type {subsets type, redefines membershipOwningNamespace}
             The Type that owns this FeatureMembership.
     """
 
@@ -314,31 +307,17 @@ class Conjugation(Relationship):
 class Disjoining(Relationship):
     """
     Attributes
-        ownedRelatedElement : Element [0..*]
-            {subsets relatedElement, ordered}
-
+        ownedRelatedElement : Element [0..*] {subsets relatedElement, ordered}
             The relatedElements of this Relationship that are owned by the Relationship.
-
-        owningRelatedElement : Element [0..1]
-            {subsets relatedElement}
-
+        owningRelatedElement : Element [0..1] {subsets relatedElement}
             The relatedElement of this Relationship that owns the Relationship, if any.
-
-        relatedElement : Element [2..*]
-            {ordered, nonunique, union}
-
+        relatedElement : Element [2..*] {ordered, nonunique, union}
             [Derived] The Elements that are related by this Relationship, derived as the
             union of the source and target Elements of the Relationship. Every Relationship
             must have at least two relatedElements.
-
-        source : Element [0..*]
-            {subsets relatedElement, ordered}
-
+        source : Element [0..*] {subsets relatedElement, ordered}
             The relatedElements from which this Relationship is considered to be directed.
-
-        target : Element [0..*]
-            {subsets relatedElement, ordered}
-
+        target : Element [0..*] {subsets relatedElement, ordered}
             The relatedElements to which this Relationship is considered to be directed.
     """
 
@@ -459,7 +438,6 @@ class Feature(Type):
                  isUnique=False, isReadOnly=False):
         super(Feature, self).__init__(name=name, parent=parent, humanId=humanId,
                                       ownedRelationship=ownedRelationship)
-        self.humanId = humanId
         self.direction = direction
         self.isAbstract = isAbstract
         self.isSufficient = isSufficient
@@ -521,8 +499,6 @@ class Classifier(Type):
 
     def __init__(self, name, parent, ownedSubclassification=None):
         super(Classifier, self).__init__(name, parent)
-        self.name = name
-        self.parent = parent
         self.ownedSubclassification = ownedSubclassification
 
 
@@ -533,28 +509,18 @@ class Subclassification(Specialization):
     general Classifier.
 
     Attributes
-        /owningClassifier : Classifier [0..1]
-            {redefines owningType}
-
+        /owningClassifier : Classifier [0..1] {redefines owningType}
             The Classfier that owns this Subclassification relationship, which must also be its
             subclassifier.
-
-        subclassifier : Classifier
-            {redefines specific}
-
+        subclassifier : Classifier {redefines specific}
             The more specific Classifier in this Subclassification.
-
-        superclassifier : Classifier
-            {redefines general}
-
+        superclassifier : Classifier {redefines general}
             The more general Classifier in this Subclassification.
     """
 
     def __init__(self, name, parent, owningClassifier=None, subclassifier=None,
                  superclassifier=None):
         super(Subclassification, self).__init__(name, parent)
-        self.name = name
-        self.parent = parent
         self.owningClassifier = owningClassifier
         self.subclassifier = subclassifier
         self.superclassifier = superclassifier
@@ -573,30 +539,18 @@ class Subsetting(Specialization):
     subsettingFeature and subsettedFeature to be different.
 
     Attributes
-        /owningFeature : Feature
-            {subsets subsettingFeature, redefines owningType}
-
+        /owningFeature : Feature {subsets subsettingFeature, redefines owningType}
             The Feature that owns this Subsetting relationship, which must also be its
             subsettingFeature.
-
-        subsettedFeature : Feature
-            {redefines general}
-
+        subsettedFeature : Feature {redefines general}
             The Feature that is subsetted by the subsettingFeature of this Subsetting.
-
-        subsettingFeature : Feature
-            {redefines specific}
-
+        subsettingFeature : Feature {redefines specific}
             The Feature that is a subset of the subsettedFeature of this Subsetting.
     """
 
     def __init__(self, name, parent, humanId=None, owningFeature=None, subsettedFeature=None,
                  subsettingFeature=None):
         super(Subsetting, self).__init__(name=name, parent=parent, humanId=humanId)
-        self.name = name
-        self.parent = parent
-        self.humanId = humanId
-
         self.owningFeature = owningFeature
         self.subsettedFeature = subsettedFeature
         self.subsettingFeature = subsettingFeature
@@ -618,22 +572,14 @@ class Redefinition(Subsetting):
     enables the redefiningFeature to have the same name as the redefinedFeature if desired.
 
     Attributes
-        redefinedFeature : Feature
-            {redefines subsettedFeature}
-
+        redefinedFeature : Feature {redefines subsettedFeature}
             The Feature that is redefined by the redefiningFeature of this Redefinition.
-
-        redefiningFeature : Feature
-            {redefines subsettingFeature}
-
+        redefiningFeature : Feature {redefines subsettingFeature}
             The Feature that is redefining the redefinedFeature of this Redefinition.
     """
 
     def __init__(self, name, parent, humanId=None, redefinedFeature=None, redefiningFeature=None):
         super(Redefinition, self).__init__(name=name, parent=parent, humanId=humanId)
-        self.name = name
-        self.parent = parent
-        self.humanId = humanId
         self.redefinedFeature = redefinedFeature
         self.redefiningFeature = redefiningFeature
 
@@ -655,15 +601,9 @@ class FeatureTyping(Specialization):
             The Feature that has its Type determined by this FeatureTyping.
     """
 
-    def __init__(self, name, parent, humanId=None, owningFeature=None, type=None,
-                 typedFeature=None):
+    def __init__(self, name, parent, humanId=None, general=None, typedFeature=None):
         super(FeatureTyping, self).__init__(name=name, parent=parent, humanId=humanId)
-        self.name = name
-        self.parent = parent
-        self.humanId = humanId
-
-        self.owningFeature = owningFeature
-        self._type = type
+        self.general = general
         self.typedFeature = typedFeature
 
 
@@ -673,28 +613,26 @@ class FeatureChaining(Relationship):
     its owning Feature.
 
     Attributes
-        chainingFeature : Feature
-             {redefines target}
-
+        chainingFeature : Feature {redefines target}
              The Feature whose values partly determine values of featureChained, as described in
              Feature::chainingFeature.
-        /featureChained : Feature
-            {redefines source, owningRelatedElement}
-
+        /featureChained : Feature {redefines source, owningRelatedElement}
             The Feature whose values are partly determined by values of the chainingFeature, as
             described in Feature::chainingFeature.
     """
 
     def __init__(self, name, parent, humanId=None, chainingFeature=None):
         super(FeatureChaining, self).__init__(name=name, parent=parent, humanId=humanId)
-        self.name = name
-        self.parent = parent
-        self.humanId = humanId
         self.chainingFeature = chainingFeature
 
 
 class EndFeatureMembership(FeatureMember):
+    """
+    EndFeatureMembership is a FeatureMembership that requires its memberFeature be owned and have
+    isEnd = true.
+
+    Attributes
+        ownedMemberFeature : Feature {redefines ownedMemberFeature}
+    """
     def __init__(self, name, parent):
         super(EndFeatureMembership, self).__init__(name=name, parent=parent)
-        self.name = name
-        self.parent = parent

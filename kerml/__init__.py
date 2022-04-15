@@ -1,6 +1,7 @@
 import json
 
-from kerml.model_processing import owned_specialization_definer_scope
+from kerml.model_processing import owned_specialization_definer_scope, \
+    owned_conjugation_definer_scope
 from textx import metamodel_for_language
 from kerml.classes.root_layer import Element, NonFeatureElement, Relationship, Annotation, \
     ModelComment, \
@@ -21,6 +22,7 @@ from kerml.classes.kernel_layer import Class, DataType, Structure, Association, 
     OperatorExpression, LiteralRational, Interaction, ItemFlow, AnnotatingFeature, MetadataFeature, \
     Package, ElementFilterMembership
 from textx.export import model_export
+import textx.scoping.providers as scoping_providers
 from textx import language, metamodel_from_file
 from os.path import join
 import os
@@ -67,7 +69,8 @@ def kerml_language():
     # Here if necessary register object processors or scope providers
     # http://textx.github.io/textX/stable/metamodel/#object-processors
     # http://textx.github.io/textX/stable/scoping/
-    mm.register_scope_providers({'OwnedSpecialization.*': owned_specialization_definer_scope})
+    mm.register_scope_providers({'*.*': scoping_providers.FQN()})
+    # mm.register_scope_providers({'OwnedSpecialization.*': owned_specialization_definer_scope})
 
     return mm
 
@@ -76,14 +79,12 @@ def get_element_mm(debug=False):
     """
     Builds and returns a meta-model for Entity language.
     """
-    from kernel_layer import Package
     entity_mm = metamodel_from_file(join(current_dir, 'kerml.tx'),
                                     classes=class_provider,
                                     use_regexp_group=True,
                                     autokwd=True,
                                     debug=debug,
                                     auto_init_attributes=False)
-    entity_mm.register_scope_providers({'OwnedSpecialization.*': owned_specialization_definer_scope})
     return entity_mm
 
 
@@ -125,11 +126,10 @@ def load_examples(kerml_dirs: list):
 
 def main(test_file, debug=False):
     element_mm = get_element_mm(debug)
-    # element_mm.register_scope_providers({
-    #     "Element.*": root_layer.relationship_definer_scope,
-    #     "Relationship.*": root_layer.relationship_definer_scope,
-    #     "RelationshipOwnedElement.*": root_layer.relationship_definer_scope,
-    # })
+    element_mm.register_scope_providers({
+        'OwnedSpecialization.*': owned_specialization_definer_scope,
+        # 'OwnedConjugation.*': owned_conjugation_definer_scope,
+    })
     model = element_mm.model_from_file(test_file)
     model_export(model, join(current_dir, '../_dot_files', 'kerml_mm.dot'))
 

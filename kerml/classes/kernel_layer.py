@@ -77,28 +77,21 @@ class Association(Classifier, Relationship):
     Attributes
         /associationEnd : Feature [2..*]
             {redefines endFeature}
-
             The features of the Association that identifying the things that can be related by it.
             An Association must have at least two associationEnds. When it has exactly two, the
             Association is called a binary Association.
-
         /relatedType : Type [2..*]
             {redefines relatedElement, ordered, nonunique, union}
-
             The types of the endFeatures of the Association, which are the relatedElements of the
             Association considered as a Relationship.
-
         /sourceType : Type [0..1]
             {subsets relatedType, redefines source}
-
             The source relatedType for this Association. If this is a binary Association, then the
             sourceType is the first relatedType, and the first associationEnd of the Association
             must redefine the source Feature of the Association BinaryLink from the Kernel Library.
             If this Association is not binary, then it has no sourceType.
-
         /targetType : Type [1..*]
             {subsets relatedType, redefines target}
-
             The target relatedTypes for this Association. This includes all the relatedTypes other
             than the sourceType. If this is a binary Association, then the associationEnds
             corresponding to the relatedTypes must all redefine the target Feature of the
@@ -115,17 +108,12 @@ class Association(Classifier, Relationship):
 
         associationClassifiesLink:
             [no documentation]
-
             allSupertypes()->includes(Kernel Library::Link)
-
         AssociationStructureIntersection:
             [no documentation]
-
             oclIsKindOf(Structure) = oclIsKindOf(AssociationStructure)
-
         associationRelatedTypes:
             [no documentation]
-
             relatedTypes = associationEnd.type
     """
 
@@ -148,7 +136,6 @@ class AssociationStructure(Association, Structure):
     Constraints
         associationStructureClassifiesLinkObject:
             [no documentation]
-
             allSupertypes()->includes(Kernel Library::LinkObject)
     """
 

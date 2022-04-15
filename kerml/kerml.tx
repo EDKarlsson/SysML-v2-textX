@@ -128,23 +128,24 @@ MemberPrefix:
     ( visibility = VisibilityIndicator )?
 ;
 NamespaceMember:
+        MemberPrefix
      (
     // <! NonFeatureMember
-        MemberPrefix
+//        MemberPrefix
         ownedMemberElement=NonFeatureElement
     // !>
      )
     |
     // <! FeatureNamespaceMember
      (
-        MemberPrefix
+//        MemberPrefix
         ownedMemberElement=FeatureElement
      // !>
      )
     |
     (
     // <! ChainFeatureMember
-        MemberPrefix
+//        MemberPrefix
         'feature'? ( name=Name )? 'is'
         ownedMemberElement = FeatureChain
     // !>
@@ -244,7 +245,7 @@ FullyQualifiedID[noskipws]:
     /\s*/-
 ;
 QuotedID:
-    '"'?- ID '"'?-
+    '"'?- Name '"'?-
 ;
 
 /* =============================================================== */
@@ -350,14 +351,14 @@ Conjugation:
     ( 'conjugation' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
     'conjugate'
     (
-        conjugatedType=[Type|QualifiedName]
+        conjugatedType=[QualifiedName]
         | conjugatedType = FeatureChain
         // TODO: Do this in the class instantiation
         //  { ownedRelatedElement += conjugatedType }
     )
     CONJUGATES
     (
-        originalType=[Type|QualifiedName]
+        originalType=[QualifiedName]
         | originalType = FeatureChain
         // TODO: Do this in the class instantiation
         //  { ownedRelatedElement += originalType }
@@ -365,7 +366,8 @@ Conjugation:
 ;
 
 OwnedConjugation:
-      originalType=[Element|QualifiedName]
+      originalType=[FullyQualifiedID]
+//      originalType=[Element|QualifiedName]
     | originalType = FeatureChain
     // TODO: Do this in the class instantiation
     //  { ownedRelatedElement += originalType }
@@ -1222,7 +1224,8 @@ Qualification:
     ;
 
 QualifiedName:
-    Name Qualification?
+    Name('::'Name)*
+//    Name Qualification?
     ;
 
 /* NAMES */
