@@ -537,7 +537,7 @@ class NonFeatureMember(Membership):
     # __slots__ = ["effectiveMemberName", "memberElement", "memberName", "membershipOwningNamespace",
     #              "ownedMemberElement", "visibility"]
 
-    def __init__(self, parent, name='', effectiveMemberName=None, memberElement=None,
+    def __init__(self, parent, name='NON_FEATURE_MEMBER', effectiveMemberName=None, memberElement=None,
                  membershipOwningNamespace=None, ownedMemberElement=None,
                  visibility=None):
         super(NonFeatureMember, self).__init__(name=name, parent=parent)
@@ -553,7 +553,7 @@ class FeatureNamespaceMember(Membership):
     # __slots__ = ["effectiveMemberName", "memberElement", "memberName", "membershipOwningNamespace",
     #              "ownedMemberElement", "visibility"]
 
-    def __init__(self, parent, name, effectiveMemberName=None, memberElement=None,
+    def __init__(self, parent, name=None, effectiveMemberName=None, memberElement=None,
                  memberName=None, membershipOwningNamespace=None, ownedMemberElement=None,
                  visibility=None):
         super(FeatureNamespaceMember, self).__init__(name=name, parent=parent)

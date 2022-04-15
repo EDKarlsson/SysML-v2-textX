@@ -1,10 +1,25 @@
 import json
+
+from kerml.model_processing import owned_specialization_definer_scope
 from textx import metamodel_for_language
-from kerml.classes.root_layer import Element, NonFeatureElement, Relationship, Annotation, ModelComment, \
-    TextualRepresentation, AliasMember, FeatureNamespaceMember, NonFeatureMember, Import, OwnedDocumentation, Namespace, \
+from kerml.classes.root_layer import Element, NonFeatureElement, Relationship, Annotation, \
+    ModelComment, \
+    TextualRepresentation, AliasMember, FeatureNamespaceMember, NonFeatureMember, Import, \
+    OwnedDocumentation, Namespace, \
     Membership
-from kerml.classes.core_layer import Type, FeatureElement, Specialization, Conjugation, Disjoining, TypeFeaturing, \
-    FeatureMember
+from kerml.classes.core_layer import Type, FeatureElement, Specialization, Conjugation, Disjoining, \
+    TypeFeaturing, \
+    FeatureMember, Feature, Multiplicity, Classifier, Subclassification, Subsetting, Redefinition, \
+    FeatureTyping, FeatureChaining, EndFeatureMembership
+from kerml.classes.kernel_layer import Class, DataType, Structure, Association, \
+    AssociationStructure, Connector, BindingConnector, Succession, Behavior, Step, \
+    ParameterMembership, Function, Predicate, Expression, BooleanExpression, Invariant, \
+    ReturnParameterMembership, ResultExpressionMembership, LiteralExpression, LiteralInteger, \
+    NullExpression, SelectExpression, MultiplicityRange, MetadataFeatureValue, \
+    FeatureReferenceExpression, InvocationExpression, LiteralBoolean, LiteralString, \
+    LiteralInfinity, CollectExpression, FeatureValue, SuccessionItemFlow, FeatureChainExpression, \
+    OperatorExpression, LiteralRational, Interaction, ItemFlow, AnnotatingFeature, MetadataFeature, \
+    Package, ElementFilterMembership
 from textx.export import model_export
 from textx import language, metamodel_from_file
 from os.path import join
@@ -16,10 +31,25 @@ current_dir = os.path.dirname(__file__)
 
 
 def class_provider(name):
-    classes = [Element, NonFeatureElement, Relationship, Annotation, ModelComment,
-               TextualRepresentation, AliasMember, FeatureNamespaceMember, Type,
-               NonFeatureMember, Import, OwnedDocumentation, Namespace, Membership,
-               FeatureElement, Specialization, Conjugation, Disjoining, TypeFeaturing, FeatureMember]
+    classes = [
+        AliasMember, Annotation, Element,
+        FeatureNamespaceMember, Import,
+        ModelComment, Membership, Namespace, NonFeatureElement,
+        NonFeatureMember, OwnedDocumentation, Relationship, TextualRepresentation,
+
+        Type, FeatureElement, TypeFeaturing, FeatureMember, Specialization,
+        Conjugation, Disjoining, Feature, Multiplicity, Classifier, Subclassification, Subsetting,
+        Redefinition, FeatureTyping, FeatureChaining, EndFeatureMembership,
+
+        Class, DataType, Structure, Association, AssociationStructure, Connector, BindingConnector,
+        Succession, Behavior, Step, ParameterMembership, Function, Predicate, Expression,
+        BooleanExpression, Invariant, ReturnParameterMembership, ResultExpressionMembership,
+        FeatureReferenceExpression, InvocationExpression, LiteralExpression, LiteralInteger,
+        LiteralRational, LiteralBoolean, LiteralString, LiteralInfinity, NullExpression,
+        OperatorExpression, FeatureChainExpression, CollectExpression, SelectExpression,
+        Interaction, ItemFlow, SuccessionItemFlow, FeatureValue, MultiplicityRange,
+        AnnotatingFeature, MetadataFeature, MetadataFeatureValue, Package, ElementFilterMembership
+    ]
     classes = dict(map(lambda x: (x.__name__, x), classes))
     return classes.get(name)
 
@@ -27,11 +57,17 @@ def class_provider(name):
 @language('kerml', '*.kerml')
 def kerml_language():
     """KerML - Kernel Modeling Language"""
-    mm = metamodel_from_file(os.path.join(current_dir, 'kerml.tx'))
+    mm = metamodel_from_file(join(current_dir, 'kerml.tx'),
+                             classes=class_provider,
+                             use_regexp_group=True,
+                             autokwd=True,
+                             debug=False,
+                             auto_init_attributes=False)
 
     # Here if necessary register object processors or scope providers
     # http://textx.github.io/textX/stable/metamodel/#object-processors
     # http://textx.github.io/textX/stable/scoping/
+    mm.register_scope_providers({'OwnedSpecialization.*': owned_specialization_definer_scope})
 
     return mm
 
@@ -47,6 +83,7 @@ def get_element_mm(debug=False):
                                     autokwd=True,
                                     debug=debug,
                                     auto_init_attributes=False)
+    entity_mm.register_scope_providers({'OwnedSpecialization.*': owned_specialization_definer_scope})
     return entity_mm
 
 
@@ -114,9 +151,9 @@ if __name__ == "__main__":
         "baseline.kerml",
         "elements.kerml",
         # "features.kerml",
-        # "simple_features.kerml",
+        "simple_features.kerml",
         "simpletypes.kerml",
-        "typeconjugation.kerml"
+        # "typeconjugation.kerml"
     ]
     for test in tests:
         tfile = test_files.get_test_file(test, "test")
