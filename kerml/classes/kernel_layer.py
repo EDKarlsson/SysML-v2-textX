@@ -14,12 +14,10 @@ class Class(Classifier):
     by the same Class can be distinguished, even when they are related other things in exactly
     the same way.
 
-    Constraints:
-    ----
-    classClassifiesOccurrence:
-        [no documentation]
-
-        allSupertypes()->includes(Kernel Library::Occurrence)
+    Constraints
+        classClassifiesOccurrence:
+            [no documentation]
+            allSupertypes()->includes(Kernel Library::Occurrence)
     """
 
     def __init__(self, name, parent):
@@ -39,12 +37,10 @@ class DataType(Classifier):
       - Can be distinguished when they are related to other things in different ways, even when
         they are intended to be about the same thing.
 
-    Constraints:
-    ----
-    datatypeClassifiesDataValue:
-        [no documentation]
-
-        allSupertypes()->includes(Kernel Library::DataValue)
+    Constraints
+        datatypeClassifiesDataValue:
+            [no documentation]
+            allSupertypes()->includes(Kernel Library::DataValue)
     """
 
     def __init__(self, name, parent):
@@ -59,11 +55,10 @@ class Structure(Class):
     nature. While an Object is not itself behavioral, it may be involved in and acted on by
     Behaviors, and it may be the performer of some of them.
 
-    Constraints:
-    ----
-    structureClassifiesObject:
-        [no documentation]
-        allSupertypes()->includes(Kernel Library::Object)
+    Constraints
+        structureClassifiesObject:
+            [no documentation]
+            allSupertypes()->includes(Kernel Library::Object)
     """
 
     def __init__(self, name, parent):
@@ -79,61 +74,59 @@ class Association(Classifier, Relationship):
     relatedTypes, as co-domain and participants (linked things) of an Association identify each
     other.
 
-    Attributes:
-    ----
-    /associationEnd : Feature [2..*]
-        {redefines endFeature}
+    Attributes
+        /associationEnd : Feature [2..*]
+            {redefines endFeature}
 
-        The features of the Association that identifying the things that can be related by it.
-        An Association must have at least two associationEnds. When it has exactly two, the
-        Association is called a binary Association.
+            The features of the Association that identifying the things that can be related by it.
+            An Association must have at least two associationEnds. When it has exactly two, the
+            Association is called a binary Association.
 
-    /relatedType : Type [2..*]
-        {redefines relatedElement, ordered, nonunique, union}
+        /relatedType : Type [2..*]
+            {redefines relatedElement, ordered, nonunique, union}
 
-        The types of the endFeatures of the Association, which are the relatedElements of the
-        Association considered as a Relationship.
+            The types of the endFeatures of the Association, which are the relatedElements of the
+            Association considered as a Relationship.
 
-    /sourceType : Type [0..1]
-        {subsets relatedType, redefines source}
+        /sourceType : Type [0..1]
+            {subsets relatedType, redefines source}
 
-        The source relatedType for this Association. If this is a binary Association, then the
-        sourceType is the first relatedType, and the first associationEnd of the Association
-        must redefine the source Feature of the Association BinaryLink from the Kernel Library.
-        If this Association is not binary, then it has no sourceType.
+            The source relatedType for this Association. If this is a binary Association, then the
+            sourceType is the first relatedType, and the first associationEnd of the Association
+            must redefine the source Feature of the Association BinaryLink from the Kernel Library.
+            If this Association is not binary, then it has no sourceType.
 
-    /targetType : Type [1..*]
-        {subsets relatedType, redefines target}
+        /targetType : Type [1..*]
+            {subsets relatedType, redefines target}
 
-        The target relatedTypes for this Association. This includes all the relatedTypes other
-        than the sourceType. If this is a binary Association, then the associationEnds
-        corresponding to the relatedTypes must all redefine the target Feature of the
-        Association BinaryLink from the Kernel Library.
+            The target relatedTypes for this Association. This includes all the relatedTypes other
+            than the sourceType. If this is a binary Association, then the associationEnds
+            corresponding to the relatedTypes must all redefine the target Feature of the
+            Association BinaryLink from the Kernel Library.
 
-    Constraints:
-    -----
-    AssociationLink:
-        [no documentation]
+    Constraints
+        AssociationLink:
+            [no documentation]
 
-        let numend : Natural = associationEnd->size() in
-            allSupertypes()->includes(
-                if numend = 2 then Kernel Library::BinaryLink
-                else Kernel Library::Link)
+            let numend : Natural = associationEnd->size() in
+                allSupertypes()->includes(
+                    if numend = 2 then Kernel Library::BinaryLink
+                    else Kernel Library::Link)
 
-    associationClassifiesLink:
-        [no documentation]
+        associationClassifiesLink:
+            [no documentation]
 
-        allSupertypes()->includes(Kernel Library::Link)
+            allSupertypes()->includes(Kernel Library::Link)
 
-    AssociationStructureIntersection:
-        [no documentation]
+        AssociationStructureIntersection:
+            [no documentation]
 
-        oclIsKindOf(Structure) = oclIsKindOf(AssociationStructure)
+            oclIsKindOf(Structure) = oclIsKindOf(AssociationStructure)
 
-    associationRelatedTypes:
-        [no documentation]
+        associationRelatedTypes:
+            [no documentation]
 
-        relatedTypes = associationEnd.type
+            relatedTypes = associationEnd.type
     """
 
     def __init__(self, name, parent, humanId=None, associationEnd=None, relatedType=None,
@@ -152,12 +145,11 @@ class AssociationStructure(Association, Structure):
     """
     No Description
 
-    Constraints:
-    ----
-    associationStructureClassifiesLinkObject:
-        [no documentation]
+    Constraints
+        associationStructureClassifiesLinkObject:
+            [no documentation]
 
-        allSupertypes()->includes(Kernel Library::LinkObject)
+            allSupertypes()->includes(Kernel Library::LinkObject)
     """
 
     def __init__(self, name, parent, humanId=None):
@@ -174,89 +166,87 @@ class Connector(Feature, Relationship):
     be linked. The Connector further restricts these links to between values of two Features on
     instances of its domain.
 
-    Attributes:
-    -----
-    /association : Association [1..*]
-        {redefines type}
+    Attributes
+        /association : Association [1..*]
+            {redefines type}
 
-        The Associations that type the Connector.
-    /connectorEnd : Feature [2..*]
-        {redefines endFeature}
+            The Associations that type the Connector.
+        /connectorEnd : Feature [2..*]
+            {redefines endFeature}
 
-        These are the ends of the Connector, which show what Features it relates. The
-        connectorEnds of a Connector are the features of the Connector that redefine the end
-        Features of the Connector association.
+            These are the ends of the Connector, which show what Features it relates. The
+            connectorEnds of a Connector are the features of the Connector that redefine the end
+            Features of the Connector association.
 
-    isDirected : Boolean
-        Whether or not the Connector should be considered to have a direction from source to
-        target.
+        isDirected : Boolean
+            Whether or not the Connector should be considered to have a direction from source to
+            target.
 
-    /relatedFeature : Feature [2..*]
-        {redefines relatedElement, ordered, nonunique, union}
+        /relatedFeature : Feature [2..*]
+            {redefines relatedElement, ordered, nonunique, union}
 
-        The Features that are related by this Connector considered as a Relationship, derived
-        as the subsetted Features of the connectorEnds of the Connector.
+            The Features that are related by this Connector considered as a Relationship, derived
+            as the subsetted Features of the connectorEnds of the Connector.
 
-    /sourceFeature : Feature [0..1]
-        {subsets relatedFeature, redefines source}
+        /sourceFeature : Feature [0..1]
+            {subsets relatedFeature, redefines source}
 
-        The source relatedFeature for this Connector. If this is a binary Connector, then the
-        sourceFeature is the first relatedFeature, and the first end Feature of the Connector
-        must redefine the source Feature of the Connector binaryLinks from the Kernel Library.
-        If this Connector is not binary, then it has no sourceFeature.
+            The source relatedFeature for this Connector. If this is a binary Connector, then the
+            sourceFeature is the first relatedFeature, and the first end Feature of the Connector
+            must redefine the source Feature of the Connector binaryLinks from the Kernel Library.
+            If this Connector is not binary, then it has no sourceFeature.
 
-    /targetFeature : Feature [1..*]
-        {subsets relatedFeature, redefines target}
+        /targetFeature : Feature [1..*]
+            {subsets relatedFeature, redefines target}
 
-        The target relatedFeatures for this Connector. This includes all the relatedFeatures
-        other than the sourceFeature. If this is a binary Connector, then the end Feature
-        corresponding to the targetFeature must redefine the target Feature of the Connector
-        binaryLinks from the Kernel Library.
+            The target relatedFeatures for this Connector. This includes all the relatedFeatures
+            other than the sourceFeature. If this is a binary Connector, then the end Feature
+            corresponding to the targetFeature must redefine the target Feature of the Connector
+            binaryLinks from the Kernel Library.
 
-    Constraints:
-    -----
-    connectorEndRedefinition
-        For each association of a Connector, each associationEnd must be redefined by a
-        different connectorEnd of the Connector.
+    Constraints
+        connectorEndRedefinition
+            For each association of a Connector, each associationEnd must be redefined by a
+            different connectorEnd of the Connector.
 
-        association->forAll(a |
-            a.associationEnd->forAll(ae |
-                connectorEnd->one(ce |
-                    ce.ownedRedefinition.redefinedFeature->includes(ae))))
+            association->forAll(a |
+                a.associationEnd->forAll(ae |
+                    connectorEnd->one(ce |
+                        ce.ownedRedefinition.redefinedFeature->includes(ae))))
 
-    connectorTargetFeature
-        The targetFeatures of a Connector are the relatedFeatures other than the sourceFeature.
+        connectorTargetFeature
+            The targetFeatures of a Connector are the relatedFeatures other than the sourceFeature.
 
-        targetFeature =
-            if sourceFeature = null then relatedFeature
-            else relatedFeature->excluding(sourceFeature)
-            endif
+            targetFeature =
+                if sourceFeature = null then relatedFeature
+                else relatedFeature->excluding(sourceFeature)
+                endif
 
-    connectorConnectorEnd
-        The connectorEnds of a Connector are its endFeatures.
+        connectorConnectorEnd
+            The connectorEnds of a Connector are its endFeatures.
 
-        connectorEnd = feature->select(isEnd)
+            connectorEnd = feature->select(isEnd)
 
-    connectorRelatedFeatures
-        The relatedFeatures of a Connector are the subsetted Features of its connectorEnds.
-        relatedFeature = connectorEnd.ownedSubsetting.subsettedFeature connectorFeaturingType
-        Each relatedFeature of a Connector must have some featuringType of the Connector as a
-        direct or indirect featuringType (where a Feature with no featuringType is treated as
-        if the Classifier Base::Anything was its featuringType).
+        connectorRelatedFeatures
+            The relatedFeatures of a Connector are the subsetted Features of its connectorEnds.
+            relatedFeature = connectorEnd.ownedSubsetting.subsettedFeature connectorFeaturingType
+            Each relatedFeature of a Connector must have some featuringType of the Connector as a
+            direct or indirect featuringType (where a Feature with no featuringType is treated as
+            if the Classifier Base::Anything was its featuringType).
 
-        relatedFeature->forAll(f |
-            if featuringType->isEmpty() then f.isFeaturedWithin(null)
-            else featuringType->exists(t | f.isFeaturedWithin(t))
-            endif)
+            relatedFeature->forAll(f |
+                if featuringType->isEmpty() then f.isFeaturedWithin(null)
+                else featuringType->exists(t | f.isFeaturedWithin(t))
+                endif)
 
-    connectorSourceFeature
-        If this is a binary Connector, then the sourceFeature is the first relatedFeature.
-        If this Connector is not binary, then it has no sourceFeature.
+        connectorSourceFeature
+            If this is a binary Connector, then the sourceFeature is the first relatedFeature.
+            If this Connector is not binary, then it has no sourceFeature.
 
-        sourceFeature =
-            if relatedFeature->size() = 2 then relatedFeature->at(1)
-            else null
-            endif
+            sourceFeature =
+                if relatedFeature->size() = 2 then relatedFeature->at(1)
+                else null
+                endif
     """
 
     def __init__(self, name, parent, humanId=None, isDirected=False, association=None,
@@ -293,7 +283,7 @@ class Succession(Connector):
     time. A Succession must be typed by the Association HappensBefore from the Kernel Model
     Library (or a specialization of it).
 
-    Attributes:
+    Attributes
         /effectStep : Step [0..*]
             Steps that represent occurrences that are side effects of the transitionStep occurring.
         /guardExpression : Expression [0..*]
@@ -305,7 +295,7 @@ class Succession(Connector):
             Steps that map incoming events to the timing of occurrences of the transitionStep.
             The values of triggerStep subset the list of acceptable events to be received by a
             Behavior or the object that performs it.
-    """
+"""
 
     def __init__(self, name, parent, humanId=None, effectStep=None, guardExpression=None,
                  transitionStep=None, triggerStep=None):
@@ -332,7 +322,7 @@ class Behavior(Class):
         /step : Step [0..*] {subsets feature}
             The Steps that make up this Behavior.
 
-    Constraints:
+    Constraints
         behaviorClassifiesPerformance:
             [no documentation]
             allSupertypes()->includes(Kernel Library::Performance)
@@ -378,7 +368,7 @@ class ParameterMembership(FeatureMember):
     parameter, which is always owned, and must have a direction. A ParameterMembership must be
     owned by a Behavior or a Step.
 
-    Attributes:
+    Attributes
         memberParameter : Feature {redefines memberFeature}
             The Feature that is identified as a parameter by this ParameterMembership, which must
             be the ownedMemberParameter.
@@ -426,7 +416,7 @@ class BooleanExpression(Expression):
     a BooleanExpression must always be typed by BooleanEvaluation or a subclass of
     BooleanEvaluation.
 
-    Attributes:
+    Attributes
         /predicate : Predicate {redefines function}
         The Predicate that types the Expression.
     """
@@ -641,7 +631,7 @@ class Package(Namespace):
     of multiple Memberships in a Namespace (though it may be owned at most once), each of which
     may define a separate alias for the Element relative to the Namespace.
 
-    Attributes:
+    Attributes
         importedMembership : Membership [0..*] {subsets membership, ordered}
             [Derived] The Memberships in this Namespace that result from Import Relationships between the
             Namespace and other Namespaces.
@@ -685,17 +675,17 @@ class Package(Namespace):
 
         body:
             ownedImport->excluding(excluded->contains(importOwningNamespace)).importedMembership(excluded)
-
-        @param excluded: Namespace
-        @return membership:Membership
         """
         # set(self.ownedImport).difference()
         # importOwningNamespace in excluded
         return Membership
 
-    def namesOf(self, element: Element) -> [str]:
+    def namesOf(self, element: Element):
         """
-        Return the names of the given element as it is known in this Namespace.
+        Parameters
+            element (Element): The Element in which we want to get the name of if it is known in this Namespace
+        Returns
+            [str]: The names of the given element as it is known in this Namespace.
         """
         return [n.name for n in self.member if element.name == n.name]
 

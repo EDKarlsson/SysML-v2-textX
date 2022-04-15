@@ -14,106 +14,60 @@ class Type(Namespace):
     defining conditions on what is classified by the Type (see also the
     description of isSufficient).
 
-    Attributes:
-    -----
-    /directedFeature : Feature [0..*]
-        {subsets feature, ordered}
-
-        The features of this Type that have a non-null direction.
-
-    /endFeature : Feature [0..*]
-        {subsets feature, ordered}
-
-        All features related to this Type by EndFeatureMemberships.
-
-    /feature : Feature [0..*]
-        {subsets member, ordered}
-
-        The memberFeatures of the featureMemberships of this Type.
-
-    /featureMembership : FeatureMembership [0..*]
-        {subsets typedFeaturing, ordered}
-
-        All FeatureMemberships that have the Type as source.
-        Each FeatureMembership identifies a Feature of the Type.
-
-    /inheritedFeature : Feature [0..*]
-        {subsets feature, ordered}
-
-        All the memberFeatures of the inheritedMemberships of this Type.
-
-    /inheritedMembership : Membership [0..*]
-        {subsets membership, ordered}
-
-        All Memberships inherited by this Type via Generalization or Conjugation.
-
-    /input : Feature [0..*]
-        {subsets directedFeature, ordered}
-
-        All features related to this Type by FeatureMemberships that have direction in or inout.
-
-    isAbstract : Boolean
-        Indicates whether instances of this Type must also be instances of at least one of its
-        specialized Types.
-
-    /isConjugated : Boolean
-        Indicates whether this Type has an ownedConjugator. (See Conjugation.)
-
-    isSufficient : Boolean
-        Whether all things that meet the classification conditions of this Type must
-        be classified by the Type. (A Type gives conditions that must be met by whatever
-        it classifies, but when isSufficient is false, things may meet those conditions
-        but still not be classified by the Type. For example, a Type Car that is not
-        sufficient could require everything it classifies to have four wheels, but not all four
-        wheeled things would need to be cars. However, if the type Car were sufficient, it
-        would classify all four-wheeled things.)
-
-    /multiplicity : Multiplicity [0..1]
-        {subsets member}
-
-        The one member (at most) of this Type that is a Multiplicity, which constrains the
-        cardinality of the Type. A multiplicity can be owned or inherited. If it is owned, the
-        multiplicity must redefine the multiplicity (if it has one) of any general Type of a
-        Generalization of this Type.
-
-    /output : Feature [0..*]
-        {subsets directedFeature, ordered}
-
-        All features related to this Type by FeatureMemberships that have direction out or
-        inout.
-
-    /ownedConjugator : Conjugation [0..1]
-        {subsets ownedRelationship, conjugator}
-
-        A Conjugation owned by this Type for which the Type is the originalType.
-
-    /ownedDisjoining : Disjoining [0..*]
-        {subsets ownedRelationship, disjoiningTypeDisjoining}
-
-        The Disjoinings that are among the ownedRelationships of this Type (identify their
-        typeDisjoined also as an owningRelatedElement).
-
-    /ownedEndFeature : Feature [0..*]
-        {subsets endFeature, ownedFeature, ordered}
-
-        All endFeatures of this Type that are ownedFeatures.
-
-    /ownedFeature : Feature [0..*]
-        {subsets ownedMember, ordered}
-
-        The ownedMemberFeatures of the ownedFeatureMemberships of this Type.
-
-    /ownedFeatureMembership : FeatureMembership [0..*]
-        {subsets ownedMembership, featureMembership, ordered}
-
-        The ownedMemberships of this Type that are FeatureMemberships, for which the Type is
-        the owningType. Each such FeatureMembership identifies a feature of the Type.
-
-    /ownedSpecialization : Specialization [0..*]
-        {subsets specialization, ownedRelationship, ordered}
-
-        The ownedRelationships of this Type that are Specializations, for which the Type is the
-        specific Type.
+    Attributes
+        /directedFeature : Feature [0..*] {subsets feature, ordered}
+            The features of this Type that have a non-null direction.
+        /endFeature : Feature [0..*] {subsets feature, ordered}
+            All features related to this Type by EndFeatureMemberships.
+        /feature : Feature [0..*] {subsets member, ordered}
+            The memberFeatures of the featureMemberships of this Type.
+        /featureMembership : FeatureMembership [0..*] {subsets typedFeaturing, ordered}
+            All FeatureMemberships that have the Type as source.
+            Each FeatureMembership identifies a Feature of the Type.
+        /inheritedFeature : Feature [0..*] {subsets feature, ordered}
+            All the memberFeatures of the inheritedMemberships of this Type.
+        /inheritedMembership : Membership [0..*] {subsets membership, ordered}
+            All Memberships inherited by this Type via Generalization or Conjugation.
+        /input : Feature [0..*] {subsets directedFeature, ordered}
+            All features related to this Type by FeatureMemberships that have direction in or inout.
+        isAbstract : Boolean
+            Indicates whether instances of this Type must also be instances of at least one of its
+            specialized Types.
+        /isConjugated : Boolean
+            Indicates whether this Type has an ownedConjugator. (See Conjugation.)
+        isSufficient : Boolean
+            Whether all things that meet the classification conditions of this Type must
+            be classified by the Type. (A Type gives conditions that must be met by whatever
+            it classifies, but when isSufficient is false, things may meet those conditions
+            but still not be classified by the Type. For example, a Type Car that is not
+            sufficient could require everything it classifies to have four wheels, but not all four
+            wheeled things would need to be cars. However, if the type Car were sufficient, it
+            would classify all four-wheeled things.)
+        /multiplicity : Multiplicity [0..1] {subsets member}
+            The one member (at most) of this Type that is a Multiplicity, which constrains the
+            cardinality of the Type. A multiplicity can be owned or inherited. If it is owned, the
+            multiplicity must redefine the multiplicity (if it has one) of any general Type of a
+            Generalization of this Type.
+        /output : Feature [0..*] {subsets directedFeature, ordered}
+            All features related to this Type by FeatureMemberships that have direction out or
+            inout.
+        /ownedConjugator : Conjugation [0..1] {subsets ownedRelationship, conjugator}
+            A Conjugation owned by this Type for which the Type is the originalType.
+        /ownedDisjoining : Disjoining [0..*] {subsets ownedRelationship, disjoiningTypeDisjoining}
+            The Disjoinings that are among the ownedRelationships of this Type (identify their
+            typeDisjoined also as an owningRelatedElement).
+        /ownedEndFeature : Feature [0..*] {subsets endFeature, ownedFeature, ordered}
+            All endFeatures of this Type that are ownedFeatures.
+        /ownedFeature : Feature [0..*] {subsets ownedMember, ordered}
+            The ownedMemberFeatures of the ownedFeatureMemberships of this Type.
+        /ownedFeatureMembership : FeatureMembership [0..*]
+            {subsets ownedMembership, featureMembership, ordered}
+            The ownedMemberships of this Type that are FeatureMemberships, for which the Type is
+            the owningType. Each such FeatureMembership identifies a feature of the Type.
+        /ownedSpecialization : Specialization [0..*]
+            {subsets specialization, ownedRelationship, ordered}
+            The ownedRelationships of this Type that are Specializations, for which the Type is the
+            specific Type.
     """
 
     def __init__(self, name, parent, humanId=None, aliasId=None, documentation=None,
@@ -122,8 +76,6 @@ class Type(Namespace):
                  ownedImport=None, ownedMember=None, ownedMembership=None):
         super(Namespace, self).__init__(name=name, parent=parent,
                                         humanId=humanId, aliasId=aliasId)
-        self.name = name
-        self.parent = parent
         self.isAbstract = isAbstract
         self.importedMembership = importedMembership
         self.ownedMembership = ownedMembership
@@ -145,82 +97,47 @@ class FeatureElement(Element):
     This is an intermediate class which allows the language to work. There needs to be some
     refactoring done to have this class removed.
 
-    Attributes:
-    ----
-    aliasId: String[0..*]
-        {ordered}
-
-        Various alternative identifiers for this Element.
-
-    humanId: String[0..1]
-        {subsets aliasId}
-
-        An identifier for this Element that is set by the modeler.
-
-    derivedName: String[0..1]
-        (/name)
-
-        [Derived] Primary name of this Element. If the Element is owned by a Namespace, then
-        its name is derived as the memberName of the owningMembership of the Element.
-
-    documentation: Documentation[0..*]
-        {subsets ownedAnnotation, ordered}
-
-        [Derived] The ownedAnnotations of this Element that are Documentation, for which the
-        Element is the annotatedElement.
-
-    documentationComment: Comment[0..*]
-        {subsetsOwnedAnnotation, ordered}
-
-        [Derived] Comments that document this Element, derived as the documentingComments of
-        the documentation of the Element.
-
-    effectiveName:
-
-        [Derived] The effective name to be used for this Element during name resolution within
-        its owningNamespace.
-
-    identifier: String
-
-        Globally unique identifier for this Element. Intended to be set by tooling. Immutable.
-
-    ownedAnnotation: Annotation[0..*]
-        {subsets ownedRelationship, annotation, ordered}
-
-        [Derived] The ownedRelationships of this Element that are Annotations, for which this
-        Element is the annotatedElement.
-
-    ownedElement: Element[0..*]
-        {ordered}
-
-        [Derived] The Elements owned by this Element, derived as the ownedRelatedElements of the
-        ownedRelationships of this Element.
-
-    ownedRelationship:
-    ownedTextualRepresentation: TextualRepresentation[0..*]
-        {subsets ownedElement, textualRepresentation}
-        [Derived] The textualRepresentations that are ownedElements of this Element.
-
-    owner: Element[0..1]
-
-        [Derived] The owned of this Element, derived as the owningRelatedElement of the
-        owningRelationship of this Element, if any.
-
-    owningMembership: Membership[0..1]
-        {subsets owningRelationship}
-
-        The owningRelationship of this Element, if that Relationships is a Membership.
-
-    owningNamespace: Namespace [0..1]
-        {subsets namespace}
-
-        [Derived] The Namespace that owns this Element, derived as the membershipsOwningNamespace
-        of the owningMembership of this Element, if any.
-
-    qualifiedName: String[0..1]
-
-        [Derived] The name of this Element, if it has one, qualified by the name of its
-        owningNamespace, if it has one.
+    Attributes
+        aliasId: String[0..*] {ordered}
+            Various alternative identifiers for this Element.
+        humanId: String[0..1] {subsets aliasId}
+            An identifier for this Element that is set by the modeler.
+        derivedName: String[0..1] (/name)
+            [Derived] Primary name of this Element. If the Element is owned by a Namespace, then
+            its name is derived as the memberName of the owningMembership of the Element.
+        documentation: Documentation[0..*] {subsets ownedAnnotation, ordered}
+            [Derived] The ownedAnnotations of this Element that are Documentation, for which the
+            Element is the annotatedElement.
+        documentationComment: Comment[0..*] {subsetsOwnedAnnotation, ordered}
+            [Derived] Comments that document this Element, derived as the documentingComments of
+            the documentation of the Element.
+        effectiveName
+            [Derived] The effective name to be used for this Element during name resolution within
+            its owningNamespace.
+        identifier: str
+            Globally unique identifier for this Element. Intended to be set by tooling. Immutable.
+        ownedAnnotation: Annotation[0..*] {subsets ownedRelationship, annotation, ordered}
+            [Derived] The ownedRelationships of this Element that are Annotations, for which this
+            Element is the annotatedElement.
+        ownedElement: Element[0..*] {ordered}
+            [Derived] The Elements owned by this Element, derived as the ownedRelatedElements of the
+            ownedRelationships of this Element.
+        ownedRelationship: Relationship [0..*] {subsets relationship, ordered}
+            The Relationships for which this Element is the owningRelatedElement.
+        ownedTextualRepresentation: TextualRepresentation[0..*]
+            {subsets ownedElement, textualRepresentation}
+            [Derived] The textualRepresentations that are ownedElements of this Element.
+        owner: Element[0..1]
+            [Derived] The owned of this Element, derived as the owningRelatedElement of the
+            owningRelationship of this Element, if any.
+        owningMembership: Membership[0..1] {subsets owningRelationship}
+            The owningRelationship of this Element, if that Relationships is a Membership.
+        owningNamespace: Namespace [0..1] {subsets namespace}
+            [Derived] The Namespace that owns this Element, derived as the membershipsOwningNamespace
+            of the owningMembership of this Element, if any.
+        qualifiedName: String[0..1]
+            [Derived] The name of this Element, if it has one, qualified by the name of its
+            owningNamespace, if it has one.
     """
 
     def __init__(self, parent, name, ownedElement: Element, aliasId=None,
@@ -271,28 +188,17 @@ class TypeFeaturing(Relationship):
     This means that sequences that are classified by the featureOfType must have a prefix
     subsequence that is classified by the featuringType.
 
-    Attributes:
-    ----
-    featureOfType : Feature
-        {redefines source}
-
-        The Feature that is featured by the featuringType.
-
-    featuringType : Type
-        {redefines target}
-
-        The Type that features the featureOfType.
-
-    /owningFeatureOfType : Feature [0..1]
-        {subsets featureOfType, owningRelatedElement}
-
-        The Feature that owns this TypeFeaturing and is also the featureOfType.
+    Attributes
+        featureOfType : Feature {redefines source}
+            The Feature that is featured by the featuringType.
+        featuringType : Type {redefines target}
+            The Type that features the featureOfType.
+        /owningFeatureOfType : Feature [0..1] {subsets featureOfType, owningRelatedElement}
+            The Feature that owns this TypeFeaturing and is also the featureOfType.
     """
 
     def __init__(self, parent, name, featureOfType=None, featuringType=None):
         super(TypeFeaturing, self).__init__(name=name, parent=parent)
-        self.name = name
-        self.parent = parent
         self.featureOfType = featureOfType
         self.featuringType = featuringType
 
@@ -302,31 +208,24 @@ class FeatureMember(Membership, TypeFeaturing):
     FeatureMembership is a Membership for a Feature in a Type that is also a TypeFeaturing
     Relationship between the Feature and the Type.
 
-    Attributes:
-    ----
-    memberFeature : Feature
-        {redefines memberElement, featureOfType}
+    Attributes
+        memberFeature : Feature
+            {redefines memberElement, featureOfType}
 
-        The Feature that this FeatureMembership relates to its owningType, making it a
-        ownedFeature of the owningType.
+            The Feature that this FeatureMembership relates to its owningType, making it a
+            ownedFeature of the owningType.
 
-    ownedMemberFeature : Feature [0..1]
-        {subsets memberFeature, redefines ownedMemberElement}
+        ownedMemberFeature : Feature [0..1]
+            {subsets memberFeature, redefines ownedMemberElement}
 
-        A memberFeature that is owned by this FeatureMembership and hence an ownedFeature of
-        the owningType.
+            A memberFeature that is owned by this FeatureMembership and hence an ownedFeature of
+            the owningType.
 
-    /owningType : Type
-        {subsets type, redefines membershipOwningNamespace}
+        /owningType : Type
+            {subsets type, redefines membershipOwningNamespace}
 
-        The Type that owns this FeatureMembership.
+            The Type that owns this FeatureMembership.
     """
-
-    # __slots__ = ["parent", "name", "derivedName", "identifier", "featureOfType",
-    # "featuringType", "owner", 'memberFeature', 'ownedMemberFeature', "ownedElement",
-    # "ownedRelationship", "owningMembership", "aliasId", "owningNamespace",
-    # "documentationComment", "ownedTextualRepresentation", "ownedAnnotation", "documentation",
-    # "owningFeatureOfType"]
 
     def __init__(self, parent, name, memberFeature=None, ownedMemberFeature=None):
         super(FeatureMember, self).__init__(name=name, parent=parent)
@@ -337,7 +236,7 @@ class FeatureMember(Membership, TypeFeaturing):
 
 class Specialization(Relationship):
     """
-    Attributes:
+    Attributes
         ownedRelatedElement : Element [0..*] {subsets relatedElement, ordered}
             The relatedElements of this Relationship that are owned by the Relationship.
         owningRelatedElement : Element [0..1] {subsets relatedElement}
@@ -351,9 +250,6 @@ class Specialization(Relationship):
         target : Element [0..*] {subsets relatedElement, ordered}
             The relatedElements to which this Relationship is considered to be directed.
     """
-
-    # __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement",
-    #              "relatedElement"]
 
     def __init__(self, name, parent, humanId=None, target=None, source=None,
                  ownedRelatedElement=None, owningRelatedElement=None):
@@ -377,8 +273,7 @@ class Specialization(Relationship):
 
 class Conjugation(Relationship):
     """
-    Attributes:
-    ----
+    Attributes
         ownedRelatedElement : Element [0..*] {subsets relatedElement, ordered}
             The relatedElements of this Relationship that are owned by the Relationship.
         owningRelatedElement : Element [0..1] {subsets relatedElement}
@@ -393,12 +288,8 @@ class Conjugation(Relationship):
             The relatedElements to which this Relationship is considered to be directed.
     """
 
-    # __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement",
-    #              "relatedElement", "conjugatedType", "originalType"]
-
     def __init__(self, name, parent, humanId=None, target=None, source=None,
-                 conjugatedType=None,
-                 ownedRelatedElement=None, owningRelatedElement=None,
+                 conjugatedType=None, ownedRelatedElement=None, owningRelatedElement=None,
                  originalType=None):
         super(Conjugation, self).__init__(name=name, parent=parent,
                                           humanId=humanId)
@@ -422,45 +313,39 @@ class Conjugation(Relationship):
 
 class Disjoining(Relationship):
     """
-    Attributes:
-    ----
-    ownedRelatedElement : Element [0..*]
-        {subsets relatedElement, ordered}
+    Attributes
+        ownedRelatedElement : Element [0..*]
+            {subsets relatedElement, ordered}
 
-        The relatedElements of this Relationship that are owned by the Relationship.
+            The relatedElements of this Relationship that are owned by the Relationship.
 
-    owningRelatedElement : Element [0..1]
-        {subsets relatedElement}
+        owningRelatedElement : Element [0..1]
+            {subsets relatedElement}
 
-        The relatedElement of this Relationship that owns the Relationship, if any.
+            The relatedElement of this Relationship that owns the Relationship, if any.
 
-    relatedElement : Element [2..*]
-        {ordered, nonunique, union}
+        relatedElement : Element [2..*]
+            {ordered, nonunique, union}
 
-        [Derived] The Elements that are related by this Relationship, derived as the
-        union of the source and target Elements of the Relationship. Every Relationship
-        must have at least two relatedElements.
+            [Derived] The Elements that are related by this Relationship, derived as the
+            union of the source and target Elements of the Relationship. Every Relationship
+            must have at least two relatedElements.
 
-    source : Element [0..*]
-        {subsets relatedElement, ordered}
+        source : Element [0..*]
+            {subsets relatedElement, ordered}
 
-        The relatedElements from which this Relationship is considered to be directed.
+            The relatedElements from which this Relationship is considered to be directed.
 
-    target : Element [0..*]
-        {subsets relatedElement, ordered}
+        target : Element [0..*]
+            {subsets relatedElement, ordered}
 
-        The relatedElements to which this Relationship is considered to be directed.
+            The relatedElements to which this Relationship is considered to be directed.
     """
 
-    # __slots__ = ["name", "parent", "humanId", "target", "source", "ownedRelatedElement", "owningRelatedElement",
-    #              "relatedElement", "conjugatedType", "originalType"]
-
     def __init__(self, name, parent, humanId=None, target=None, source=None,
-                 conjugatedType=None,
-                 ownedRelatedElement=None, owningRelatedElement=None,
+                 conjugatedType=None, ownedRelatedElement=None, owningRelatedElement=None,
                  originalType=None):
-        super(Disjoining, self).__init__(name=name, parent=parent,
-                                         humanId=humanId)
+        super(Disjoining, self).__init__(name=name, parent=parent, humanId=humanId)
         self.source = source
         self.target = target
         self.ownedRelatedElement = ownedRelatedElement
@@ -505,68 +390,67 @@ class Feature(Type):
     values of the last feature.
 
     Attributes:
-    ----
-    /chainingFeature : Feature [0..*] {ordered, nonunique}
-        The Features that are chained together to determine the values of this Feature,
-        derived from the chainingFeatures of the ownedFeatureChainings of this Feature,
-        in the same order. The values of a Feature with chainingFeatures are the same
-        as values of the last Feature in the chain, which can be found by starting with
-        the values of the first Feature (for each instance of the original Feature's domain),
-        then on each of those to the values of the second Feature in chainingFeatures,
-        and so on, to values of the last Feature. The Features related to a Feature by a
-        FeatureChaining are identified as its chainingFeatures.
-    direction : FeatureDirectionKind [0..1]
-        Determines how values of this Feature are determined or used (see FeatureDirectionKind).
-    /endOwningType : Type [0..1] {subsets typeWithEndFeature, owningType}
-        The Type that is related to this Feature by an EndFeatureMembership in which the
-        Feature is an ownedMemberFeature.
-    /featuringType : Type [0..*] {ordered}
-    isComposite : Boolean
-        Whether the Feature is a composite feature of its featuringType. If so, the values
-        of the Feature cannot exist after the instance of the featuringType no longer does.
-    isDerived : Boolean
-        Whether the values of this Feature can always be computed from the values of other Features.
-    isEnd : Boolean
-        Whether or not the this Feature is an end Feature, requiring a different interpretation
-        of the multiplicity of the Feature. An end Feature is always considered to map each
-        domain entity to a single co-domain entity, whether or not a Multiplicity is given
-        for it. If a Multiplicity is given for an end Feature, rather than giving the co-domain
-        cardinality for the Feature as usual, it specifies a cardinality constraint for navigating
-        across the endFeatures of the featuringType of the end Feature. That is, if a Type
-        has n endFeatures, then the Multiplicity of any one of those end Features constrains
-        the cardinality of the set of values of that Feature when the values of the other n-1
-        end Features are held fixed.
-    isOrdered : Boolean
-        Whether an order exists for the values of this Feature or not.
-    isPortion : Boolean
-        Whether the values of this Feature are contained in the space and time of instances
-        of the Feature's domain.
-    isReadOnly : Boolean
-        Whether the values of this Feature can change over the lifetime of an instance of
-        the domain.
-    isUnique : Boolean
-        Whether values for this Feature must have no duplicates or not.
-    /ownedFeatureChaining : FeatureChaining [0..*] {subsets sourceRelationship, ownedRelationship, ordered}
-        The FeatureChainings that are among the ownedRelationships of this Feature
-        (identify their featureChained also as an owningRelatedElement).
-    /ownedRedefinition : Redefinition [0..*] {subsets ownedSubsetting}
-        The ownedSubsettings of this Feature that are Redefinitions, for which the Feature
-        is the redefiningFeature.
-    /ownedSubsetting : Subsetting [0..*] {subsets ownedSpecialization, subsetting}
-        The ownedGeneralizations of this Feature that are Subsettings, for which the Feature
-        is the subsettingFeature.
+        /chainingFeature : Feature [0..*] {ordered, nonunique}
+            The Features that are chained together to determine the values of this Feature,
+            derived from the chainingFeatures of the ownedFeatureChainings of this Feature,
+            in the same order. The values of a Feature with chainingFeatures are the same
+            as values of the last Feature in the chain, which can be found by starting with
+            the values of the first Feature (for each instance of the original Feature's domain),
+            then on each of those to the values of the second Feature in chainingFeatures,
+            and so on, to values of the last Feature. The Features related to a Feature by a
+            FeatureChaining are identified as its chainingFeatures.
+        direction : FeatureDirectionKind [0..1]
+            Determines how values of this Feature are determined or used (see FeatureDirectionKind).
+        /endOwningType : Type [0..1] {subsets typeWithEndFeature, owningType}
+            The Type that is related to this Feature by an EndFeatureMembership in which the
+            Feature is an ownedMemberFeature.
+        /featuringType : Type [0..*] {ordered}
+        isComposite : Boolean
+            Whether the Feature is a composite feature of its featuringType. If so, the values
+            of the Feature cannot exist after the instance of the featuringType no longer does.
+        isDerived : Boolean
+            Whether the values of this Feature can always be computed from the values of other Features.
+        isEnd : Boolean
+            Whether or not the this Feature is an end Feature, requiring a different interpretation
+            of the multiplicity of the Feature. An end Feature is always considered to map each
+            domain entity to a single co-domain entity, whether or not a Multiplicity is given
+            for it. If a Multiplicity is given for an end Feature, rather than giving the co-domain
+            cardinality for the Feature as usual, it specifies a cardinality constraint for navigating
+            across the endFeatures of the featuringType of the end Feature. That is, if a Type
+            has n endFeatures, then the Multiplicity of any one of those end Features constrains
+            the cardinality of the set of values of that Feature when the values of the other n-1
+            end Features are held fixed.
+        isOrdered : Boolean
+            Whether an order exists for the values of this Feature or not.
+        isPortion : Boolean
+            Whether the values of this Feature are contained in the space and time of instances
+            of the Feature's domain.
+        isReadOnly : Boolean
+            Whether the values of this Feature can change over the lifetime of an instance of
+            the domain.
+        isUnique : Boolean
+            Whether values for this Feature must have no duplicates or not.
+        /ownedFeatureChaining : FeatureChaining [0..*] {subsets sourceRelationship, ownedRelationship, ordered}
+            The FeatureChainings that are among the ownedRelationships of this Feature
+            (identify their featureChained also as an owningRelatedElement).
+        /ownedRedefinition : Redefinition [0..*] {subsets ownedSubsetting}
+            The ownedSubsettings of this Feature that are Redefinitions, for which the Feature
+            is the redefiningFeature.
+        /ownedSubsetting : Subsetting [0..*] {subsets ownedSpecialization, subsetting}
+            The ownedGeneralizations of this Feature that are Subsettings, for which the Feature
+            is the subsettingFeature.
 
-    /ownedTypeFeaturing : TypeFeaturing [0..*] {subsets ownedRelationship, typeFeaturing, ordered}
-        The ownedRelationships of this Feature that are TypeFeaturings, for which the Feature is the featureOfType.
-    /ownedTyping : FeatureTyping [0..*] {subsets ownedSpecialization, typing, ordered}
-        The ownedGeneralizations of this Feature that are FeatureTypings, for which the Feature is the typedFeature.
-    owningFeatureMembership : FeatureMembership [0..1] {subsets owningMembership, featureMembership}
-        The FeatureMembership that owns this Feature as an ownedMemberFeature, determining its owningType.
-    /owningType : Type [0..1] {subsets typeWithFeature, owningNamespace, featuringType}
-        The Type that is the owningType of the owningFeatureMembership of this Type.
-    /type : Type [1..*] {ordered}
-        Types that restrict the values of this Feature, such that the values must be instances of all the types. The types of a
-        Feature are derived from its ownedFeatureTypings and the types of its ownedSubsettings.
+        /ownedTypeFeaturing : TypeFeaturing [0..*] {subsets ownedRelationship, typeFeaturing, ordered}
+            The ownedRelationships of this Feature that are TypeFeaturings, for which the Feature is the featureOfType.
+        /ownedTyping : FeatureTyping [0..*] {subsets ownedSpecialization, typing, ordered}
+            The ownedGeneralizations of this Feature that are FeatureTypings, for which the Feature is the typedFeature.
+        owningFeatureMembership : FeatureMembership [0..1] {subsets owningMembership, featureMembership}
+            The FeatureMembership that owns this Feature as an ownedMemberFeature, determining its owningType.
+        /owningType : Type [0..1] {subsets typeWithFeature, owningNamespace, featuringType}
+            The Type that is the owningType of the owningFeatureMembership of this Type.
+        /type : Type [1..*] {ordered}
+            Types that restrict the values of this Feature, such that the values must be instances of all the types. The types of a
+            Feature are derived from its ownedFeatureTypings and the types of its ownedSubsettings.
     """
 
     def __init__(self, name, parent, humanId=None, direction=None, isAbstract=None,
@@ -575,8 +459,6 @@ class Feature(Type):
                  isUnique=False, isReadOnly=False):
         super(Feature, self).__init__(name=name, parent=parent, humanId=humanId,
                                       ownedRelationship=ownedRelationship)
-        self.name = name
-        self.parent = parent
         self.humanId = humanId
         self.direction = direction
         self.isAbstract = isAbstract
@@ -595,17 +477,21 @@ class Multiplicity(Feature):
     """
     A Multiplicity is a Feature whose co-domain is a set of natural numbers that includes the
     number of sequences determined below, based on the kind of typeWithMultiplicity:
-    Classifiers: minimal sequences (the single length sequences of the Classifier).
-    Features: sequences with the same feature-pair head. In the case of Features with Classifiers
-    as domain and co-domain, these sequences are pairs, with the first element in a single-length
-    sequence of the domain Classifier (head of the pair), and the number of pairs with the same first
-    element being among the Multiplicity co-domain numbers.
+
+    - Classifiers: minimal sequences (the single length sequences of the Classifier).
+    - Features: sequences with the same feature-pair head.
+
+    In the case of Features with Classifiers as domain and co-domain, these sequences are pairs,
+    with the first element in a single-length sequence of the domain Classifier (head of the pair),
+    and the number of pairs with the same first element being among the Multiplicity co-domain
+    numbers.
 
     Multiplicity co-domains (in models) can be specified by Expression that might vary in their
     results. If the typeWithMultiplicity is a Classifier, the domain of the Multiplicity shall be
     Anything. If the typeWithMultiplicity is a Feature, the Multiplicity shall have the same domain
     as the typeWithMultiplicity.
     """
+
     def __init__(self, name, parent, humanId=None):
         super(Multiplicity, self).__init__(name=name, parent=parent, humanId=humanId)
 
@@ -613,28 +499,31 @@ class Multiplicity(Feature):
 class Classifier(Type):
     """
     A Classifier is a Type for model elements that classify:
-      - Things (in the universe) regardless of how Features relate them. These are sequences of
-        exactly one thing (sequence of length 1).
-      - How the above things are related by Features. These are sequences of multiple things
-        (length > 1).
+
+    - Things (in the universe) regardless of how Features relate them. These are sequences of
+      exactly one thing (sequence of length 1).
+    - How the above things are related by Features. These are sequences of multiple things
+      (length > 1).
+
     Classifiers that classify relationships (sequence length > 1) must also classify the things at
     the end of those sequences (sequence length =1). Because of this, Classifiers specializing
     Features cannot classify anything (any sequences).
 
-    Attributes:
-    ----
-    /ownedSubclassification : Subclassification [0..*]
-        {subsets ownedSpecialization}
-
-        The ownedSpecializations of this Classifier that are Subclassifications, for which this
-        Classifier is the subclassifier.
-
+    Attributes
+        /ownedSubclassification : Subclassification [0..*] {subsets ownedSpecialization}
+            The ownedSpecializations of this Classifier that are Subclassifications, for which this
+            Classifier is the subclassifier.
+        name : str
+            textX `name` of the element
+        parent : str
+            textX `parent` of the element
     """
 
-    def __init__(self, name, parent):
+    def __init__(self, name, parent, ownedSubclassification=None):
         super(Classifier, self).__init__(name, parent)
         self.name = name
         self.parent = parent
+        self.ownedSubclassification = ownedSubclassification
 
 
 class Subclassification(Specialization):
@@ -643,23 +532,22 @@ class Subclassification(Specialization):
     Classifiers. This means all instances of the specific Classifier are also instances of the
     general Classifier.
 
-    Attributes:
-    ----
-    /owningClassifier : Classifier [0..1]
-        {redefines owningType}
+    Attributes
+        /owningClassifier : Classifier [0..1]
+            {redefines owningType}
 
-        The Classfier that owns this Subclassification relationship, which must also be its
-        subclassifier.
+            The Classfier that owns this Subclassification relationship, which must also be its
+            subclassifier.
 
-    subclassifier : Classifier
-        {redefines specific}
+        subclassifier : Classifier
+            {redefines specific}
 
-        The more specific Classifier in this Subclassification.
+            The more specific Classifier in this Subclassification.
 
-    superclassifier : Classifier
-        {redefines general}
+        superclassifier : Classifier
+            {redefines general}
 
-        The more general Classifier in this Subclassification.
+            The more general Classifier in this Subclassification.
     """
 
     def __init__(self, name, parent, owningClassifier=None, subclassifier=None,
@@ -684,23 +572,22 @@ class Subsetting(Specialization):
     subsettingFeature (if it is not already in that namespace), requiring the names of the
     subsettingFeature and subsettedFeature to be different.
 
-    Attributes:
-    ----
-    /owningFeature : Feature
-        {subsets subsettingFeature, redefines owningType}
+    Attributes
+        /owningFeature : Feature
+            {subsets subsettingFeature, redefines owningType}
 
-        The Feature that owns this Subsetting relationship, which must also be its
-        subsettingFeature.
+            The Feature that owns this Subsetting relationship, which must also be its
+            subsettingFeature.
 
-    subsettedFeature : Feature
-        {redefines general}
+        subsettedFeature : Feature
+            {redefines general}
 
-        The Feature that is subsetted by the subsettingFeature of this Subsetting.
+            The Feature that is subsetted by the subsettingFeature of this Subsetting.
 
-    subsettingFeature : Feature
-        {redefines specific}
+        subsettingFeature : Feature
+            {redefines specific}
 
-        The Feature that is a subset of the subsettedFeature of this Subsetting.
+            The Feature that is a subset of the subsettedFeature of this Subsetting.
     """
 
     def __init__(self, name, parent, humanId=None, owningFeature=None, subsettedFeature=None,
@@ -730,17 +617,16 @@ class Redefinition(Subsetting):
     redefinedFeature to not be imported into the owningNamespace of the redefiningFeature. This
     enables the redefiningFeature to have the same name as the redefinedFeature if desired.
 
-    Attributes:
-    ----
-    redefinedFeature : Feature
-        {redefines subsettedFeature}
+    Attributes
+        redefinedFeature : Feature
+            {redefines subsettedFeature}
 
-        The Feature that is redefined by the redefiningFeature of this Redefinition.
+            The Feature that is redefined by the redefiningFeature of this Redefinition.
 
-    redefiningFeature : Feature
-        {redefines subsettingFeature}
+        redefiningFeature : Feature
+            {redefines subsettingFeature}
 
-        The Feature that is redefining the redefinedFeature of this Redefinition.
+            The Feature that is redefining the redefinedFeature of this Redefinition.
     """
 
     def __init__(self, name, parent, humanId=None, redefinedFeature=None, redefiningFeature=None):
@@ -760,7 +646,7 @@ class FeatureTyping(Specialization):
     subset has instances interpreted as sequences ending in things (in the modeled universe) that
     are instances of the Classifier.
 
-    Attributes:
+    Attributes
         /owningFeature : Feature [0..1] {subsets typedFeature, redefines owningType}
             The Feature that owns this FeatureTyping (which must also be the typedFeature).
         type : Type {redefines general}
@@ -786,18 +672,17 @@ class FeatureChaining(Relationship):
     FeatureChaining is a Relationship that makes its target Feature one of the chainingFeatures of
     its owning Feature.
 
-    Attributes:
-    ----
-    chainingFeature : Feature
-         {redefines target}
+    Attributes
+        chainingFeature : Feature
+             {redefines target}
 
-         The Feature whose values partly determine values of featureChained, as described in
-         Feature::chainingFeature.
-    /featureChained : Feature
-        {redefines source, owningRelatedElement}
+             The Feature whose values partly determine values of featureChained, as described in
+             Feature::chainingFeature.
+        /featureChained : Feature
+            {redefines source, owningRelatedElement}
 
-        The Feature whose values are partly determined by values of the chainingFeature, as
-        described in Feature::chainingFeature.
+            The Feature whose values are partly determined by values of the chainingFeature, as
+            described in Feature::chainingFeature.
     """
 
     def __init__(self, name, parent, humanId=None, chainingFeature=None):
