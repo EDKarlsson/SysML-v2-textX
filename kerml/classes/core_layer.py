@@ -479,7 +479,8 @@ class Feature(Type):
                  owningFeatureMembership=None, isEnd=False, isComposite=False,
                  isDerived=False, isOrdered=False,
                  isPortion=False, isUnique=False, isReadOnly=False):
-        super(Feature, self).__init__(name=name, parent=parent, humanId=humanId, ownedRelationship=ownedRelationship)
+        super(Feature, self).__init__(name=name, parent=parent, humanId=humanId,
+                                      ownedRelationship=ownedRelationship)
         self.name = name
         self.parent = parent
         self.humanId = humanId
@@ -497,6 +498,19 @@ class Feature(Type):
 
 
 class Multiplicity(Feature):
+    """
+    A Multiplicity is a Feature whose co-domain is a set of natural numbers that includes the
+    number of sequences determined below, based on the kind of typeWithMultiplicity:
+    • Classifiers: minimal sequences (the single length sequences of the Classifier).
+    • Features: sequences with the same feature-pair head. In the case of Features with Classifiers
+        as domain and co-domain, these sequences are pairs, with the first element in a
+        single-length sequence of the domain Classifier (head of the pair), and the number of pairs
+        with the same first element being among the Multiplicity co-domain numbers.
+    Multiplicity co-domains (in models) can be specified by Expression that might vary in their
+    results. If the typeWithMultiplicity is a Classifier, the domain of the Multiplicity shall be
+    Anything. If the typeWithMultiplicity is a Feature, the Multiplicity shall have the same domain
+    as the typeWithMultiplicity.
+    """
     def __init__(self, name, parent, humanId=None):
         super(Multiplicity, self).__init__(name=name, parent=parent, humanId=humanId)
 
@@ -546,23 +560,94 @@ class Subclassification(Specialization):
 
 
 class Subsetting(Specialization):
+    """
+    Subsetting is Generalization in which the specific and general Types that are Features. This
+    means all values of the subsettingFeature (on instances of its domain, i.e., the intersection
+    of its featuringTypes) are values of the subsettedFeature on instances of its domain. To
+    support this, the domain of the subsettingFeature must be the same or specialize (at least
+    indirectly) the domain of the subsettedFeature (via Generalization), and the range (
+    intersection of a Feature's types) of the subsettingFeature must specialize the range of the
+    subsettedFeature. The subsettedFeature is imported into the owningNamespace of the
+    subsettingFeature (if it is not already in that namespace), requiring the names of the
+    subsettingFeature and subsettedFeature to be different.
+
+    Attributes:
+        /owningFeature : Feature {subsets subsettingFeature, redefines owningType}
+            The Feature that owns this Subsetting relationship, which must also be its
+            subsettingFeature.
+        subsettedFeature : Feature {redefines general}
+            The Feature that is subsetted by the subsettingFeature of this Subsetting.
+        subsettingFeature : Feature {redefines specific}
+            The Feature that is a subset of the subsettedFeature of this Subsetting.
+    """
     def __init__(self, name, parent, humanId=None):
         super(Subsetting, self).__init__(name=name, parent=parent, humanId=humanId)
 
 
 class Redefinition(Subsetting):
+    """
+    Redefinition specializes Subsetting to require the redefinedFeature and the redefiningFeature
+    to have the same values (on each instance of the domain of the redefiningFeature). This means
+    any restrictions on the redefiningFeature, such as type or multiplicity, also apply to the
+    redefinedFeature (on each instance of the owningType of the redefining Feature), and vice
+    versa. The redefinedFeature might have values for instances of the owningType of the
+    redefiningFeature, but only as instances of the owningType of the redefinedFeature that
+    happen to also be instances of the owningType of the redefiningFeature. This is supported by
+    the constraints inherited from Subsetting on the domains of the redefiningFeature and
+    redefinedFeature. However, these constraints are narrowed for Redefinition to require the
+    owningTypes of the redefiningFeature and redefinedFeature to be different and the
+    redefinedFeature to not be imported into the owningNamespace of the redefiningFeature. This
+    enables the redefiningFeature to have the same name as the redefinedFeature if desired.
+
+    Attributes:
+        redefinedFeature : Feature {redefines subsettedFeature}
+            The Feature that is redefined by the redefiningFeature of this Redefinition.
+        redefiningFeature : Feature {redefines subsettingFeature}
+            The Feature that is redefining the redefinedFeature of this Redefinition.
+    """
     def __init__(self, name, parent, humanId=None):
         super(Redefinition, self).__init__(name=name, parent=parent, humanId=humanId)
 
 
 class FeatureTyping(Specialization):
+    """
+    FeatureTyping is Specialization in which the specific Type is a Feature. This means the set
+    of instances of the (specific) typedFeature is a subset of the set of instances of the (
+    general) type. In the simplest case, the type is a Classifier, whereupon the typedFeature
+    subset has instances interpreted as sequences ending in things (in the modeled universe) that
+    are instances of the Classifier.
+
+    Attributes:
+        /owningFeature : Feature [0..1] {subsets typedFeature, redefines owningType}
+            The Feature that owns this FeatureTyping (which must also be the typedFeature).
+        type : Type {redefines general}
+            The Type that is being applied by this FeatureTyping.
+        typedFeature : Feature {redefines specific}
+            The Feature that has its Type determined by this FeatureTyping.
+    """
     def __init__(self, name, parent, humanId=None):
         super(FeatureTyping, self).__init__(name=name, parent=parent, humanId=humanId)
 
 
 class FeatureChaining(Relationship):
-    def __init__(self, name, parent, humanId=None):
+    """
+    FeatureChaining is a Relationship that makes its target Feature one of the chainingFeatures of
+    its owning Feature.
+
+    Attributes:
+       chainingFeature : Feature {redefines target}
+            The Feature whose values partly determine values of featureChained, as described in
+            Feature::chainingFeature.
+       /featureChained : Feature {redefines source, owningRelatedElement}
+           The Feature whose values are partly determined by values of the chainingFeature, as
+           described in Feature::chainingFeature.
+    """
+    def __init__(self, name, parent, humanId=None, chainingFeature=None):
         super(FeatureChaining, self).__init__(name=name, parent=parent, humanId=humanId)
+        self.name = name
+        self.parent = parent
+        self.humanId = None
+        self.chainingFeature = chainingFeature
 
 
 class EndFeatureMembership(FeatureMember):
