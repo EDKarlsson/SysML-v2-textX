@@ -8,7 +8,7 @@ RootNamespace:
 ;
 
 Element:
-    'element' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)
+    'element' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)
     (';' | '{'
         (   ownedRelationship += OwnedRelationship
             | ownedRelationship += OwnedDocumentation
@@ -20,7 +20,7 @@ Element:
 /* =============================================================== */
 /* Relationships */
 Relationship:
-    'relationship' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+    'relationship' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
         ('from' source+=[Element|QualifiedName][','])?
         ('to' target+=[Element|QualifiedName][','])?
     (';' | '{'
@@ -29,7 +29,7 @@ Relationship:
 ;
 
 OwnedRelationship:
-    'relationship' ('<' name=Name '>')? ('to' target+=[Element|QualifiedName][','])?
+    'relationship' ('<' name=QualifiedName '>')? ('to' target+=[Element|QualifiedName][','])?
     (';' | '{'
         ownedRelatedElement+=RelationshipOwnedElement
     '}')
@@ -49,12 +49,12 @@ RelationshipOwnedElement:
 /* =============================================================== */
 /* Comments */
 ModelComment:
-	( 'comment' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)
+	( 'comment' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)
 	  'about' ownedRelationship += Annotation
       //{ ownedRelationship += annotation }
       ownedRelationship += [Annotation|QualifiedName]
 	  ( ',' ownedRelationship += Annotation )*
-	  | ( 'comment' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name) )?
+	  | ( 'comment' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName) )?
 	  ownedRelationship += ElementAnnotation
       //{ ownedRelationship += annotation }
       ownedRelationship += [Annotation|QualifiedName]
@@ -96,15 +96,15 @@ OwnedTextualRepresentationAnnotation:
 ;
 
 OwnedTextualRepresentation:
-    ( 'rep' ( name=Name )? )?
+    ( 'rep' ( name=QualifiedName )? )?
     'language' language=QuotedID body=REGULAR_COMMENT
     // { annotation += a }
 ;
 
 TextualRepresentation:
-    (   'rep' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+    (   'rep' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
         'about' annotation+=Annotation
-    | ( 'rep' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
+    | ( 'rep' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)? )?
         ElementAnnotation
     )
     'language' language=QuotedID body=REGULAR_COMMENT
@@ -113,7 +113,7 @@ TextualRepresentation:
 /* =============================================================== */
 /* Namespace */
 Namespace:
-    'namespace' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)
+    'namespace' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)
     (';' | '{'
       ( ownedRelationship += OwnedDocumentation
       | ownedRelationship += NamespaceMember
@@ -146,7 +146,7 @@ NamespaceMember:
     (
     // <! ChainFeatureMember
 //        MemberPrefix
-        'feature'? ( name=Name )? 'is'
+        'feature'? ( name=QualifiedName )? 'is'
         ownedMemberElement = FeatureChain
     // !>
     )
@@ -161,12 +161,12 @@ FeatureNamespaceMember:
 ;
 ChainFeatureMember:
     MemberPrefix
-    'feature'? ( name=Name )? 'is'
+    'feature'? ( name=QualifiedName )? 'is'
     ownedMemberElement = FeatureChain
 ;
 AliasMember:
     MemberPrefix
-    'alias' name=Name 'for'
+    'alias' name=QualifiedName 'for'
     memberElement=[Element|QualifiedName] ';'
 ;
 Import:
@@ -178,7 +178,7 @@ Import:
 ;
 ImportedNamespace:
     ( importedNamespace = [Namespace|QualifiedName] '::' )?
-    ( importedName=Name | '*' )
+    ( importedName=QualifiedName | '*' )
     ( '::' isRecursive ?= '**' )?
 ;
 ImportedFilterPackage:
@@ -257,7 +257,7 @@ QuotedID:
 Type:
     ( isAbstract ?= 'abstract' )? 'type'
     // <! TypeDeclaration
-    ( isSufficient ?= 'all' )? (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+    ( isSufficient ?= 'all' )? (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ( ownedRelationship += OwnedMultiplicity )?
     (
         // <!! SpecializationPart
@@ -322,33 +322,20 @@ DisjoiningPart:
 /* =============================================================== */
 /* SPECIALIZATION */
 Specialization:
-    ( 'specialization' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?)?
-    'subtype' SpecificType
-    SPECIALIZES GeneralType ';'
+    ( 'specialization' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?)?
+    'subtype'     (subsettingFeature = [Feature|QualifiedName] | ownedRelatedElement += FeatureChain)
+    SPECIALIZES     subsettedFeature = [Feature|QualifiedName]
+    | ownedRelatedElement += FeatureChain';'
     ;
 OwnedSpecialization :
-    // <! GeneralType
-    general = [Type|QualifiedName]
-    | general += FeatureChain
-    // !>
+    subsettedFeature = [Feature|QualifiedName]
+    | ownedRelatedElement += FeatureChain
     ;
-SpecificType :
-      specific = [Type|QualifiedName]
-    | specific += FeatureChain
-    // TODO: Do this in the class instantiation
-    // { s.ownedRelatedElement += s.specific }
-;
-GeneralType :
-    general = [Type|QualifiedName]
-    | general += FeatureChain
-    // TODO: Do this in the class instantiation
-    // { ownedRelatedElement += general }
-;
 
 /* =============================================================== */
 /* CONJUGATION */
 Conjugation:
-    ( 'conjugation' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
+    ( 'conjugation' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)? )?
     'conjugate'
     (
         conjugatedType=[QualifiedName]
@@ -376,7 +363,7 @@ OwnedConjugation:
 /* =============================================================== */
 /* DISJOINING */
 Disjoining:
-    ( 'disjoining' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
+    ( 'disjoining' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)? )?
     'disjoint' ( typeDisjoined = [Type|QualifiedName]
     | typeDisjoined = FeatureChain
     // TODO: Do this in the class instantiation
@@ -413,7 +400,7 @@ OwnedFeatureMember:
 ;
 
 UnownedFeatureMember:
-    MemberPrefix 'feature'? ( name=Name )? 'is'
+    MemberPrefix 'feature'? ( name=QualifiedName )? 'is'
     memberFeature = [Membership|QualifiedName]
 ;
 
@@ -426,7 +413,7 @@ Classifier:
     ;
 
 ClassifierDeclaration:
-    ( isSufficient ?= 'all' )? (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+    ( isSufficient ?= 'all' )? (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ( ownedRelationship += OwnedMultiplicity )?
     (
     // <! SuperclassingPart
@@ -447,7 +434,7 @@ SuperclassingPart:
 /* =============================================================== */
 /* SUBCLASSIFICATION */
 Subclassification:
-    ( 'specialization' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
+    ( 'specialization' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)? )?
     'subclassifier' subclassifer = [Element|QualifiedName]
     SPECIALIZES superclassifer = [Element|QualifiedName] ';'
     ;
@@ -473,7 +460,7 @@ Feature:
     FeaturePrefix 'feature'?
     // <! FeatureDeclaration
     ( isSufficient ?= 'all' )?
-    (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+    (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ( FeatureSpecializationPart | ConjugationPart)?
     DisjoiningPart? TypeFeaturingPart?
     // !>
@@ -493,7 +480,7 @@ Feature:
 
 FeatureDeclaration:
     ( isSufficient ?= 'all' )?
-    (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+    (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ( FeatureSpecializationPart | ConjugationPart )?
     DisjoiningPart?
     TypeFeaturingPart?
@@ -539,9 +526,9 @@ Redefines:
 /* =============================================================== */
 /* TYPE FEATURING */
 TypeFeaturing:
-    'featuring' ( (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? 'of')?
-    featureOfType = [Type|QualifiedName]
-    'by' featuringType = [Type|QualifiedName] ';'
+    'featuring' ( (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)? 'of')?
+    featureOfType = [Feature|QualifiedName]
+    'by' featuringType = [Feature|QualifiedName] ';'
     ;
 OwnedTypeFeaturing:
     featuringType = [TypeFeaturing|QualifiedName]
@@ -550,9 +537,9 @@ OwnedTypeFeaturing:
 /* =============================================================== */
 /* FEATURING TYPE */
 FeatureTyping:
-    ( 'specialization' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
-    'typing' typedFeature = [Type|QualifiedName]
-    TYPED_BY general = [Type|QualifiedName] ';'
+    ( 'specialization' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)? )?
+    'typing' typedFeature = [Feature|QualifiedName]
+    TYPED_BY general = [Feature|QualifiedName] ';'
 ;
 
 OwnedFeatureTyping :
@@ -563,35 +550,36 @@ OwnedFeatureTyping :
 /* =============================================================== */
 /* SUBSETTING */
 Subsetting:
-    ( 'specialization' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? )?
-    'subset' SpecificType
+    ( 'specialization' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)? )?
+    'subset'
+    (subsettingFeature = [Feature|QualifiedName]
+    | ownedRelatedElement += FeatureChain)
     ( ':>'  | 'subsets' )
 //    SUBSETS
-    // <! GeneralType
     (
-     general = [Element|QualifiedName]
-    | general += FeatureChain
+     subsettedFeature = [Feature|QualifiedName]
+    | ownedRelatedElement += FeatureChain
     )
-    // !>
     ';'
 ;
 
 OwnedSubsetting:
-    // <! GeneralType
-    general = [Element|QualifiedName]
-    | general += FeatureChain
-    // !>
+    subsettedFeature = [Feature|QualifiedName]
+    | ownedRelatedElement += FeatureChain
 ;
 
 /* =============================================================== */
 /* SUBSETTING */
 Redefinition:
-    ( 'specialization' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?   )?
-    'redefinition' SpecificType
-    REDEFINES GeneralType ';'
+    ( 'specialization' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?   )?
+    'redefinition'
+    (subsettingFeature = [Feature|QualifiedName] | ownedRelatedElement += FeatureChain)
+    REDEFINES     subsettedFeature = [Feature|QualifiedName]
+    | ownedRelatedElement += FeatureChain';'
 ;
-OwnedRedefinition : Redefinition =
-    GeneralType
+OwnedRedefinition:
+    subsettedFeature = [Feature|QualifiedName]
+    | ownedRelatedElement += FeatureChain
 ;
 
 
@@ -719,22 +707,22 @@ ParameterDeclaration:
     ;
 FeatureParameterDeclaration:
     ( direction = FeatureDirection )?
-    'feature'? ( isSufficient ?= 'all' )? (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+    'feature'? ( isSufficient ?= 'all' )? (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ParameterSpecializationPart
     ;
 StepParameterDeclaration:
     ( direction = FeatureDirection )?
-    'step' ( isSufficient ?= 'all' )? (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+    'step' ( isSufficient ?= 'all' )? (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ParameterSpecializationPart
     ;
 ExpressionParameterDeclaration:
     ( direction = FeatureDirection )?
-    'expr' ( isSufficient ?= 'all' )? (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+    'expr' ( isSufficient ?= 'all' )? (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ParameterSpecializationPart
     ;
 BooleanExpressionParameterDeclaration:
     ( direction = FeatureDirection )?
-    'bool' ( isSufficient ?= 'all' )? (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+    'bool' ( isSufficient ?= 'all' )? (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ParameterSpecializationPart
     ;
 ParameterSpecializationPart:
@@ -993,7 +981,7 @@ NamedArgumentList:
     ( ',' ownedRelationship += NamedExpressionMember )*
     ;
 NamedExpressionMember:
-    name=Name '=' ownedMemberFeature = OwnedExpression
+    name=QualifiedName '=' ownedMemberFeature = OwnedExpression
     ;
 ExpressionBody:
     FunctionBody
@@ -1113,10 +1101,10 @@ Multiplicity:
     MultiplicitySubset | MultiplicityRange
     ;
 MultiplicitySubset:
-    'multiplicity' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? Subsets ';'
+    'multiplicity' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)? Subsets ';'
     ;
 MultiplicityRange:
-    'multiplicity' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? MultiplicityBounds ';'
+    'multiplicity' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)? MultiplicityBounds ';'
     ;
 OwnedMultiplicity:
     ownedMemberElement = OwnedMultiplicityRange
@@ -1148,7 +1136,7 @@ AnnotatingFeature:
     AnnotatingFeatureBody
     ;
 AnnotatingFeatureDeclaration:
-    ( (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)? ( ':' | 'typed' 'by' ) )?
+    ( (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)? ( ':' | 'typed' 'by' ) )?
     ownedRelationship += OwnedFeatureTyping
     ;
 AnnotatingFeatureBody:
@@ -1168,7 +1156,7 @@ MetadataFeatureValue:
 /* =============================================================== */
 /* PACKAGES */
 Package:
-    'package' (('<' humanId=Name '>' name=Name ) | ( '<' name=Name '>' ) | name=Name)?
+    'package' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     (';'
     | '{'
          (
@@ -1191,7 +1179,7 @@ ElementFilterMember:
 
 // This is only here to allow the class to be pulled in
 Membership:
-    'membership' name=Name memberElement=Element ownedMemberElement=Element visibility=VisibilityIndicator
+    'membership' name=QualifiedName memberElement=Element ownedMemberElement=Element visibility=VisibilityIndicator
 ;
 
 
@@ -1220,12 +1208,11 @@ DOCUMENTATION_COMMENT:
 
 /* QualifiedNames */
 Qualification:
-    ('::'Name)+
+    ('::' Name)*
     ;
 
 QualifiedName:
-    Name('::'Name)*
-//    Name Qualification?
+    Name Qualification?
     ;
 
 /* NAMES */

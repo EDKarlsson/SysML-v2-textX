@@ -146,16 +146,38 @@ if __name__ == "__main__":
 
     # inspect_language("./root/kerml.tx")
     # print(f"Testing {test_files}")
+    simple_tests = [
+        "ArgumentResolution.kerml",
+        "Associations.kerml",
+        "Circular.kerml",
+        "Classes.kerml",
+        "Classifications.kerml",
+        "Classifiers.kerml",
+        "Comments.kerml",
+        "Conjugation.kerml",
+        "Elements.kerml",
+        "Expansion.kerml",
+        "Expressions.kerml",
+        "FeatureInheritance.kerml",
+        "FeaturePaths.kerml",
+        "Features.kerml",
+        "Filtering.kerml",
+        "Imports.kerml",
+        "Inheritance.kerml",
+        "MetadataTest.kerml",
+        "Redefinition.kerml",
+        "Relationships.kerml",
+        "TextualRepresentation.kerml",
+        "Types.kerml"
+    ]
     tests = [
-        # "ElementDocRelationship.kerml",
-        # "baseline.kerml",
-        # "elements.kerml",
-        # "simple_features.kerml",
-        # "simpletypes.kerml",
-        "Conjugation.kerml"
-        # "features.kerml",
-        # "typeconjugation.kerml"
-        # "Base.kerml",
+        "ElementDocRelationship.kerml",
+        "baseline.kerml",
+        "elements.kerml",
+        "simple_features.kerml",
+        "simpletypes.kerml",
+        "features.kerml",
+        "typeconjugation.kerml"
     ]
     for test in tests:
         tfile = test_files.get_test_file(test, "test")

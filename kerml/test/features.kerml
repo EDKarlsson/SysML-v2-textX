@@ -38,7 +38,7 @@ package Features {
     specialization t2 typing g : A;
 
     specialization Sub subset parent subsets person;
-    specialization subset mother subsets parent;
+//    specialization subset mother subsets parent;
 
     classifier LegalRecord {
         feature guardian[1];
