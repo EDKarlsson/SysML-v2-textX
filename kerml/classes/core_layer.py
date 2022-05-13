@@ -1,7 +1,7 @@
 try:
     from root_layer import Element, Namespace, Relationship, Membership
 except:
-    from kerml.classes.root_layer import Element, Namespace, Relationship,  Membership
+    from kerml.classes.root_layer import Element, Namespace, Relationship, Membership
 
 import json
 
@@ -198,8 +198,8 @@ class TypeFeaturing(Relationship):
             The Feature that owns this TypeFeaturing and is also the featureOfType.
     """
 
-    def __init__(self, parent, name, featureOfType=None, featuringType=None):
-        super(TypeFeaturing, self).__init__(name=name, parent=parent)
+    def __init__(self, parent, name, humanId=None, featureOfType=None, featuringType=None):
+        super(TypeFeaturing, self).__init__(name=name, parent=parent, humanId=humanId)
         self.featureOfType = featureOfType
         self.featuringType = featuringType
 
@@ -497,8 +497,12 @@ class Classifier(Type):
             textX `parent` of the element
     """
 
-    def __init__(self, name, parent, ownedSubclassification=None):
-        super(Classifier, self).__init__(name, parent)
+    def __init__(self, name, parent, humanId=None, ownedSubclassification=None, isAbstract=False,
+                 isSufficient=False, ownedRelationship=None, documentation=None):
+        super(Classifier, self).__init__(name=name, parent=parent, humanId=humanId,
+                                         isAbstract=isAbstract, isSufficient=isSufficient,
+                                         ownedRelationship=ownedRelationship,
+                                         documentation=documentation)
         self.ownedSubclassification = ownedSubclassification
 
 
@@ -549,8 +553,10 @@ class Subsetting(Specialization):
     """
 
     def __init__(self, name, parent, humanId=None, owningFeature=None, subsettedFeature=None,
-                 subsettingFeature=None):
-        super(Subsetting, self).__init__(name=name, parent=parent, humanId=humanId)
+                 subsettingFeature=None, ownedRelatedElement=None, owningRelatedElement=None):
+        super(Subsetting, self).__init__(name=name, parent=parent, humanId=humanId,
+                                         ownedRelatedElement=ownedRelatedElement,
+                                         owningRelatedElement=owningRelatedElement)
         self.owningFeature = owningFeature
         self.subsettedFeature = subsettedFeature
         self.subsettingFeature = subsettingFeature
@@ -634,5 +640,6 @@ class EndFeatureMembership(FeatureMember):
     Attributes
         ownedMemberFeature : Feature {redefines ownedMemberFeature}
     """
+
     def __init__(self, name, parent):
         super(EndFeatureMembership, self).__init__(name=name, parent=parent)

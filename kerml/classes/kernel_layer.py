@@ -456,35 +456,25 @@ class InvocationExpression(Expression):
 
 
 class LiteralExpression(Expression):
-    def __init__(self, name, parent, humanId=None):
+    def __init__(self, name=None, parent=None, humanId=None, value=None):
         super(LiteralExpression, self).__init__(name=name, parent=parent, humanId=humanId)
-        self.name = name
-        self.parent = parent
-        self.humanId = humanId
+        self.value = value
 
 
 class LiteralInteger(LiteralExpression):
-    def __init__(self, name, parent, humanId=None):
-        super(LiteralInteger, self).__init__(name=name, parent=parent, humanId=humanId)
-        self.name = name
-        self.parent = parent
-        self.humanId = humanId
+    def __init__(self, name=None, parent=None, humanId=None, value=None):
+        super(LiteralInteger, self).__init__(name=name, parent=parent, humanId=humanId, value=value)
 
 
 class LiteralRational(LiteralExpression):
-    def __init__(self, name, parent, humanId=None):
-        super(LiteralRational, self).__init__(name=name, parent=parent, humanId=humanId)
-        self.name = name
-        self.parent = parent
-        self.humanId = humanId
+    def __init__(self, name=None, parent=None, humanId=None, value=None):
+        super(LiteralRational, self).__init__(name=name, parent=parent, humanId=humanId,
+                                              value=value)
 
 
 class LiteralBoolean(LiteralExpression):
-    def __init__(self, name, parent, humanId=None):
-        super(LiteralBoolean, self).__init__(name=name, parent=parent, humanId=humanId)
-        self.name = name
-        self.parent = parent
-        self.humanId = humanId
+    def __init__(self, name=None, parent=None, humanId=None, value=None):
+        super(LiteralBoolean, self).__init__(name=name, parent=parent, humanId=humanId, value=value)
 
 
 class LiteralString(LiteralExpression):

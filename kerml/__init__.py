@@ -128,7 +128,7 @@ def main(test_file, debug=False):
     element_mm = get_element_mm(debug)
     element_mm.register_scope_providers({
         'OwnedSpecialization.*': owned_specialization_definer_scope,
-        # 'OwnedConjugation.*': owned_conjugation_definer_scope,
+        'OwnedConjugation.*': owned_conjugation_definer_scope,
     })
     model = element_mm.model_from_file(test_file)
     model_export(model, join(current_dir, '../_dot_files', 'kerml_mm.dot'))

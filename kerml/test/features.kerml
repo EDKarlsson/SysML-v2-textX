@@ -48,14 +48,14 @@ package Features {
         composite readonly feature identifier[0..1];
     }
 
-    classifier Vehicle :> RegisteredAsset {
-        derived feature vin[1] = identifier;
-    }
-
-    feature legalIdentification;
-
-    specialization Redef redefinition LegalRecord::guardian redefines parent;
-    specialization redefinition Vehicle::vin redefines RegisteredAsset::identifier;
-
-    redefinition Vehicle::vin redefines legalIdentification;
+//    classifier Vehicle :> RegisteredAsset {
+//        derived feature vin[1] = identifier;
+//    }
+//
+//    feature legalIdentification;
+//
+//    specialization Redef redefinition LegalRecord::guardian redefines parent;
+//    specialization redefinition Vehicle::vin redefines RegisteredAsset::identifier;
+//
+//    redefinition Vehicle::vin redefines legalIdentification;
 }

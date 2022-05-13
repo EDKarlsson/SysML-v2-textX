@@ -19,7 +19,7 @@ def owned_conjugation_definer_scope(owned_conjugation, attr, attr_ref):
     m = get_model(owned_conjugation)  # get the model of the currently processed element
     name = attr_ref.obj_name  # the name of currently looked up element
     print_model_elem(owned_conjugation, m, attr, attr_ref)
-    found_relationships = []
+
     print(f"Owned Relationship Type: {owned_conjugation}")
     mm = get_location(owned_conjugation)
     print(f"mm: {mm}")
