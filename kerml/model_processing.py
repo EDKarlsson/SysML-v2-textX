@@ -23,7 +23,7 @@ def owned_conjugation_definer_scope(owned_conjugation, attr, attr_ref):
     print(f"Owned Relationship Type: {owned_conjugation}")
     mm = get_location(owned_conjugation)
     print(f"mm: {mm}")
-    print(f"mm.__dict__: {mm.__dict__}")
+    # print(f"mm.__dict__: {mm.__dict__}")
 
 
 def owned_specialization_definer_scope(general, attr, attr_ref):

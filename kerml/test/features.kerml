@@ -48,9 +48,9 @@ package Features {
         composite readonly feature identifier[0..1];
     }
 
-//    classifier Vehicle :> RegisteredAsset {
+    classifier Vehicle :> RegisteredAsset {
 //        derived feature vin[1] = identifier;
-//    }
+    }
 //
 //    feature legalIdentification;
 //

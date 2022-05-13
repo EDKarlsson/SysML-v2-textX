@@ -69,8 +69,8 @@ def kerml_language():
     # Here if necessary register object processors or scope providers
     # http://textx.github.io/textX/stable/metamodel/#object-processors
     # http://textx.github.io/textX/stable/scoping/
-    mm.register_scope_providers({'*.*': scoping_providers.FQN()})
-    # mm.register_scope_providers({'OwnedSpecialization.*': owned_specialization_definer_scope})
+    # mm.register_scope_providers({'*.*': scoping_providers.FQN()})
+    mm.register_scope_providers({'OwnedSpecialization.*': owned_specialization_definer_scope})
 
     return mm
 
@@ -128,7 +128,7 @@ def main(test_file, debug=False):
     element_mm = get_element_mm(debug)
     element_mm.register_scope_providers({
         'OwnedSpecialization.*': owned_specialization_definer_scope,
-        'OwnedConjugation.*': owned_conjugation_definer_scope,
+        # 'OwnedConjugation.*': owned_conjugation_definer_scope,
     })
     model = element_mm.model_from_file(test_file)
     model_export(model, join(current_dir, '../_dot_files', 'kerml_mm.dot'))
