@@ -49,13 +49,15 @@ package Features {
     }
 
     classifier Vehicle :> RegisteredAsset {
+        derived feature vin[1];
+        // Assignment causes infinite recursion
 //        derived feature vin[1] = identifier;
     }
-//
-//    feature legalIdentification;
-//
-//    specialization Redef redefinition LegalRecord::guardian redefines parent;
-//    specialization redefinition Vehicle::vin redefines RegisteredAsset::identifier;
-//
-//    redefinition Vehicle::vin redefines legalIdentification;
+
+    feature legalIdentification;
+
+    specialization Redef redefinition LegalRecord::guardian redefines parent;
+    specialization redefinition Vehicle::vin redefines RegisteredAsset::identifier;
+
+    redefinition Vehicle::vin redefines legalIdentification;
 }

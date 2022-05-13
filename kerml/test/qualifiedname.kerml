@@ -1,3 +1,3 @@
 package qfn {
-    class A::B
+    class A::B;
 }

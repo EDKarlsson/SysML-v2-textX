@@ -20,10 +20,11 @@ class Class(Classifier):
             allSupertypes()->includes(Kernel Library::Occurrence)
     """
 
-    def __init__(self, name, parent):
-        super(Class, self).__init__(name=name, parent=parent)
-        self.name = name
-        self.parent = parent
+    def __init__(self, name, parent, humanId=None, isAbstract=False, isSufficient=False,
+                 ownedRelationship=None,documentation=None):
+        super(Class, self).__init__(name=name, parent=parent, humanId=humanId,
+                                    isAbstract=isAbstract, isSufficient=isSufficient,
+                                    ownedRelationship=ownedRelationship,documentation=documentation)
 
 
 class DataType(Classifier):

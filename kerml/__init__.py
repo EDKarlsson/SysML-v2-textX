@@ -171,13 +171,14 @@ if __name__ == "__main__":
         "Types.kerml"
     ]
     tests = [
+        "qualifiedname.kerml",
         "ElementDocRelationship.kerml",
         "baseline.kerml",
         "elements.kerml",
         "simple_features.kerml",
         "simpletypes.kerml",
         "features.kerml",
-        "typeconjugation.kerml"
+        "typeconjugation.kerml",
     ]
     for test in tests:
         tfile = test_files.get_test_file(test, "test")
