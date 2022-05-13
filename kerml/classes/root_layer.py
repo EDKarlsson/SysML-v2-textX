@@ -490,6 +490,18 @@ class Membership(Relationship):
             visible outside that Namespace.
     """
 
+    # def __new__(cls, name, bases, dct, parent, memberElement: Element = None,
+    #             memberName: str = None, ownedMemberElement: Element = None,
+    #             visibility=None, effectiveMemberName=None, membershipOwningNamespace=None):
+    #     membership = super().__new__(cls, name, bases, dct)
+    #     membership.memberElement = memberElement
+    #     membership.memberName = memberName
+    #     membership.ownedMemberElement = ownedMemberElement
+    #     membership.visibility = visibility
+    #     membership.effectiveMemberName = effectiveMemberName
+    #     membership.membershipOwningNamespace = membershipOwningNamespace
+    #     return membership
+
     def __init__(self, parent, name, memberElement=None, memberName=None, ownedMemberElement=None,
                  visibility=None,
                  effectiveMemberName=None, membershipOwningNamespace=None, ):
@@ -514,10 +526,6 @@ class Membership(Relationship):
 
 
 class NamespaceMember(Membership):
-
-    def __new__(cls, *args, **kwargs):
-        return super().__new__(cls, *args, **kwargs)
-
     def __init__(self, parent, name, effectiveMemberName=None, memberElement=None,
                  membershipOwningNamespace=None, ownedMemberElement=None,
                  visibility=None):

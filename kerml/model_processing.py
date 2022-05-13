@@ -55,14 +55,14 @@ def feature_redefinition_definer_scope(redef_relationship, attr, attr_ref):
     model: kerml.Namespace = get_model(
         redef_relationship)  # get the model of the currently processed element
     element_of_interest = attr_ref.obj_name  # the name of currently looked up element
-    print_model_elem(model, redef_relationship, attr, attr_ref)
+    # print_model_elem(model, redef_relationship, attr, attr_ref)
 
-    # print(f"Redefinition Relationship Type: {type(redef_relationship)}")
-    # print(f"m: {model}")
-    #
-    # for ownedRelationship in model.ownedRelationship:
-    #     print(f"Owned Relationship: {ownedRelationship}")
-    #     pprint(f"Dict: {ownedRelationship.__dict__}")
+    print(f"Redefinition Relationship Type: {type(redef_relationship)}")
+    print(f"m: {model}")
+
+    for ownedRelationship in model.ownedRelationship:
+        print(f"Owned Relationship: {ownedRelationship}")
+        pprint(f"Dict: {ownedRelationship.__dict__}")
 
     qualified_path = element_of_interest.split("::")
     child: kerml.Feature
@@ -85,6 +85,8 @@ def feature_redefinition_definer_scope(redef_relationship, attr, attr_ref):
     metamodel = get_metamodel(model)  # else, create it and store it in the model
     new_feature = metamodel['Feature'](element_of_interest, redef_relationship.parent.name)
     model.ownedRelationship.append(new_feature)
+    new_feature.name = element_of_interest
+    new_feature.parent = model
     return new_feature
 
 
@@ -95,14 +97,14 @@ def owned_specialization_definer_scope(general, attr, attr_ref):
     found_general = []
     # If trying to Specialize a Type
     for ownedRel in m.ownedRelationship:
-        print(f'Owned Relationship: {ownedRel} - Type: {type(ownedRel)}')
-        print(f'Owned Relationship Dict: {ownedRel.__dict__}')
+        # print(f'Owned Relationship: {ownedRel} - Type: {type(ownedRel)}')
+        # print(f'Owned Relationship Dict: {ownedRel.__dict__}')
         from kerml import Type
         if isinstance(ownedRel, Type):
             if name == ownedRel.name:
                 found_general.append(ownedRel)
         elif 'name' in ownedRel.ownedMemberElement.name and name == ownedRel.ownedMemberElement.name:
-            print(f'Attributes:{dir(ownedRel.ownedMemberElement)}')
+            # print(f'Attributes:{dir(ownedRel.ownedMemberElement)}')
             found_general.append(ownedRel)
 
     if len(found_general) > 0:
