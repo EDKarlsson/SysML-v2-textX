@@ -1,13 +1,13 @@
 import json
 
 from kerml.model_processing import owned_specialization_definer_scope, \
-    owned_conjugation_definer_scope
+    owned_conjugation_definer_scope, feature_redefinition_definer_scope
+from kerml.object_processing import namespace_member_to_membership
 from textx import metamodel_for_language
 from kerml.classes.root_layer import Element, NonFeatureElement, Relationship, Annotation, \
     ModelComment, \
-    TextualRepresentation, AliasMember, FeatureNamespaceMember, NonFeatureMember, Import, \
-    OwnedDocumentation, Namespace, \
-    Membership
+    TextualRepresentation, AliasMember, NamespaceMember, FeatureNamespaceMember, NonFeatureMember, \
+    Import, OwnedDocumentation, Namespace, Membership
 from kerml.classes.core_layer import Type, FeatureElement, Specialization, Conjugation, Disjoining, \
     TypeFeaturing, \
     FeatureMember, Feature, Multiplicity, Classifier, Subclassification, Subsetting, Redefinition, \
@@ -38,6 +38,7 @@ def class_provider(name):
         FeatureNamespaceMember, Import,
         ModelComment, Membership, Namespace, NonFeatureElement,
         NonFeatureMember, OwnedDocumentation, Relationship, TextualRepresentation,
+        NamespaceMember,
 
         Type, FeatureElement, TypeFeaturing, FeatureMember, Specialization,
         Conjugation, Disjoining, Feature, Multiplicity, Classifier, Subclassification, Subsetting,
@@ -70,12 +71,14 @@ def kerml_language():
     # http://textx.github.io/textX/stable/metamodel/#object-processors
     # http://textx.github.io/textX/stable/scoping/
     # mm.register_scope_providers({'*.*': scoping_providers.FQN()})
-    mm.register_scope_providers({'OwnedSpecialization.*': owned_specialization_definer_scope})
-
+    mm.register_scope_providers({
+        'OwnedSpecialization.*': owned_specialization_definer_scope,
+        'Redefinition.*': feature_redefinition_definer_scope,
+    })
     return mm
 
 
-def get_element_mm(debug=False):
+def get_element_mm(debug: bool = False):
     """
     Builds and returns a meta-model for Entity language.
     """
@@ -85,6 +88,12 @@ def get_element_mm(debug=False):
                                     autokwd=True,
                                     debug=debug,
                                     auto_init_attributes=False)
+
+    entity_mm.register_scope_providers({
+        'OwnedSpecialization.*': owned_specialization_definer_scope,
+        'Redefinition.*': feature_redefinition_definer_scope,
+        # 'OwnedConjugation.*': owned_conjugation_definer_scope,
+    })
     return entity_mm
 
 
@@ -126,10 +135,6 @@ def load_examples(kerml_dirs: list):
 
 def main(test_file, debug=False):
     element_mm = get_element_mm(debug)
-    element_mm.register_scope_providers({
-        'OwnedSpecialization.*': owned_specialization_definer_scope,
-        # 'OwnedConjugation.*': owned_conjugation_definer_scope,
-    })
     model = element_mm.model_from_file(test_file)
     model_export(model, join(current_dir, '../_dot_files', 'kerml_mm.dot'))
 
@@ -171,12 +176,12 @@ if __name__ == "__main__":
         "Types.kerml"
     ]
     tests = [
-        "qualifiedname.kerml",
-        "ElementDocRelationship.kerml",
-        "baseline.kerml",
-        "elements.kerml",
-        "simple_features.kerml",
-        "simpletypes.kerml",
+        # "qualifiedname.kerml",
+        # "ElementDocRelationship.kerml",
+        # "baseline.kerml",
+        # "elements.kerml",
+        # "simple_features.kerml",
+        # "simpletypes.kerml",
         "features.kerml",
         "typeconjugation.kerml",
     ]

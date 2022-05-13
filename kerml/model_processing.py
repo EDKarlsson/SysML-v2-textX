@@ -1,16 +1,16 @@
 from pprint import pprint
+
+import kerml
 from textx.scoping import providers, Postponed
-from textx import get_model, get_metamodel, get_location
+from textx import get_model, get_metamodel, get_location, get_children, get_children_of_type
 
 
-def print_model_elem(elem, model, attr, attr_ref):
-    print(f'attr.__dict__: {attr.__dict__}')
-    print(f'attr_ref.__dict__: {attr_ref.__dict__}')
-    print()
-    print(f'element.__dict__: {elem.__dict__}')
-    print(f'element.parent: {elem.parent.__dict__}')
-    print()
-    print(f'model.__dict__: {model.__dict__}')
+def print_model_elem(model, elem, attr, attr_ref):
+    print(f'model.__dict__: {model.__dict__}\n\tType:{type(model)}')
+    print(f'element.__dict__: {elem.__dict__}\n\tType:{type(elem)}')
+    print(f'element.parent: {elem.parent.__dict__}\n\tType:{type(elem.parent)}')
+    print(f'attr.__dict__: {attr.__dict__}\n\tType:{type(attr)}')
+    print(f'attr_ref.__dict__: {attr_ref.__dict__}\n\tType:{type(attr_ref)}')
     print(f'attr_ref.obj_name: {attr_ref.obj_name}')
     print()
 
@@ -23,7 +23,69 @@ def owned_conjugation_definer_scope(owned_conjugation, attr, attr_ref):
     print(f"Owned Relationship Type: {owned_conjugation}")
     mm = get_location(owned_conjugation)
     print(f"mm: {mm}")
-    # print(f"mm.__dict__: {mm.__dict__}")
+
+
+def feature_redefinition_definer_scope(redef_relationship, attr, attr_ref):
+    """
+
+    MyAttribute:
+        ref=[MyInterface|FQN] name=ID ';'
+    ;
+
+    The scope providers are Python callables accepting obj, attr, obj_ref:
+
+    * obj : the object representing the start of the search (e.g., a rule, like MyAttribute in the
+        example above, or the model)
+    * attr : a reference to the attribute (e.g. ref in the first example above)
+    * obj_ref : a textx.model.ObjCrossRef - the reference to be resolved
+
+    Parameters
+    ----------
+    redef_relationship : Redefinition
+        Current element being processed.
+    attr :
+        Reference to the attribute
+    attr_ref :
+        Reference to be resolved ( textx.model.ObjCrossRef )
+
+    Returns
+    -------
+
+    """
+    model: kerml.Namespace = get_model(
+        redef_relationship)  # get the model of the currently processed element
+    element_of_interest = attr_ref.obj_name  # the name of currently looked up element
+    print_model_elem(model, redef_relationship, attr, attr_ref)
+
+    # print(f"Redefinition Relationship Type: {type(redef_relationship)}")
+    # print(f"m: {model}")
+    #
+    # for ownedRelationship in model.ownedRelationship:
+    #     print(f"Owned Relationship: {ownedRelationship}")
+    #     pprint(f"Dict: {ownedRelationship.__dict__}")
+
+    qualified_path = element_of_interest.split("::")
+    child: kerml.Feature
+
+    pprint(f"QPath: {qualified_path}")
+    pprint(f"Redefinition Name: {redef_relationship.name}")
+    pprint(f"Redefinition Parent: {redef_relationship.parent}")
+
+    for child in get_children_of_type("Feature", model):
+        if child.name == qualified_path[-1]:
+            pprint(f"Child: {child}")
+            print(f"\tName: {child.name}")
+            print(f"\tParent: {child.parent}\tType: {type(child.parent)}")
+            return child
+            # if len(qualified_path) > 1:
+            #     if child.parent.name == qualified_path[-2]:
+            #         return child
+
+    # No feature was found
+    metamodel = get_metamodel(model)  # else, create it and store it in the model
+    new_feature = metamodel['Feature'](element_of_interest, redef_relationship.parent.name)
+    model.ownedRelationship.append(new_feature)
+    return new_feature
 
 
 def owned_specialization_definer_scope(general, attr, attr_ref):

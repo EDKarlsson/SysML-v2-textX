@@ -490,14 +490,16 @@ class Membership(Relationship):
             visible outside that Namespace.
     """
 
-    def __init__(self, parent, name, memberElement=None, ownedMemberElement=None, visibility=None):
+    def __init__(self, parent, name, memberElement=None, memberName=None, ownedMemberElement=None,
+                 visibility=None,
+                 effectiveMemberName=None, membershipOwningNamespace=None, ):
         super(Membership, self).__init__(name=name, parent=parent)
         self.memberElement: Element = memberElement
-        self.memberName: str = name
+        self.memberName: str = memberName
         self.ownedMemberElement: Element = ownedMemberElement
         self.visibility = visibility
-        self.effectiveMemberName = None
-        self.membershipOwningNamespace = None
+        self.effectiveMemberName = effectiveMemberName
+        self.membershipOwningNamespace = membershipOwningNamespace
 
     def isDistinguishableFrom(self, other) -> bool:
         """
@@ -513,16 +515,19 @@ class Membership(Relationship):
 
 class NamespaceMember(Membership):
 
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls, *args, **kwargs)
+
     def __init__(self, parent, name, effectiveMemberName=None, memberElement=None,
                  membershipOwningNamespace=None, ownedMemberElement=None,
                  visibility=None):
-        super(NamespaceMember, self).__init__(name=name, parent=parent)
-        self.effectiveMemberName = effectiveMemberName
-        self.memberElement: Element = memberElement
-        self.memberName: str = name
-        self.membershipOwningNamespace: Namespace = membershipOwningNamespace
-        self.ownedMemberElement: Element = ownedMemberElement
-        self.visibility = visibility
+        super(NamespaceMember, self).__init__(name=name, parent=parent,
+                                              memberName=name,
+                                              memberElement=memberElement,
+                                              effectiveMemberName=effectiveMemberName,
+                                              visibility=visibility,
+                                              ownedMemberElement=ownedMemberElement,
+                                              membershipOwningNamespace=membershipOwningNamespace)
 
 
 class AliasMember(Membership):

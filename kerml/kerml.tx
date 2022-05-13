@@ -23,8 +23,6 @@ Relationship:
     'relationship' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
         ('from' source+=[QualifiedName][','])?
         ('to' target+=[QualifiedName][','])?
-//        ('from' source+=[Element|QualifiedName][','])?
-//        ('to' target+=[Element|QualifiedName][','])?
     (';' | '{'
         ownedRelatedElement+=RelationshipOwnedElement
     '}')
@@ -32,14 +30,12 @@ Relationship:
 
 OwnedRelationship:
     'relationship' ('<' name=QualifiedName '>')? ('to' target+=[QualifiedName][','])?
-//    'relationship' ('<' name=QualifiedName '>')? ('to' target+=[Element|QualifiedName][','])?
     (';' | '{'
         ownedRelatedElement+=RelationshipOwnedElement
     '}')
 ;
 
 RelationshipOwnedElement:
-//      Element | Relationship
 // TODO: Element and relationship isn't 100% correct but works for now
 //  Fix with the OwnedRelatedElement and OwnedRelatedElementOrRelationship rule
       ownedRelatedElement += Element
@@ -64,11 +60,9 @@ ModelComment:
 	)
 	body = /(?ms)\/\*(.*?)\*\//
 ;
-
 Annotation:
 	annotatedElement = [QualifiedName]
 ;
-
 ElementAnnotation:
     annotatedElement = [QualifiedName]
 ;
@@ -78,15 +72,12 @@ ElementAnnotation:
 OwnedDocumentation:
     documentingComment=DocumentationComment
 ;
-
 DocumentationComment:
     'doc' ('<' name = Name '>' )? body=/(?ms)\/\*(.*?)\*\//
 ;
-
 PrefixDocumentation:
 	documentingComment=PrefixDocumentationComment
 ;
-
 PrefixDocumentationComment:
 	( 'doc' ( '<' name = Name '>' )? )? body=/(?ms)\/\*\*(.*?)\*\//
 ;
@@ -96,13 +87,11 @@ PrefixDocumentationComment:
 OwnedTextualRepresentationAnnotation:
     ownedRelatedElement += OwnedTextualRepresentation
 ;
-
 OwnedTextualRepresentation:
     ( 'rep' ( name=QualifiedName )? )?
     'language' language=QuotedID body=REGULAR_COMMENT
     // { annotation += a }
 ;
-
 TextualRepresentation:
     (   'rep' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
         'about' annotation+=Annotation
@@ -124,7 +113,6 @@ Namespace:
       )*
     '}')
 ;
-
 MemberPrefix:
     ( ownedRelationship += PrefixDocumentation )*
     ( visibility = VisibilityIndicator )?
@@ -264,7 +252,6 @@ Type:
 
 TypeBody:
     ';' | '{'
-//    TypeBodyElement*
     (
       documentation += OwnedDocumentation
     | ownedRelationship += NonFeatureMember
@@ -362,19 +349,12 @@ OwnedDisjoining:
 /* =============================================================== */
 /* FEATURE MEMBER */
 FeatureMember :
-      TypeFeatureMember
-    | OwnedFeatureMember
-    | UnownedFeatureMember
+      MemberPrefix 'member' ownedMemberElement = FeatureElement
+    | MemberPrefix ownedMemberFeature = FeatureElement
+    | MemberPrefix 'feature'? ( name=QualifiedName )? 'is'
+      memberFeature = [QualifiedName]
     | ChainFeatureMember
 ;
-TypeFeatureMember:
-    MemberPrefix 'member' ownedMemberElement = FeatureElement
-;
-
-OwnedFeatureMember:
-    MemberPrefix ownedMemberFeature = FeatureElement
-;
-
 UnownedFeatureMember:
     MemberPrefix 'feature'? ( name=QualifiedName )? 'is'
     memberFeature = [QualifiedName]
@@ -382,14 +362,13 @@ UnownedFeatureMember:
 
 /* =============================================================== */
 /* CLASSIFIERS */
-
 Classifier:
     ( isAbstract ?= 'abstract' ) 'classifier'
     ( isSufficient ?= 'all' )? (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ( ownedRelationship += OwnedMultiplicity )?
     (
-        SPECIALIZES ownedRelationship += OwnedSubclassification
-        ( ',' ownedRelationship += OwnedSubclassification )* | ConjugationPart
+      SPECIALIZES ownedRelationship += OwnedSubclassification
+      ( ',' ownedRelationship += OwnedSubclassification )* | ConjugationPart
     )?
     DisjoiningPart?
     (';' | '{'
@@ -407,12 +386,11 @@ ClassifierDeclaration:
     ( isSufficient ?= 'all' )? (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ( ownedRelationship += OwnedMultiplicity )?
     (
-        SPECIALIZES ownedRelationship += OwnedSubclassification
-        ( ',' ownedRelationship += OwnedSubclassification )* | ConjugationPart
+      SPECIALIZES ownedRelationship += OwnedSubclassification
+      ( ',' ownedRelationship += OwnedSubclassification )* | ConjugationPart
     )?
     DisjoiningPart?
     ;
-
 SuperclassingPart:
     SPECIALIZES ownedRelationship += OwnedSubclassification
     ( ',' ownedRelationship += OwnedSubclassification )*
@@ -442,7 +420,6 @@ FeaturePrefix:
 FeatureDirection :
     'in' | 'out' | 'inout'
 ;
-
 Feature:
     FeaturePrefix 'feature'?
     ( isSufficient ?= 'all' )?
@@ -517,12 +494,9 @@ TypeFeaturing:
     'featuring' ( (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)? 'of')?
     featureOfType = [QualifiedName]
     'by' featuringType = [QualifiedName] ';'
-//    featureOfType = [Feature|QualifiedName]
-//    'by' featuringType = [Feature|QualifiedName] ';'
     ;
 OwnedTypeFeaturing:
     featuringType = [QualifiedName]
-//    featuringType = [TypeFeaturing|QualifiedName]
     ;
 
 /* =============================================================== */
@@ -531,14 +505,10 @@ FeatureTyping:
     ( 'specialization' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)? )?
     'typing' typedFeature = [QualifiedName]
     TYPED_BY general = [QualifiedName] ';'
-//    'typing' typedFeature = [Feature|QualifiedName]
-//    TYPED_BY general = [Feature|QualifiedName] ';'
 ;
 
 OwnedFeatureTyping :
-    // TODO: FeatureTyping may not be correct, may need to reference element. Need to read the specification to verify.
     general = [QualifiedName]
-//    general = [FeatureTyping|QualifiedName]
 ;
 
 /* =============================================================== */
@@ -547,24 +517,17 @@ Subsetting:
     ( 'specialization' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)? )?
     'subset'
     (subsettingFeature = [QualifiedName]
-//    (subsettingFeature = [Feature|QualifiedName]
     | ownedRelatedElement += FeatureChain)
     ( ':>'  | 'subsets' )
-//    SUBSETS
     (
      subsettedFeature = [QualifiedName]
-//     subsettedFeature = [Feature|QualifiedName]
     | ownedRelatedElement += FeatureChain
     )
     ';'
 ;
-
 OwnedSubsetting:
-//    general = [QualifiedName]
-//    | general += FeatureChain
     subsettedFeature = [QualifiedName]
     | ownedRelatedElement += FeatureChain
-//    subsettedFeature = [Feature|QualifiedName]
 ;
 
 /* =============================================================== */
@@ -572,18 +535,28 @@ OwnedSubsetting:
 Redefinition:
     ( 'specialization' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?   )?
     'redefinition'
-    (  specific = [QualifiedNam]
-     | specific += FeatureChain )
+    ( specific = [Feature|QualifiedName]
+    | specific += FeatureChain )
     REDEFINES
-    (  general = [QualifiedName]
-     | general += FeatureChain )
+    ( general = [Feature|QualifiedName]
+    | general += FeatureChain )
     ';'
 ;
+
+SpecificType:
+    specific = [Feature|QualifiedName]
+    | specific += FeatureChain
+;
+
+GeneralType:
+    general = [Feature|QualifiedName]
+    | general += FeatureChain
+;
+
 OwnedRedefinition:
     general = [QualifiedName]
   | general += FeatureChain
 ;
-
 
 /* =============================================================== */
 /* FEATURE CHAINING */
@@ -594,9 +567,7 @@ FeatureChain:
 
 OwnedFeatureChaining:
     chainingFeature = [QualifiedName]
-//    chainingFeature = [Element|QualifiedName]
 ;
-
 
 /* =============================================================== */
 /* KERNEL LAYER RULES */
@@ -606,18 +577,13 @@ OwnedFeatureChaining:
 /* DATA TYPES */
 DataType:
     ( isAbstract ?= 'abstract' )? 'datatype'
-    // <! ClassifierDeclaration
     ( isSufficient ?= 'all' )? (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ( ownedRelationship += OwnedMultiplicity )?
     (
-          SPECIALIZES ownedRelationship += OwnedSubclassification
-          ( ',' ownedRelationship += OwnedSubclassification )*
-        | ConjugationPart
+      SPECIALIZES ownedRelationship += OwnedSubclassification
+      ( ',' ownedRelationship += OwnedSubclassification )* | ConjugationPart
     )?
     DisjoiningPart?
-    // !>
-
-    // <! DataType
     (';' | '{'
     (
       documentation += OwnedDocumentation
@@ -627,25 +593,19 @@ DataType:
     | ownedRelationship += Import
     )*
     '}')
-    // !>
 ;
 
 /* =============================================================== */
 /* CLASSES */
 Class:
     ( isAbstract ?= 'abstract' )? 'class'
-//    ClassifierDeclaration TypeBody
     ( isSufficient ?= 'all' )? (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ( ownedRelationship += OwnedMultiplicity )?
     (
-    // <! SuperclassingPart
-          SPECIALIZES ownedRelationship += OwnedSubclassification
-          ( ',' ownedRelationship += OwnedSubclassification )*
-    // !>
-        | ConjugationPart
+      SPECIALIZES ownedRelationship += OwnedSubclassification
+      ( ',' ownedRelationship += OwnedSubclassification )* | ConjugationPart
     )?
     DisjoiningPart?
-
     (';' | '{'
     (
       documentation += OwnedDocumentation
@@ -655,22 +615,17 @@ Class:
     | ownedRelationship += Import
     )*
     '}')
-
 ;
 
 /* =============================================================== */
 /* STRUCTURES */
 Structure:
     ( isAbstract ?= 'abstract' )? 'struct'
-//    ClassifierDeclaration TypeBody
     ( isSufficient ?= 'all' )? (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ( ownedRelationship += OwnedMultiplicity )?
     (
-    // <! SuperclassingPart
-          SPECIALIZES ownedRelationship += OwnedSubclassification
-          ( ',' ownedRelationship += OwnedSubclassification )*
-    // !>
-        | ConjugationPart
+      SPECIALIZES ownedRelationship += OwnedSubclassification
+      ( ',' ownedRelationship += OwnedSubclassification )* | ConjugationPart
     )?
     DisjoiningPart?
     (';' | '{'
@@ -687,15 +642,11 @@ Structure:
 /* ASSOCIATIONS */
 Association:
     ( isAbstract ?= 'abstract' )? 'assoc'
-//    ClassifierDeclaration TypeBody
     ( isSufficient ?= 'all' )? (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ( ownedRelationship += OwnedMultiplicity )?
     (
-    // <! SuperclassingPart
-          SPECIALIZES ownedRelationship += OwnedSubclassification
-          ( ',' ownedRelationship += OwnedSubclassification )*
-    // !>
-        | ConjugationPart
+      SPECIALIZES ownedRelationship += OwnedSubclassification
+      ( ',' ownedRelationship += OwnedSubclassification )* | ConjugationPart
     )?
     DisjoiningPart?
     (';' | '{'
@@ -710,15 +661,11 @@ Association:
 ;
 AssociationStructure:
     ( isAbstract ?= 'abstract' )? 'assoc' 'struct'
-//    ClassifierDeclaration TypeBody
     ( isSufficient ?= 'all' )? (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ( ownedRelationship += OwnedMultiplicity )?
     (
-    // <! SuperclassingPart
-          SPECIALIZES ownedRelationship += OwnedSubclassification
-          ( ',' ownedRelationship += OwnedSubclassification )*
-    // !>
-        | ConjugationPart
+      SPECIALIZES ownedRelationship += OwnedSubclassification
+      ( ',' ownedRelationship += OwnedSubclassification )* | ConjugationPart
     )?
     DisjoiningPart?
     (';' | '{'
@@ -730,15 +677,13 @@ AssociationStructure:
     | ownedRelationship += Import
     )*
     '}')
-
-;
+    ;
 
 /* =============================================================== */
 /* CONNECTORS */
 Connector:
     FeaturePrefix 'connector'
     ConnectorDeclaration
-    // TypeBody
     (';' | '{'
     (
       documentation += OwnedDocumentation
@@ -748,7 +693,6 @@ Connector:
     | ownedRelationship += Import
     )*
     '}')
-
     ;
 ConnectorDeclaration:
     BinaryConnectorDeclaration | NaryConnectorDeclaration
@@ -777,7 +721,6 @@ ConnectorEnd:
 BindingConnector:
     FeaturePrefix 'binding'
     BindingConnectorDeclaration
-    //TypeBody
     (';' | '{'
     (
       documentation += OwnedDocumentation
@@ -800,7 +743,6 @@ BindingConnectorDeclaration:
 Succession:
     FeaturePrefix 'succession'
     SuccessionDeclaration
-    //TypeBody
     (';' | '{'
     (
       documentation += OwnedDocumentation
@@ -822,7 +764,6 @@ SuccessionDeclaration:
 Behavior:
     ( isAbstract ?= 'abstract ')? 'behavior'
     BehaviorDeclaration
-    //TypeBody
     (';' | '{'
     (
       documentation += OwnedDocumentation
@@ -834,18 +775,13 @@ Behavior:
     '}')
     ;
 BehaviorDeclaration:
-//    ClassifierDeclaration ParameterList?
     ( isSufficient ?= 'all' )? (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)?
     ( ownedRelationship += OwnedMultiplicity )?
     (
-    // <! SuperclassingPart
-          SPECIALIZES ownedRelationship += OwnedSubclassification
-          ( ',' ownedRelationship += OwnedSubclassification )*
-    // !>
-        | ConjugationPart
+      SPECIALIZES ownedRelationship += OwnedSubclassification
+      ( ',' ownedRelationship += OwnedSubclassification )* | ConjugationPart
     )?
     DisjoiningPart?
-
     ParameterList?
     ;
 ParameterList:
@@ -1063,7 +999,6 @@ TypeReference:
     ;
 ReferenceTyping:
     type = [QualifiedName]
-//    type = [Element|QualifiedName]
     ;
 /* =============================================================== */
 /* PRIMARY EXPRESSIONS */
@@ -1151,7 +1086,6 @@ FeatureReferenceExpression:
     ;
 FeatureReferenceMember:
     memberElement = [QualifiedName]
-//    memberElement = [Element|QualifiedName]
     ;
 InvocationExpression:
     ownedRelationship += OwnedSpecialization
@@ -1425,24 +1359,21 @@ DOCUMENTATION_COMMENT:
 Qualification:
     ('::' Name)*
     ;
-
-QualifiedName:
-    Name Qualification?
+QualifiedName[split='::']:
+//    Name Qualification
+    Name('::'Name)*
     ;
 
 /* NAMES */
 Name:
     !Keyword (BASIC_NAME | '\'' UNRESTRICTED_NAME '\'')
 ;
-
 BASIC_NAME:
     /([a-zA-Z]|'_')([\w\d])*/
     ;
-
 UNRESTRICTED_NAME:
     /((?!['"])([ -~])|(\\(b|t|n|f|r)))*/
     ;
-
 DECIMAL_DIGIT:
 //    /\'[0-9]\'/
     /[0-9]/

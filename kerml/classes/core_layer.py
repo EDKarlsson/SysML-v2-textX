@@ -220,8 +220,10 @@ class FeatureMember(Membership, TypeFeaturing):
             The Type that owns this FeatureMembership.
     """
 
-    def __init__(self, parent, name, memberFeature=None, ownedMemberFeature=None):
-        super(FeatureMember, self).__init__(name=name, parent=parent)
+    def __init__(self, parent, name, memberFeature=None, ownedMemberFeature=None,
+                 memberElement=None, ownedMemberElement=None):
+        super(FeatureMember, self).__init__(name=name, parent=parent, memberElement=memberElement,
+                                            ownedMemberElement=ownedMemberElement)
         self.memberName: str = name
         self.memberFeature = memberFeature
         self.ownedMemberFeature = ownedMemberFeature
@@ -245,7 +247,7 @@ class Specialization(Relationship):
     """
 
     def __init__(self, name, parent, humanId=None, target=None, source=None,
-                 ownedRelatedElement=None, owningRelatedElement=None):
+                 ownedRelatedElement=None, owningRelatedElement=None, specific=None, general=None):
         super(Specialization, self).__init__(name=name, parent=parent,
                                              humanId=humanId)
         self.source = source
@@ -262,6 +264,8 @@ class Specialization(Relationship):
             self.relatedElement.append(self.target)
 
         self.owningRelatedElement = owningRelatedElement
+        self.specific = specific
+        self.general = general
 
 
 class Conjugation(Relationship):
@@ -553,10 +557,12 @@ class Subsetting(Specialization):
     """
 
     def __init__(self, name, parent, humanId=None, owningFeature=None, subsettedFeature=None,
-                 subsettingFeature=None, ownedRelatedElement=None, owningRelatedElement=None):
+                 subsettingFeature=None, ownedRelatedElement=None, owningRelatedElement=None,
+                 specific=None, general=None):
         super(Subsetting, self).__init__(name=name, parent=parent, humanId=humanId,
                                          ownedRelatedElement=ownedRelatedElement,
-                                         owningRelatedElement=owningRelatedElement)
+                                         owningRelatedElement=owningRelatedElement,
+                                         specific=specific, general=general)
         self.owningFeature = owningFeature
         self.subsettedFeature = subsettedFeature
         self.subsettingFeature = subsettingFeature
@@ -584,8 +590,10 @@ class Redefinition(Subsetting):
             The Feature that is redefining the redefinedFeature of this Redefinition.
     """
 
-    def __init__(self, name, parent, humanId=None, redefinedFeature=None, redefiningFeature=None):
-        super(Redefinition, self).__init__(name=name, parent=parent, humanId=humanId)
+    def __init__(self, name, parent, humanId=None, redefinedFeature=None, redefiningFeature=None,
+                 specific=None, general=None):
+        super(Redefinition, self).__init__(name=name, parent=parent, humanId=humanId,
+                                           specific=specific, general=general)
         self.redefinedFeature = redefinedFeature
         self.redefiningFeature = redefiningFeature
 

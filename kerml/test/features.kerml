@@ -38,6 +38,7 @@ package Features {
     specialization t2 typing g : A;
 
     specialization Sub subset parent subsets person;
+    // Still doesn't work
 //    specialization subset mother subsets parent;
 
     classifier LegalRecord {
@@ -57,7 +58,8 @@ package Features {
     feature legalIdentification;
 
     specialization Redef redefinition LegalRecord::guardian redefines parent;
-    specialization redefinition Vehicle::vin redefines RegisteredAsset::identifier;
-
-    redefinition Vehicle::vin redefines legalIdentification;
+//    specialization Redef redefinition LegalRecord::guardian redefines parent;
+//    specialization redefinition Vehicle::vin redefines RegisteredAsset::identifier;
+//
+//    redefinition Vehicle::vin redefines legalIdentification;
 }
