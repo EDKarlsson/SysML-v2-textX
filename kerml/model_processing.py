@@ -57,25 +57,25 @@ def feature_redefinition_definer_scope(redef_relationship, attr, attr_ref):
     element_of_interest = attr_ref.obj_name  # the name of currently looked up element
     # print_model_elem(model, redef_relationship, attr, attr_ref)
 
-    print(f"Redefinition Relationship Type: {type(redef_relationship)}")
-    print(f"m: {model}")
+    # print(f"Redefinition Relationship Type: {type(redef_relationship)}")
+    # print(f"m: {model}")
 
-    for ownedRelationship in model.ownedRelationship:
-        print(f"Owned Relationship: {ownedRelationship}")
-        pprint(f"Dict: {ownedRelationship.__dict__}")
+    # for ownedRelationship in model.ownedRelationship:
+    #     print(f"Owned Relationship: {ownedRelationship}")
+    #     pprint(f"Dict: {ownedRelationship.__dict__}")
 
     qualified_path = element_of_interest.split("::")
     child: kerml.Feature
 
-    pprint(f"QPath: {qualified_path}")
-    pprint(f"Redefinition Name: {redef_relationship.name}")
-    pprint(f"Redefinition Parent: {redef_relationship.parent}")
+    # pprint(f"QPath: {qualified_path}")
+    # pprint(f"Redefinition Name: {redef_relationship.name}")
+    # pprint(f"Redefinition Parent: {redef_relationship.parent}")
 
     for child in get_children_of_type("Feature", model):
         if child.name == qualified_path[-1]:
-            pprint(f"Child: {child}")
-            print(f"\tName: {child.name}")
-            print(f"\tParent: {child.parent}\tType: {type(child.parent)}")
+            # pprint(f"Child: {child}")
+            # print(f"\tName: {child.name}")
+            # print(f"\tParent: {child.parent}\tType: {type(child.parent)}")
             return child
             # if len(qualified_path) > 1:
             #     if child.parent.name == qualified_path[-2]:

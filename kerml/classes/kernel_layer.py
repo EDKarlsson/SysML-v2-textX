@@ -21,10 +21,17 @@ class Class(Classifier):
     """
 
     def __init__(self, name, parent, humanId=None, isAbstract=False, isSufficient=False,
-                 ownedRelationship=None,documentation=None):
+                 ownedRelationship=None, documentation=None):
         super(Class, self).__init__(name=name, parent=parent, humanId=humanId,
                                     isAbstract=isAbstract, isSufficient=isSufficient,
-                                    ownedRelationship=ownedRelationship,documentation=documentation)
+                                    ownedRelationship=ownedRelationship,
+                                    documentation=documentation)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class DataType(Classifier):
@@ -49,6 +56,12 @@ class DataType(Classifier):
         self.name = name
         self.parent = parent
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class Structure(Class):
     """
@@ -66,6 +79,12 @@ class Structure(Class):
         super(Structure, self).__init__(name=name, parent=parent)
         self.name = name
         self.parent = parent
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class Association(Classifier, Relationship):
@@ -129,6 +148,12 @@ class Association(Classifier, Relationship):
         self.sourceType = sourceType
         self.targetType = targetType
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class AssociationStructure(Association, Structure):
     """
@@ -145,6 +170,12 @@ class AssociationStructure(Association, Structure):
         self.name = name
         self.parent = parent
         self.humanId = humanId
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class Connector(Feature, Relationship):
@@ -251,6 +282,12 @@ class Connector(Feature, Relationship):
         self.sourceFeature = sourceFeature
         self.targetFeature = targetFeature
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class BindingConnector(Connector):
     """
@@ -263,6 +300,12 @@ class BindingConnector(Connector):
         self.name = name
         self.parent = parent
         self.humanId = humanId
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class Succession(Connector):
@@ -297,6 +340,12 @@ class Succession(Connector):
         self.transitionStep = transitionStep
         self.triggerStep = triggerStep
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class Behavior(Class):
     """
@@ -324,6 +373,12 @@ class Behavior(Class):
         self.parameter = parameter
         self.step = step
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class Step(Feature):
     """
@@ -349,6 +404,12 @@ class Step(Feature):
         self.behavior = behavior
         self.parameter = parameter
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class ParameterMembership(FeatureMember):
     """
@@ -372,12 +433,24 @@ class ParameterMembership(FeatureMember):
         self.memberParameter = memberParameter
         self.ownedMemberParameter = ownedMemberParameter
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class Function(Behavior):
     def __init__(self, name, parent):
         super(Function, self).__init__(name=name, parent=parent)
         self.name = name
         self.parent = parent
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class Predicate(Function):
@@ -386,6 +459,12 @@ class Predicate(Function):
         self.name = name
         self.parent = parent
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class Expression(Step):
     def __init__(self, name, parent, humanId=None):
@@ -393,6 +472,12 @@ class Expression(Step):
         self.name = name
         self.parent = parent
         self.humanId = humanId
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class BooleanExpression(Expression):
@@ -417,6 +502,12 @@ class BooleanExpression(Expression):
 
         self.predicate = predicate
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class Invariant(BooleanExpression):
     def __init__(self, name, parent, humanId=None):
@@ -425,12 +516,24 @@ class Invariant(BooleanExpression):
         self.parent = parent
         self.humanId = humanId
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class ReturnParameterMembership(ParameterMembership):
     def __init__(self, name, parent):
         super(ReturnParameterMembership, self).__init__(name=name, parent=parent)
         self.name = name
         self.parent = parent
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class ResultExpressionMembership(FeatureMember):
@@ -439,6 +542,12 @@ class ResultExpressionMembership(FeatureMember):
         self.name = name
         self.parent = parent
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class FeatureReferenceExpression(Expression):
     def __init__(self, name, parent, humanId=None):
@@ -446,6 +555,12 @@ class FeatureReferenceExpression(Expression):
         self.name = name
         self.parent = parent
         self.humanId = humanId
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class InvocationExpression(Expression):
@@ -461,10 +576,22 @@ class LiteralExpression(Expression):
         super(LiteralExpression, self).__init__(name=name, parent=parent, humanId=humanId)
         self.value = value
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class LiteralInteger(LiteralExpression):
     def __init__(self, name=None, parent=None, humanId=None, value=None):
         super(LiteralInteger, self).__init__(name=name, parent=parent, humanId=humanId, value=value)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class LiteralRational(LiteralExpression):
@@ -472,10 +599,22 @@ class LiteralRational(LiteralExpression):
         super(LiteralRational, self).__init__(name=name, parent=parent, humanId=humanId,
                                               value=value)
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class LiteralBoolean(LiteralExpression):
     def __init__(self, name=None, parent=None, humanId=None, value=None):
         super(LiteralBoolean, self).__init__(name=name, parent=parent, humanId=humanId, value=value)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class LiteralString(LiteralExpression):
@@ -485,6 +624,12 @@ class LiteralString(LiteralExpression):
         self.parent = parent
         self.humanId = humanId
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class LiteralInfinity(LiteralExpression):
     def __init__(self, name, parent, humanId=None):
@@ -492,6 +637,12 @@ class LiteralInfinity(LiteralExpression):
         self.name = name
         self.parent = parent
         self.humanId = humanId
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class NullExpression(Expression):
@@ -501,6 +652,12 @@ class NullExpression(Expression):
         self.parent = parent
         self.humanId = humanId
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class OperatorExpression(InvocationExpression):
     def __init__(self, name, parent, humanId=None):
@@ -508,6 +665,12 @@ class OperatorExpression(InvocationExpression):
         self.name = name
         self.parent = parent
         self.humanId = humanId
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class FeatureChainExpression(OperatorExpression):
@@ -517,6 +680,12 @@ class FeatureChainExpression(OperatorExpression):
         self.parent = parent
         self.humanId = humanId
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class CollectExpression(OperatorExpression):
     def __init__(self, name, parent, humanId=None):
@@ -524,6 +693,12 @@ class CollectExpression(OperatorExpression):
         self.name = name
         self.parent = parent
         self.humanId = humanId
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class SelectExpression(OperatorExpression):
@@ -533,6 +708,12 @@ class SelectExpression(OperatorExpression):
         self.parent = parent
         self.humanId = humanId
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class Interaction(Behavior, Association):
     def __init__(self, name, parent, humanId=None):
@@ -540,6 +721,12 @@ class Interaction(Behavior, Association):
         self.name = name
         self.parent = parent
         self.humanId = humanId
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class ItemFlow(Step, Connector):
@@ -549,6 +736,12 @@ class ItemFlow(Step, Connector):
         self.parent = parent
         self.humanId = humanId
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class SuccessionItemFlow(ItemFlow, Succession):
     def __init__(self, name, parent, humanId=None):
@@ -557,12 +750,25 @@ class SuccessionItemFlow(ItemFlow, Succession):
         self.parent = parent
         self.humanId = humanId
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class FeatureValue(Membership):
-    def __init__(self, name, parent):
+    def __init__(self, parent, value, name=None, isInitial=False, isDefault=False):
         super(FeatureValue, self).__init__(name=name, parent=parent)
-        self.name = name
-        self.parent = parent
+        self.isInitial = isInitial
+        self.isDefault = isDefault
+        self.value = value
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class MultiplicityRange(Multiplicity):
@@ -572,6 +778,12 @@ class MultiplicityRange(Multiplicity):
         self.parent = parent
         self.humanId = humanId
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class AnnotatingFeature(AnnotatingElement, Feature):
     def __init__(self, name, parent, humanId=None):
@@ -579,6 +791,12 @@ class AnnotatingFeature(AnnotatingElement, Feature):
         self.name = name
         self.parent = parent
         self.humanId = humanId
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class MetadataFeature(Feature):
@@ -588,12 +806,24 @@ class MetadataFeature(Feature):
         self.parent = parent
         self.humanId = humanId
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class MetadataFeatureValue(FeatureValue):
     def __init__(self, name, parent):
         super(MetadataFeatureValue, self).__init__(name=name, parent=parent)
         self.name = name
         self.parent = parent
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class Package(Namespace):
@@ -667,9 +897,21 @@ class Package(Namespace):
         """
         return [n.name for n in self.member if element.name == n.name]
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class ElementFilterMembership(Membership):
     def __init__(self, name, parent):
         super(ElementFilterMembership, self).__init__(name=name, parent=parent)
         self.name = name
         self.parent = parent
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"

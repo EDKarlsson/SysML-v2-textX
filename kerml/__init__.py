@@ -1,4 +1,5 @@
 import json
+from pprint import pprint
 
 from kerml.model_processing import owned_specialization_definer_scope, \
     owned_conjugation_definer_scope, feature_redefinition_definer_scope
@@ -87,7 +88,8 @@ def get_element_mm(debug: bool = False):
                                     use_regexp_group=True,
                                     autokwd=True,
                                     debug=debug,
-                                    auto_init_attributes=False)
+                                    auto_init_attributes=False,
+                                    memoization=True)
 
     entity_mm.register_scope_providers({
         'OwnedSpecialization.*': owned_specialization_definer_scope,
@@ -152,40 +154,59 @@ if __name__ == "__main__":
     # inspect_language("./root/kerml.tx")
     # print(f"Testing {test_files}")
     simple_tests = [
-        "ArgumentResolution.kerml",
-        "Associations.kerml",
-        "Circular.kerml",
-        "Classes.kerml",
-        "Classifications.kerml",
-        "Classifiers.kerml",
-        "Comments.kerml",
-        "Conjugation.kerml",
-        "Elements.kerml",
-        "Expansion.kerml",
-        "Expressions.kerml",
-        "FeatureInheritance.kerml",
-        "FeaturePaths.kerml",
-        "Features.kerml",
-        "Filtering.kerml",
-        "Imports.kerml",
-        "Inheritance.kerml",
-        "MetadataTest.kerml",
-        "Redefinition.kerml",
-        "Relationships.kerml",
-        "TextualRepresentation.kerml",
-        "Types.kerml"
+        # "ArgumentResolution.kerml",
+        # "Associations.kerml",
+        # "Circular.kerml",
+        # "Classes.kerml",
+        # "Classifications.kerml",
+        # "Classifiers.kerml",
+        # "Comments.kerml",
+        # "Conjugation.kerml",
+        # "Elements.kerml",
+        # "Expansion.kerml",
+        # "Expressions.kerml",
+        # "FeatureInheritance.kerml",
+        # "FeaturePaths.kerml",
+        # "Features.kerml",
+        # "Filtering.kerml",
+        # "Imports.kerml",
+        # "Inheritance.kerml",
+        # "MetadataTest.kerml",
+        # "Redefinition.kerml",
+        # "Relationships.kerml",
+        # "TextualRepresentation.kerml",
+        # "Types.kerml"
     ]
     tests = [
-        "qualifiedname.kerml",
-        "ElementDocRelationship.kerml",
+        # Failing
+        # "Base.kerml",
+        # "expressions.kerml",
+
+        # Working
         "baseline.kerml",
+        "ElementDocRelationship.kerml",
         "elements.kerml",
+        "qualifiedname.kerml",
         "simple_features.kerml",
         "simpletypes.kerml",
         "features.kerml",
         "typeconjugation.kerml",
+        "simple_expressions.kerml",
     ]
+
+    print("------------------------------------------------------------------------------------")
+    print(f"Running simplified tests for development.")
+    print("------------------------------------------------------------------------------------")
     for test in tests:
+        tfile = test_files.get_test_file(test, "test")
+        print(f"Testing {tfile}")
+        main(tfile, debug=False)
+        print(f"PASSED: {test}")
+
+    print("\n------------------------------------------------------------------------------------")
+    print(f"Running tests from SysML-v2-Release/kerml/.../Simple Tests.")
+    print("------------------------------------------------------------------------------------")
+    for test in simple_tests:
         tfile = test_files.get_test_file(test, "test")
         print(f"Testing {tfile}")
         main(tfile, debug=False)

@@ -49,7 +49,7 @@ RelationshipOwnedElement:
 /* Comments */
 ModelComment:
 	( 'comment' (('<' humanId=QualifiedName '>' name=QualifiedName ) | ( '<' name=QualifiedName '>' ) | name=QualifiedName)
-	  'about' ownedRelationship += Annotation
+	  'about' annotation += Annotation
       //{ ownedRelationship += annotation }
       ownedRelationship += [QualifiedName]
 	  ( ',' ownedRelationship += Annotation )*
@@ -114,7 +114,6 @@ Namespace:
     '}')
 ;
 MemberPrefix:
-    ( ownedRelationship += PrefixDocumentation )*
     ( visibility = VisibilityIndicator )?
 ;
 NamespaceMember:
@@ -143,7 +142,6 @@ AliasMember:
     memberElement=[QualifiedName] ';'
 ;
 Import:
-    ( ownedRelationship += PrefixDocumentation )*
     ( visibility = VisibilityIndicator )?
     'import' ( isImportAll ?= 'all' )?
         ( ImportedNamespace
@@ -941,23 +939,38 @@ OwnedExpressionMember:
     ownedFeatureMember = OwnedExpression
     ;
 OwnedExpression:
-      ConditionalExpression
-    | BinaryOperatorExpression
-    | UnaryOperatorExpression
-    | ClassificationExpression
-    | ExtentExpression
-    | PrimaryExpression
+//    DECIMAL_VALUE
+//      ConditionalExpression
+      BinaryOperatorExpression
+//      UnaryOperatorExpression
+//      ClassificationExpression
+//      ExtentExpression
+//      PrimaryExpression
+
+//      ConditionalExpression
+//    | BinaryOperatorExpression
+//    | UnaryOperatorExpression
+//    | ClassificationExpression
+//    | ExtentExpression
+//    | PrimaryExpression
     ;
 ConditionalExpression:
-      ownedRelationship += OwnedExpressionMember
-      operator = '?'
-      ownedRelationship += OwnedExpressionMember ':'
-      ownedRelationship += OwnedExpressionMember
+      ConditionalDeclaration
     | 'if' ownedRelationship += OwnedExpressionMember
       operator = '?'
-      ownedRelationship += OwnedExpressionMember 'else'
+      ownedRelationship += OwnedExpressionMember &'else'
       ownedRelationship += OwnedExpressionMember
-      ;
+    ;
+
+ConditionalDeclaration:
+    (
+      | ownedRelationship += OwnedExpressionMember
+    )
+    operator = '?'
+    ownedRelationship += OwnedExpressionMember &':'
+    ownedRelationship += OwnedExpressionMember
+    ;
+
 BinaryOperatorExpression:
     ownedRelationship += OwnedExpressionMember
     operator = BinaryOperator

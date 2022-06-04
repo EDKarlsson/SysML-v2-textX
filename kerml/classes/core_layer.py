@@ -89,6 +89,12 @@ class Type(Namespace):
         self.isSufficient = isSufficient
         self.documentation = documentation
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class FeatureElement(Element):
     """
@@ -181,6 +187,12 @@ class FeatureElement(Element):
         return self.name
         # return self.parent.name + '::' + self.name
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class TypeFeaturing(Relationship):
     """
@@ -202,6 +214,12 @@ class TypeFeaturing(Relationship):
         super(TypeFeaturing, self).__init__(name=name, parent=parent, humanId=humanId)
         self.featureOfType = featureOfType
         self.featuringType = featuringType
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class FeatureMember(Membership, TypeFeaturing):
@@ -227,6 +245,12 @@ class FeatureMember(Membership, TypeFeaturing):
         self.memberName: str = name
         self.memberFeature = memberFeature
         self.ownedMemberFeature = ownedMemberFeature
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class Specialization(Relationship):
@@ -266,6 +290,12 @@ class Specialization(Relationship):
         self.owningRelatedElement = owningRelatedElement
         self.specific = specific
         self.general = general
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class Conjugation(Relationship):
@@ -307,6 +337,12 @@ class Conjugation(Relationship):
 
         self.owningRelatedElement = owningRelatedElement
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class Disjoining(Relationship):
     """
@@ -345,6 +381,12 @@ class Disjoining(Relationship):
             self.relatedElement.append(self.target)
 
         self.owningRelatedElement = owningRelatedElement
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class Feature(Type):
@@ -454,6 +496,12 @@ class Feature(Type):
         self.isReadOnly = isReadOnly
         self.owningFeatureMembership = owningFeatureMembership
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class Multiplicity(Feature):
     """
@@ -476,6 +524,12 @@ class Multiplicity(Feature):
 
     def __init__(self, name, parent, humanId=None):
         super(Multiplicity, self).__init__(name=name, parent=parent, humanId=humanId)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class Classifier(Type):
@@ -509,6 +563,12 @@ class Classifier(Type):
                                          documentation=documentation)
         self.ownedSubclassification = ownedSubclassification
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class Subclassification(Specialization):
     """
@@ -532,6 +592,12 @@ class Subclassification(Specialization):
         self.owningClassifier = owningClassifier
         self.subclassifier = subclassifier
         self.superclassifier = superclassifier
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class Subsetting(Specialization):
@@ -567,6 +633,12 @@ class Subsetting(Specialization):
         self.subsettedFeature = subsettedFeature
         self.subsettingFeature = subsettingFeature
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class Redefinition(Subsetting):
     """
@@ -597,6 +669,12 @@ class Redefinition(Subsetting):
         self.redefinedFeature = redefinedFeature
         self.redefiningFeature = redefiningFeature
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class FeatureTyping(Specialization):
     """
@@ -620,6 +698,12 @@ class FeatureTyping(Specialization):
         self.general = general
         self.typedFeature = typedFeature
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class FeatureChaining(Relationship):
     """
@@ -639,6 +723,12 @@ class FeatureChaining(Relationship):
         super(FeatureChaining, self).__init__(name=name, parent=parent, humanId=humanId)
         self.chainingFeature = chainingFeature
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class EndFeatureMembership(FeatureMember):
     """
@@ -651,3 +741,9 @@ class EndFeatureMembership(FeatureMember):
 
     def __init__(self, name, parent):
         super(EndFeatureMembership, self).__init__(name=name, parent=parent)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"

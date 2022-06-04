@@ -126,6 +126,12 @@ class Element(object):
         return self.name
         # return self.parent.name + '::' + self.name
 
+    def __repr__(self):
+        return f"Element(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"Element(name={self.name}, parent={self.parent})"
+
 
 class Relationship(Element):
     """
@@ -179,6 +185,12 @@ class Relationship(Element):
 
         self.owningRelatedElement = owningRelatedElement
 
+    def __repr__(self):
+        return f"Relationship(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"Relationship(name={self.name}, parent={self.parent})"
+
 
 class AnnotatingElement(Element):
     """
@@ -197,6 +209,12 @@ class AnnotatingElement(Element):
         super(AnnotatingElement, self).__init__(name=name, parent=parent)
         self.annotatedElement: Element = annotatedElement
         self.annotation: Annotation = annotation
+
+    def __repr__(self):
+        return f"AnnotatingElement(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"AnnotatingElement(name={self.name}, parent={self.parent})"
 
 
 class Annotation(Relationship):
@@ -221,6 +239,12 @@ class Annotation(Relationship):
         self.annotatingElement: AnnotatingElement = annotatingElement
         self.owningAnnotatedElement: Element = owningAnnotatedElement
 
+    def __repr__(self):
+        return f"Annotation(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"Annotation(name={self.name}, parent={self.parent})"
+
 
 class ModelComment(AnnotatingElement):
     """
@@ -234,6 +258,12 @@ class ModelComment(AnnotatingElement):
     def __init__(self, parent, name, body=None):
         super(ModelComment, self).__init__(name=name, parent=parent)
         self.body = body
+
+    def __repr__(self):
+        return f"ModelComment(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"ModelComment(name={self.name}, parent={self.parent})"
 
 
 class Documentation(Annotation):
@@ -256,6 +286,12 @@ class Documentation(Annotation):
         self.documentingComment = documentingComment
         self.owningDocumentedElement = owningDocumentedElement
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class OwnedDocumentation(Documentation):
     """
@@ -267,8 +303,12 @@ class OwnedDocumentation(Documentation):
     def __init__(self, parent, documentingComment, name=None):
         super(OwnedDocumentation, self).__init__(name=name, parent=parent)
         self.documentingComment = documentingComment
-        self.parent = parent
-        self.name = name
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class TextualRepresentation(AnnotatingElement):
@@ -288,11 +328,17 @@ class TextualRepresentation(AnnotatingElement):
             which is its single annotatedElement.
     """
 
-    def __init__(self, parent, name, body=None, language=None, representedElement=None):
+    def __init__(self, name, parent, body=None, language=None, representedElement=None):
         super(TextualRepresentation, self).__init__(name=name, parent=parent)
         self.language = language
         self.body = body
         self.representedElement = representedElement
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class Import(Relationship):
@@ -330,15 +376,24 @@ class Import(Relationship):
             importOwningNamespace.
     """
 
-    def __init__(self, name, parent, importedMemberName=None, importedNamespace=None,
-                 importOwningNamespace=None):
+    def __init__(self,  parent, name=None, importedMemberName=None, importedNamespace=None,
+                 importOwningNamespace=None, isImportAll=False, isRecursive=False, visibility=None):
         super(Import, self).__init__(name=name, parent=parent)
         self.importedMemberName: str = importedMemberName
         self.importedNamespace: Namespace = importedNamespace
         self.importOwningNamespace: Namespace = importOwningNamespace
-        self.isImportAll: bool = False
-        self.isRecursive: bool = False
-        self.visibility = None
+        self.isImportAll: bool = isImportAll
+        self.isRecursive: bool = isRecursive
+        self.visibility = visibility
+
+    def importedMembership(self, excluded):
+        pass
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class ImportedNamespace(Import):
@@ -394,6 +449,12 @@ class ImportedNamespace(Import):
         if self.visibility == 'public':
             return True
         return False
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class Namespace(Element):
@@ -463,6 +524,12 @@ class Namespace(Element):
         """
         return [n.name for n in self.member if element.name == n.name]
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class Membership(Relationship):
     """
@@ -490,28 +557,27 @@ class Membership(Relationship):
             visible outside that Namespace.
     """
 
-    # def __new__(cls, name, bases, dct, parent, memberElement: Element = None,
-    #             memberName: str = None, ownedMemberElement: Element = None,
-    #             visibility=None, effectiveMemberName=None, membershipOwningNamespace=None):
-    #     membership = super().__new__(cls, name, bases, dct)
-    #     membership.memberElement = memberElement
-    #     membership.memberName = memberName
-    #     membership.ownedMemberElement = ownedMemberElement
-    #     membership.visibility = visibility
-    #     membership.effectiveMemberName = effectiveMemberName
-    #     membership.membershipOwningNamespace = membershipOwningNamespace
-    #     return membership
-
-    def __init__(self, parent, name, memberElement=None, memberName=None, ownedMemberElement=None,
-                 visibility=None,
-                 effectiveMemberName=None, membershipOwningNamespace=None, ):
+    def __init__(self, name, parent,
+                 effectiveMemberName=None,
+                 memberElement=None,
+                 memberName=None,
+                 membershipOwningNamespace=None,
+                 ownedMemberElement=None,
+                 visibility=None):
         super(Membership, self).__init__(name=name, parent=parent)
+        self.ownedMemberElement = ownedMemberElement
         self.memberElement: Element = memberElement
         self.memberName: str = memberName
         self.ownedMemberElement: Element = ownedMemberElement
         self.visibility = visibility
         self.effectiveMemberName = effectiveMemberName
         self.membershipOwningNamespace = membershipOwningNamespace
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
     def isDistinguishableFrom(self, other) -> bool:
         """
@@ -526,16 +592,32 @@ class Membership(Relationship):
 
 
 class NamespaceMember(Membership):
-    def __init__(self, parent, name, effectiveMemberName=None, memberElement=None,
-                 membershipOwningNamespace=None, ownedMemberElement=None,
+    def __init__(self, name, parent,
+                 effectiveMemberName=None,
+                 memberElement=None,
+                 membershipOwningNamespace=None,
+                 ownedMemberElement=None,
                  visibility=None):
         super(NamespaceMember, self).__init__(name=name, parent=parent,
-                                              memberName=name,
-                                              memberElement=memberElement,
                                               effectiveMemberName=effectiveMemberName,
-                                              visibility=visibility,
+                                              memberElement=memberElement,
+                                              memberName=name,
+                                              membershipOwningNamespace=membershipOwningNamespace,
                                               ownedMemberElement=ownedMemberElement,
-                                              membershipOwningNamespace=membershipOwningNamespace)
+                                              visibility=visibility)
+        self.ownedMemberElement = ownedMemberElement
+        self.memberElement: Element = memberElement
+        self.memberName: str = name
+        self.ownedMemberElement: Element = ownedMemberElement
+        self.visibility = visibility
+        self.effectiveMemberName = effectiveMemberName
+        self.membershipOwningNamespace = membershipOwningNamespace
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class AliasMember(Membership):
@@ -550,6 +632,12 @@ class AliasMember(Membership):
         self.membershipOwningNamespace: Namespace = membershipOwningNamespace
         self.ownedMemberElement: Element = ownedMemberElement
         self.visibility = visibility
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class NonFeatureMember(Membership):
@@ -566,6 +654,12 @@ class NonFeatureMember(Membership):
         self.ownedMemberElement: Element = ownedMemberElement
         self.visibility = visibility
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
 
 class FeatureNamespaceMember(Membership):
 
@@ -579,6 +673,12 @@ class FeatureNamespaceMember(Membership):
         self.membershipOwningNamespace: Namespace = membershipOwningNamespace
         self.ownedMemberElement: Element = ownedMemberElement
         self.visibility = visibility
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
 
 
 class NonFeatureElement(Element):
@@ -663,3 +763,9 @@ class NonFeatureElement(Element):
     def effectiveName(self):
         return self.name
         # return self.parent.name + '::' + self.name
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name={self.name}, parent={self.parent})"
