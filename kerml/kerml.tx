@@ -332,14 +332,14 @@ Disjoining:
     )
     'from'
     ( disjoiningType = [QualifiedName]
-    | disjoinginType = FeatureChain
+    | disjoiningType = FeatureChain
     // TODO: Do this in the class instantiation
     //  { ownedRelatedElement += disjoiningType }
     ) ';'
 ;
 OwnedDisjoining:
     disjoiningType = [QualifiedName]
-    | disjoinginType = FeatureChain
+    | disjoiningType = FeatureChain
     // TODO: Do this in the class instantiation
     //  { ownedRelatedElement += disjoiningType }
 ;
@@ -955,17 +955,15 @@ OwnedExpression:
 //    | PrimaryExpression
     ;
 ConditionalExpression:
-      ConditionalDeclaration
-    | 'if' ownedRelationship += OwnedExpressionMember
+      'if' ownedRelationship += OwnedExpressionMember
       operator = '?'
       ownedRelationship += OwnedExpressionMember &'else'
       ownedRelationship += OwnedExpressionMember
+    | ConditionalDeclaration
     ;
 
 ConditionalDeclaration:
-    (
-      | ownedRelationship += OwnedExpressionMember
-    )
+    ownedRelationship += OwnedExpressionMember
     operator = '?'
     ownedRelationship += OwnedExpressionMember &':'
     ownedRelationship += OwnedExpressionMember
